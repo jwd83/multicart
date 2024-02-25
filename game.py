@@ -8,6 +8,9 @@ import sys
 
 class Game:
     def __init__(self):
+        # game specific variables
+        self.four_jacks_easy = True
+
         # set the quit flag to false at the start
         self.quit = False
         self.pressed = []
