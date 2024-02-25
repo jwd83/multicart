@@ -11,15 +11,16 @@ class GameSelect(Scene):
         # menu setup
 
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
-        self.standard_font_size = 50
-        self.text_multicart = self.standard_text("Jack Games Multicart")
         self.standard_font_size = 40
-        self.text_choose = self.standard_text("Choose a game")
+        self.text_multicart = self.standard_text("Jack Games Multicart")
+        self.text_choose = self.standard_text("make a selection")
+        self.standard_font_size = 20
         self.options = [
             self.standard_text("4 Jacks"),
             self.standard_text("Via Galactica"),
             self.standard_text("Roguelike"),
             self.standard_text("Font Test"),
+            self.standard_text("Options"),
             self.standard_text("Quit"),
         ]
         self.selected = 0
@@ -49,17 +50,23 @@ class GameSelect(Scene):
             elif self.selected == 3:
                 self.game.scene_replace = "FontTest"
             elif self.selected == 4:
+                self.game.scene_push = "Menu"
+            elif self.selected == 5:
                 self.game.quit = True
 
     def draw(self):
-        self.screen.fill((0, 0, 0))
+        # choose a soothing sky blue
+        self.screen.fill((18, 27, 180))
+
+        y_spacing = 25
+
         self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
         self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
 
         for i, option in enumerate(self.options):
-            self.screen.blit(option, (100, 100 + i * 50))
+            self.screen.blit(option, (100, 100 + i * y_spacing))
 
         self.screen.blit(
             self.img_cursor,
-            (50, 105 + self.selected * 50 + math.sin(self.elapsed() * 4) * 6),
+            (50, 100 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 4),
         )

@@ -22,8 +22,6 @@ class FontTest(Scene):
                 )
             )
 
-        print(self.test_strings)
-
     def update(self):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
@@ -31,7 +29,6 @@ class FontTest(Scene):
     def draw(self):
 
         self.screen.fill((127, 127, 127))
-        print(self.test_strings)
 
         y = 0
         step = 20

@@ -9,9 +9,7 @@ class Menu(Scene):
         super().__init__(game)
 
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
-
         self.selected = 0
-        self.option_count = 4
 
     def create_text(self):
 
@@ -24,6 +22,7 @@ class Menu(Scene):
         self.options = [
             self.standard_text("sfx . . . " + str(self.game.volume_effects)),
             self.standard_text("music . . " + str(self.game.volume_music)),
+            self.standard_text("window/fullscreen"),
             self.standard_text("return to multicart"),
             self.standard_text("quit to desktop"),
         ]
@@ -50,28 +49,27 @@ class Menu(Scene):
             if self.selected == 1:
                 pass
             if self.selected == 2:
+                print("toggle fullscreen")
+                pygame.display.toggle_fullscreen()
+            if self.selected == 3:
                 self.play_sound("jsxfr-select")
                 self.game.scene_replace = "GameSelect"
-
-            if self.selected == 3:
-
+            if self.selected == 4:
                 self.game.quit = True
 
         if pygame.K_UP in self.game.just_pressed:
-            self.selected -= 1
+            self.selected = (self.selected - 1) % len(self.options)
             self.play_sound("click")
 
         if pygame.K_DOWN in self.game.just_pressed:
-            self.selected += 1
+            self.selected = (self.selected + 1) % len(self.options)
             self.play_sound("click")
-
-        self.selected = self.selected % self.option_count
 
         self.create_text()
 
     def draw(self):
         self.draw_box(
-            (40, 50), (settings.RESOLUTION[0] - 120, settings.RESOLUTION[1] - 100)
+            (40, 50), (settings.RESOLUTION[0] - 120, settings.RESOLUTION[1] - 70)
         )
 
         # wait for the box to finish drawing before drawing the text
@@ -81,9 +79,11 @@ class Menu(Scene):
         self.blit_centered(self.text_options, self.screen, (0.5, 0.2))
 
         for i, option in enumerate(self.options):
-            self.screen.blit(option, (100, 100 + i * 50))
+
+            y_spacing = 45
+            self.screen.blit(option, (100, 100 + i * y_spacing))
 
         self.screen.blit(
             self.img_cursor,
-            (50, 105 + self.selected * 50 + math.sin(self.elapsed() * 4) * 6),
+            (50, 105 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 6),
         )

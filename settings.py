@@ -3,7 +3,7 @@
 
 RESOLUTION = (640, 360)
 FPS = 60
-TITLE = "Roy2"
+TITLE = "Jack Games Multicart"
 SCENE_START = "JackGames"
 FONT = "upheavtt.ttf"
 DEBUG = False
