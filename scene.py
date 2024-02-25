@@ -14,6 +14,27 @@ class Scene:
         self.shadow_intensity = 100
         self.shadow_depth = 3
         self.box_delay = 0.25
+        self.standard_stroke = True
+        self.standard_stroke_color = (200, 80, 80)
+        self.standard_stroke_thickness = 1
+        self.standard_font_size = 40
+        self.standard_color = (240, 240, 240)
+
+    def standard_text(
+        self,
+        text: str,
+        font_size: int | None = None,
+    ):
+        if font_size is None:
+            font_size = self.standard_font_size
+        return self.make_text(
+            text,
+            self.standard_color,
+            font_size,
+            stroke=self.standard_stroke,
+            strokeColor=self.standard_stroke_color,
+            strokeThickness=self.standard_stroke_thickness,
+        )
 
     def elapsed(self):
         return time.time() - self.start

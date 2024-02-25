@@ -27,7 +27,7 @@ class Menu(Scene):
         )
 
         self.text_return_to_title = self.make_text(
-            text="return to title",
+            text="return to multicart",
             color=(255, 255, 255),
             fontSize=40,
             stroke=True,
@@ -73,8 +73,9 @@ class Menu(Scene):
             if self.option_selected == 1:
                 pass
             if self.option_selected == 2:
-                self.game.scene_pop = 2
-                self.game.scene_push = "Title"
+                # self.game.scene_pop = 2
+                # self.game.scene_push = "Title"
+                self.game.scene_replace = "GameSelect"
 
             if self.option_selected == 3:
                 self.game.quit = True

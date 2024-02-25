@@ -26,10 +26,10 @@ class Logo(Scene):
             or pygame.K_SPACE in self.game.just_pressed
             or pygame.K_ESCAPE in self.game.just_pressed
         ):
-            self.game.scene_replace = "Starfield"
+            self.game.scene_replace = "GameSelect"
 
         if self.elapsed() > self.timeout:
-            self.game.scene_replace = "Starfield"
+            self.game.scene_replace = "GameSelect"
 
     def draw(self):
         self.screen.fill((0, 0, 0))

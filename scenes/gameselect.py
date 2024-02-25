@@ -1,0 +1,49 @@
+import pygame
+import settings
+from scene import Scene
+
+
+class GameSelect(Scene):
+    def __init__(self, game):
+        super().__init__(game)
+
+        # menu setup
+
+        self.img_cursor, _ = self.load_png("cursor-4x7.png")
+        self.standard_font_size = 60
+        self.text_multicart = self.standard_text("Jack Games Multicart")
+        self.standard_font_size = 40
+        self.text_choose = self.standard_text("Choose a game")
+        self.options = [
+            self.standard_text("4 Jacks"),
+            self.standard_text("Via Galactica"),
+            self.standard_text("Roguelike"),
+        ]
+        self.selected = 0
+
+    def update(self):
+        if pygame.K_ESCAPE in self.game.just_pressed:
+            self.game.quit = True
+
+        if pygame.K_DOWN in self.game.just_pressed:
+            self.selected = (self.selected + 1) % len(self.options)
+
+        if pygame.K_UP in self.game.just_pressed:
+            self.selected = (self.selected - 1) % len(self.options)
+
+        if pygame.K_RETURN in self.game.just_pressed:
+            if self.selected == 0:
+                self.game.scene_replace = "FourJacks"
+            elif self.selected == 1:
+                self.game.scene_replace = "Starfield"
+            elif self.selected == 2:
+                self.game.scene_replace = "Roguelike"
+
+    def draw(self):
+        self.screen.fill((0, 0, 0))
+        self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
+
+        for i, option in enumerate(self.options):
+            self.screen.blit(option, (100, 100 + i * 50))
+
+        self.screen.blit(self.img_cursor, (50, 115 + self.selected * 50))

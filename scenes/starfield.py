@@ -4,6 +4,30 @@ import random
 import settings
 
 
+class Starfield(scene.Scene):
+    def __init__(self, game):
+        super().__init__(game)
+
+        # load the title screen
+        self.game.scene_push = "Title"
+
+        # create a list of 100 stars
+        self.stars = [Star() for _ in range(100)]
+
+    def update(self):
+        pass
+
+    def draw(self):
+        # set the screen to black
+        self.screen.fill((0, 0, 0))
+
+        # move then draw each star
+        for star in self.stars:
+            star.move()
+
+            pygame.draw.circle(self.screen, star.color, (star.x, star.y), star.size)
+
+
 class Star:
     def __init__(self):
         self.max_size = 4
@@ -50,27 +74,3 @@ class Star:
             # self.color = (self.intensity, self.intensity, self.intensity)
         else:
             self.recolor()
-
-
-class Starfield(scene.Scene):
-    def __init__(self, game):
-        super().__init__(game)
-
-        # load the title screen
-        self.game.scene_push = "Title"
-
-        # create a list of 100 stars
-        self.stars = [Star() for _ in range(100)]
-
-    def update(self):
-        pass
-
-    def draw(self):
-        # set the screen to black
-        self.screen.fill((0, 0, 0))
-
-        # move then draw each star
-        for star in self.stars:
-            star.move()
-
-            pygame.draw.circle(self.screen, star.color, (star.x, star.y), star.size)
