@@ -8,7 +8,7 @@ class FourJacksTitle(Scene):
     def __init__(self, game):
         super().__init__(game)
 
-        self.img_cursor, _ = self.load_png("cursor-4x7.png")
+        self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.positions = [(0.03, 0.49), (0.2, 0.64), (0.2, 0.74)]
 
         self.selected_position = 0
@@ -46,17 +46,18 @@ class FourJacksTitle(Scene):
             pygame.K_SPACE in self.game.just_pressed
             or pygame.K_RETURN in self.game.just_pressed
         ):
+            self.play_sound("jsxfr-select")
             # starting at the top option, start the game in hotseat mode
             if self.selected_position == 0:
-                self.game.ai = None
+                self.game.four_jacks_ai = None
                 self.game.scene_push = "FourJacksGameBoard"
 
             # if the user selects the second option, set the game to hotseat mode and start it
             if self.selected_position == 1:
                 if self.selected_ai_color == 2:
-                    self.game.ai = random.choice([0, 1])
+                    self.game.four_jacks_ai = random.choice([0, 1])
                 else:
-                    self.game.ai = self.selected_ai_color
+                    self.game.four_jacks_ai = self.selected_ai_color
                 self.game.scene_push = "FourJacksGameBoard"
 
             # if the user selects the third option, change the AI color setting
@@ -68,12 +69,15 @@ class FourJacksTitle(Scene):
             pygame.K_LEFT in self.game.just_pressed
             or pygame.K_UP in self.game.just_pressed
         ):
+            self.play_sound("click")
+
             self.selected_position -= 1
             self.selected_position %= len(self.positions)
         if (
             pygame.K_RIGHT in self.game.just_pressed
             or pygame.K_DOWN in self.game.just_pressed
         ):
+            self.play_sound("click")
             self.selected_position += 1
             self.selected_position %= len(self.positions)
 

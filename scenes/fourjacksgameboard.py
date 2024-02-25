@@ -466,7 +466,7 @@ class FourJacksGameBoard(Scene):
         if self.game.winner is not None:
             self.game.scene_push = "FourJacksGameOver"
 
-        if self.game.ai == self.current_turn:
+        if self.game.four_jacks_ai == self.current_turn:
             self.update_ai_turn()
         else:
             self.update_player_turn()

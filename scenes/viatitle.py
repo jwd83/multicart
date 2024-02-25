@@ -3,7 +3,7 @@ import pygame
 import settings
 
 
-class Title(scene.Scene):
+class ViaTitle(scene.Scene):
     def __init__(self, game):
         super().__init__(game)
         # make text of the game
@@ -67,7 +67,7 @@ class Title(scene.Scene):
     def update(self):
         # if escape was pressed quit the game
         if pygame.K_ESCAPE in self.game.just_pressed:
-            self.game.quit = True
+            self.game.scene_replace = "GameSelect"
 
         # if enter was pressed start the game
         if pygame.K_RETURN in self.game.just_pressed:

@@ -4,12 +4,12 @@ import random
 import settings
 
 
-class Starfield(scene.Scene):
+class ViaStarfield(scene.Scene):
     def __init__(self, game):
         super().__init__(game)
 
         # load the title screen
-        self.game.scene_push = "Title"
+        self.game.scene_push = "ViaTitle"
 
         # create a list of 100 stars
         self.stars = [Star() for _ in range(100)]

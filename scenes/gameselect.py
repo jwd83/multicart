@@ -35,10 +35,12 @@ class GameSelect(Scene):
             self.play_sound("click")
 
         if pygame.K_RETURN in self.game.just_pressed:
+            self.play_sound("jsxfr-select")
+
             if self.selected == 0:
                 self.game.scene_replace = "FourJacksTitle"
             elif self.selected == 1:
-                self.game.scene_replace = "Starfield"
+                self.game.scene_replace = "ViaStarfield"
             elif self.selected == 2:
                 self.game.scene_replace = "Roguelike"
             elif self.selected == 3:
