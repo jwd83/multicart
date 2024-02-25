@@ -14,4 +14,4 @@ from .fourjacks.fourjacksgameboard import FourJacksGameBoard
 from .fourjacks.fourjacksgameover import FourJacksGameOver
 
 # font test
-from .fonttest import FontTest
+from .fonttest.fonttest import FontTest
