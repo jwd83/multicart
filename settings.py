@@ -7,4 +7,3 @@ TITLE = "Roy2"
 SCENE_START = "JackGames"
 FONT = "upheavtt.ttf"
 DEBUG = False
-EASY = False
