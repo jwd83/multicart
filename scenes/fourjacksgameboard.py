@@ -219,7 +219,13 @@ class FourJacksGameBoard(Scene):
         if self.elapsed() - self.ai_delay_start < self.ai_delay_total:
             return
 
-        if settings.EASY:
+        print(
+            "AI Turn:"
+            + str(self.current_turn)
+            + " AI Easy: "
+            + str(self.game.four_jacks_easy)
+        )
+        if self.game.four_jacks_easy:
             self.ai_turn_easy()
         else:
             self.ai_turn_hard()
@@ -497,7 +503,9 @@ class FourJacksGameBoard(Scene):
         if settings.DEBUG:
             self.game.debug_scene.data = []
             self.game.debug_scene.data.append("Current Turn: " + str(self.current_turn))
-            self.game.debug_scene.data.append("AI Easy: " + str(settings.EASY))
+            self.game.debug_scene.data.append(
+                "AI Easy: " + str(self.game.four_jacks_easy)
+            )
             self.game.debug_scene.data.append(str(self.summarize_board(self.board_map)))
 
             for row in range(6):

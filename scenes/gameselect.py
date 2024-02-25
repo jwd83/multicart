@@ -1,3 +1,4 @@
+import math
 import pygame
 import settings
 from scene import Scene
@@ -9,7 +10,7 @@ class GameSelect(Scene):
 
         # menu setup
 
-        self.img_cursor, _ = self.load_png("cursor-4x7.png")
+        self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.standard_font_size = 50
         self.text_multicart = self.standard_text("Jack Games Multicart")
         self.standard_font_size = 40
@@ -35,7 +36,8 @@ class GameSelect(Scene):
             self.play_sound("click")
 
         if pygame.K_RETURN in self.game.just_pressed:
-            self.play_sound("jsxfr-select")
+            if self.selected != len(self.options) - 1:
+                self.play_sound("jsxfr-select")
 
             if self.selected == 0:
                 self.game.scene_replace = "FourJacksTitle"
@@ -54,4 +56,7 @@ class GameSelect(Scene):
         for i, option in enumerate(self.options):
             self.screen.blit(option, (100, 100 + i * 50))
 
-        self.screen.blit(self.img_cursor, (50, 115 + self.selected * 50))
+        self.screen.blit(
+            self.img_cursor,
+            (50, 105 + self.selected * 50 + math.sin(self.elapsed() * 4) * 6),
+        )
