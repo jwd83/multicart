@@ -18,6 +18,7 @@ class GameSelect(Scene):
             self.standard_text("4 Jacks"),
             self.standard_text("Via Galactica"),
             self.standard_text("Roguelike"),
+            self.standard_text("Quit"),
         ]
         self.selected = 0
 
@@ -27,9 +28,11 @@ class GameSelect(Scene):
 
         if pygame.K_DOWN in self.game.just_pressed:
             self.selected = (self.selected + 1) % len(self.options)
+            self.play_sound("click")
 
         if pygame.K_UP in self.game.just_pressed:
             self.selected = (self.selected - 1) % len(self.options)
+            self.play_sound("click")
 
         if pygame.K_RETURN in self.game.just_pressed:
             if self.selected == 0:
@@ -38,6 +41,8 @@ class GameSelect(Scene):
                 self.game.scene_replace = "Starfield"
             elif self.selected == 2:
                 self.game.scene_replace = "Roguelike"
+            elif self.selected == 3:
+                self.game.quit = True
 
     def draw(self):
         self.screen.fill((0, 0, 0))

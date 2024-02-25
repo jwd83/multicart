@@ -92,14 +92,14 @@ class Menu(Scene):
 
     def draw(self):
         self.draw_box(
-            (100, 50), (settings.RESOLUTION[0] - 200, settings.RESOLUTION[1] - 100)
+            (80, 50), (settings.RESOLUTION[0] - 170, settings.RESOLUTION[1] - 100)
         )
         if self.elapsed() > self.box_delay:
 
             self.blit_centered(self.text_options, self.screen, (0.5, 0.2))
 
-            self.screen.blit(self.text_volume_sfx, (125, 100))
-            self.screen.blit(self.text_volume_music, (125, 150))
-            self.screen.blit(self.text_return_to_title, (125, 200))
-            self.screen.blit(self.text_quit, (125, 250))
-            self.screen.blit(self.img_cursor, (110, 120 + 50 * self.option_selected))
+            self.screen.blit(self.text_volume_sfx, (105, 100))
+            self.screen.blit(self.text_volume_music, (105, 150))
+            self.screen.blit(self.text_return_to_title, (105, 200))
+            self.screen.blit(self.text_quit, (105, 250))
+            self.screen.blit(self.img_cursor, (90, 120 + 50 * self.option_selected))
