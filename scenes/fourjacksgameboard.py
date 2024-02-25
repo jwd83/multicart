@@ -465,7 +465,8 @@ class FourJacksGameBoard(Scene):
 
         # check for an escape press
         if pygame.K_ESCAPE in self.game.just_pressed:
-            self.game.scene_pop = True
+            self.game.scene_push = "Menu"
+            # self.game.scene_pop = True
             return
 
         self.check_winner()
