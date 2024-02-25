@@ -23,8 +23,9 @@ class FourJacksTitle(Scene):
         self.standard_font_size = 80
         self.standard_stroke_thickness = 4
         text_title = self.standard_text("4Jacks!")
-        self.standard_stroke_thickness = 1
+
         self.standard_font_size = 40
+        self.standard_stroke = False
         text_hot_seat = self.standard_text("Play Local Hot Seat")
         text_ai = self.standard_text("Play vs AI Easy")
         text_ai_hard = self.standard_text("Play vs AI Hard")
