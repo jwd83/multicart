@@ -16,8 +16,8 @@ class Game:
         self.pressed = []
         self.just_pressed = []
         self.sfx = {}
-        self.volume_music = 100
-        self.volume_effects = 100
+        self.volume_music = 20
+        self.volume_effects = 20
         self.winner = None
 
         # initialize pygame
