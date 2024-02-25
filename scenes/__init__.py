@@ -12,3 +12,6 @@ from .gameselect import GameSelect
 from .fourjackstitle import FourJacksTitle
 from .fourjacksgameboard import FourJacksGameBoard
 from .fourjacksgameover import FourJacksGameOver
+
+# font test
+from .fonttest import FontTest

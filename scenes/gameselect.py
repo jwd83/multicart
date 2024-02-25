@@ -19,6 +19,7 @@ class GameSelect(Scene):
             self.standard_text("4 Jacks"),
             self.standard_text("Via Galactica"),
             self.standard_text("Roguelike"),
+            self.standard_text("Font Test"),
             self.standard_text("Quit"),
         ]
         self.selected = 0
@@ -46,6 +47,8 @@ class GameSelect(Scene):
             elif self.selected == 2:
                 self.game.scene_replace = "Roguelike"
             elif self.selected == 3:
+                self.game.scene_replace = "FontTest"
+            elif self.selected == 4:
                 self.game.quit = True
 
     def draw(self):
