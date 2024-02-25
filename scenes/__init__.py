@@ -9,9 +9,9 @@ from .gameselect import GameSelect
 
 
 # 4jacks
-from .fourjackstitle import FourJacksTitle
-from .fourjacksgameboard import FourJacksGameBoard
-from .fourjacksgameover import FourJacksGameOver
+from .fourjacks.fourjackstitle import FourJacksTitle
+from .fourjacks.fourjacksgameboard import FourJacksGameBoard
+from .fourjacks.fourjacksgameover import FourJacksGameOver
 
 # font test
 from .fonttest import FontTest
