@@ -10,7 +10,7 @@ class GameSelect(Scene):
         # menu setup
 
         self.img_cursor, _ = self.load_png("cursor-4x7.png")
-        self.standard_font_size = 60
+        self.standard_font_size = 50
         self.text_multicart = self.standard_text("Jack Games Multicart")
         self.standard_font_size = 40
         self.text_choose = self.standard_text("Choose a game")
@@ -36,7 +36,7 @@ class GameSelect(Scene):
 
         if pygame.K_RETURN in self.game.just_pressed:
             if self.selected == 0:
-                self.game.scene_replace = "FourJacks"
+                self.game.scene_replace = "FourJacksTitle"
             elif self.selected == 1:
                 self.game.scene_replace = "Starfield"
             elif self.selected == 2:
@@ -46,6 +46,7 @@ class GameSelect(Scene):
 
     def draw(self):
         self.screen.fill((0, 0, 0))
+        self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
         self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
 
         for i, option in enumerate(self.options):
