@@ -8,7 +8,11 @@ class FourJacksTitle(Scene):
     def __init__(self, game):
         super().__init__(game)
 
-        self.background, _ = self.load_png("dalle-4jacks.png")
+        self.background = self.make_transparent_surface(self.screen.get_size())
+        self.background_image, _ = self.load_png("dalle-4jacks.png")
+        self.background_image.set_alpha(125)  # make it not so bright
+        self.background.blit(self.background_image, (0, 0))
+
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.positions = [100, 140, 180, 220, 260, 300]
 
@@ -120,6 +124,9 @@ class FourJacksTitle(Scene):
 
     def draw(self):
         if self.active:
+            # draw a black background
+            self.screen.fill((0, 0, 0))
+
             # draw the background
             self.screen.blit(self.background, (0, 0))
 
