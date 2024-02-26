@@ -13,14 +13,14 @@ class FourJacksGameOver(Scene):
         self.background = self.make_transparent_surface(self.screen.get_size())
 
         # create the text
-        text_game_over = self.make_text("Game Over!", (0, 0, 0), 8 * 8)
+        text_game_over = self.make_text("Game Over!", (0, 0, 0), 80)
         if self.game.winner == 2:
-            text_winner = self.make_text("Draw!", (255, 165, 0), 8 * 6)
+            text_winner = self.make_text("Draw!", (255, 165, 0), 80)
         else:
             text_winner = self.make_text(
                 self.colors[self.game.winner] + " WINS",
                 self.colors[self.game.winner],
-                8 * 4,
+                80,
             )
 
         # write the text to the background
