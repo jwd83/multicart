@@ -7,7 +7,7 @@ import entity
 class ViaLevel(Scene):
     def __init__(self, game):
         super().__init__(game)
-        self.player = entity.Entity(self)
+        self.player = entity.Entity(self, "dalle-ship-32.png")
         self.player_speed = 5
 
     def update(self):

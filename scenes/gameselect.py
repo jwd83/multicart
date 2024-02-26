@@ -9,7 +9,7 @@ class GameSelect(Scene):
         super().__init__(game)
 
         # menu setup
-
+        self.background, _ = self.load_png("dall-e-chess-space.png")
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.standard_font_size = 40
         self.text_multicart = self.standard_text("Jack Games Multicart")
@@ -56,7 +56,8 @@ class GameSelect(Scene):
 
     def draw(self):
         # choose a soothing sky blue
-        self.screen.fill((18, 27, 180))
+        # self.screen.fill((18, 27, 180))
+        self.screen.blit(self.background, (0, 0))
 
         y_spacing = 25
 

@@ -8,15 +8,16 @@ class FourJacksTitle(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        self.background, _ = self.load_png("dalle-4jacks.png")
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.positions = [100, 140, 180, 220, 260, 300]
 
         self.selected_position = 0
         self.selected_ai_color = 2
 
-        self.background = pygame.Surface(self.screen.get_size())
-        self.background = self.background.convert()
-        self.background.fill((80, 120, 190))
+        # self.background = pygame.Surface(self.screen.get_size())
+        # self.background = self.background.convert()
+        # self.background.fill((80, 120, 190))
 
         # make up our text
         self.standard_stroke_color = "BLACK"
@@ -25,7 +26,7 @@ class FourJacksTitle(Scene):
         text_title = self.standard_text("4Jacks!")
 
         self.standard_font_size = 40
-        self.standard_stroke = False
+        self.standard_stroke_thickness = 2
         text_hot_seat = self.standard_text("Play Local Hot Seat")
         text_ai = self.standard_text("Play vs AI Easy")
         text_ai_hard = self.standard_text("Play vs AI Hard")

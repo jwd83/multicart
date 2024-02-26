@@ -72,7 +72,7 @@ class ViaTitle(scene.Scene):
         # if enter was pressed start the game
         if pygame.K_RETURN in self.game.just_pressed:
             self.game.scene_pop = True
-            self.game.scene_push = "Level"
+            self.game.scene_push = "ViaLevel"
 
     def draw(self):
         progress = self.constrain(self.elapsed() / 1, 0, 1)
