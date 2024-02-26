@@ -24,6 +24,13 @@ class Game:
         pygame.init()
         pygame.mixer.init()
 
+        # joystick support
+        pygame.joystick.init()
+        self.joysticks = [
+            pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())
+        ]
+        print("self.joysticks=", self.joysticks)
+
         # load all sounds in assets/sounds as sound effects
         for sound in os.listdir("assets/sounds"):
             load_sound = False
@@ -163,9 +170,13 @@ class Game:
                 )
             self.scene_push = None
 
-    def load_scene(self, scene: str):
+    # return type is Scene
+    def load_scene(self, scene: str) -> Scene:
         print("load_scene: " + scene)
 
         # check if the string passed in matches the name of a class in the scenes module
         if scene in dir(scenes):
             return eval("scenes." + scene + "(self)")
+        else:
+            print("WARNING: Invalid scene name! Loading start scene!")
+            return eval("scenes." + settings.SCENE_START + "(self)")
