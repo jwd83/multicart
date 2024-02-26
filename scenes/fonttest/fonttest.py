@@ -9,11 +9,11 @@ class FontTest(Scene):
 
         self.test_strings = []
 
-        for i in range(20, 200, 20):
+        for i in [20, 40, 60, 80, 100, 120, 140]:
             print("Making text with size", i)
             self.test_strings.append(
                 self.make_text(
-                    text="Font Size " + str(i),
+                    text=str(i) + ": .,;?! the quick brown fox jumps over the lazy dog",
                     color=(255, 255, 255),
                     fontSize=i,
                     stroke=True,
@@ -35,8 +35,8 @@ class FontTest(Scene):
         self.screen.fill((127, 127, 127))
 
         y = 0
-        step = 20
+        step = 11
         for str_to_draw in self.test_strings:
             self.screen.blit(str_to_draw, (0, int(y)))
             y += step
-            step += 20
+            step += 11
