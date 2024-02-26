@@ -48,9 +48,15 @@ class Menu(Scene):
         if pygame.K_RETURN in self.game.just_pressed:
 
             if self.selected == 0:
-                pass
+                # make the changes
+                # todo
+                # then
+                self.create_text()
             if self.selected == 1:
-                pass
+                # make the changes
+                # todo
+                # then
+                self.create_text()
             if self.selected == 2 and not settings.WASM:
                 print("toggle fullscreen")
                 pygame.display.toggle_fullscreen()
