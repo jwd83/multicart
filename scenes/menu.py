@@ -11,6 +11,9 @@ class Menu(Scene):
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.selected = 0
 
+        self.create_text()
+
+
     def create_text(self):
 
         self.standard_font_size = 40
@@ -64,8 +67,6 @@ class Menu(Scene):
         if pygame.K_DOWN in self.game.just_pressed:
             self.selected = (self.selected + 1) % len(self.options)
             self.play_sound("click")
-
-        self.create_text()
 
     def draw(self):
         self.draw_box(
