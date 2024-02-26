@@ -90,7 +90,7 @@ class FourJacksTitle(Scene):
             return
 
         # if the user selects the sixth option, quit the game
-        if self.selected_position == 5:
+        if self.selected_position == 5 and not self.game.WASM:
             self.game.quit = True
 
     def update(self):
