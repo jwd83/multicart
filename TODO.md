@@ -5,6 +5,7 @@
 -   [ ] Recreate roy carnassus
 -   [ ] Create a roguelike game
 -   [ ] finish up jack ninjas
+-   [ ] fix full screen problem in wasm/pygbag. may need to make different settings files per platform and change the windowed/fullscreen behavior based on that.
 
 ## Minor goals
 
