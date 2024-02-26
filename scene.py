@@ -9,7 +9,8 @@ class Scene:
         # prevent circular import by importing game here for type hinting
         import game as g
 
-        # store the reference to the game object
+        # store the reference to the game object and add the type annotation
+        # for type hinting in our editor. This is not necessary for the code to run.
         self.game: g.Game = game
         self.active = True
         self.screen: pygame.Surface = game.screen
