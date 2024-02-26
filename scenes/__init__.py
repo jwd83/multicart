@@ -1,12 +1,14 @@
 from scenes.debug import Debug
-from scenes.viatitle import ViaTitle
 from scenes.logo import Logo
-from scenes.viastarfield import ViaStarfield
-from scenes.level import Level
 from scenes.menu import Menu
 from .jackgames import JackGames
 from .gameselect import GameSelect
 
+
+# via galactica
+from .viagalactica.viatitle import ViaTitle
+from .viagalactica.viastarfield import ViaStarfield
+from .viagalactica.vialevel import ViaLevel
 
 # 4jacks
 from .fourjacks.fourjackstitle import FourJacksTitle

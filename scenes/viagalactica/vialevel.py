@@ -4,7 +4,7 @@ from scene import Scene
 import entity
 
 
-class Level(Scene):
+class ViaLevel(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.player = entity.Entity(self)
