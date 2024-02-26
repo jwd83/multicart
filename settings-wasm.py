@@ -14,4 +14,4 @@ TITLE = "Jack Games Multicart"
 SCENE_START = "JackGames"
 FONT = "upheavtt.ttf"
 DEBUG = False
-WASM = False
+WASM = True

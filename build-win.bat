@@ -19,6 +19,18 @@ rmdir /s /q JackGamesMulticart
 
 REM wait for a second to let the user see the message
 
+
+
+echo ------------------------------------------------------
+echo preparing settings.py for win build
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
+del settings.py
+timeout /t 1 /nobreak
+copy settings-win.py settings.py
+timeout /t 1 /nobreak
+
+
 echo ------------------------------------------------------
 echo Cleaning up complete, building new release
 echo ------------------------------------------------------

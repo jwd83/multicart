@@ -11,6 +11,16 @@ rmdir /s /q JackGamesMulticart
 del *.spec
 del *.zip
 
+echo ------------------------------------------------------
+echo preparing settings for web build
+echo ------------------------------------------------------
+
+
+timeout /t 1 /nobreak
+del settings.py
+timeout /t 1 /nobreak
+copy settings-wasm.py settings.py
+timeout /t 1 /nobreak
 
 echo starting new web build in 3 seconds
 timeout /t 3 /nobreak
@@ -40,3 +50,20 @@ rmdir /s /q dist
 rmdir /s /q build
 rmdir /s /q JackGamesMulticart
 del *.spec
+
+
+echo ------------------------------------------------------
+echo restoring settings for win build
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
+del settings.py
+timeout /t 1 /nobreak
+copy settings-win.py settings.py
+timeout /t 1 /nobreak
+
+
+echo ------------------------------------------------------
+echo ALL DONE, IS IT TIME TO CELEBRATE!?
+echo ------------------------------------------------------
+
+
