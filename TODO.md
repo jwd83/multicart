@@ -2,7 +2,12 @@
 
 ## Major goals
 
--   [ ] Create game selection screen
--   [ ] Move 4jacks into this.
 -   [ ] Recreate roy carnassus
 -   [ ] Create a roguelike game
+-   [ ] Port jack ninjas and finish it up
+-   [ ] Port jack ninjas editor
+
+## Completed
+
+-   [x] Create game selection screen
+-   [x] Move 4jacks into this.
