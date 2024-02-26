@@ -74,14 +74,42 @@ class JackNinjas(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
+        # if the user presses escape or F5 key, quit the event loop.
+        if (
+            pygame.K_LEFT in self.game.just_pressed
+            or pygame.K_a in self.game.just_pressed
+        ):
+            self.movement[0] = True
+        if (
+            pygame.K_RIGHT in self.game.just_pressed
+            or pygame.K_d in self.game.just_pressed
+        ):
+            self.movement[1] = True
+
+        if (
+            pygame.K_LEFT in self.game.just_released
+            or pygame.K_a in self.game.just_released
+        ):
+            self.movement[0] = False
+        if (
+            pygame.K_RIGHT in self.game.just_released
+            or pygame.K_d in self.game.just_released
+        ):
+            self.movement[1] = False
+
+        if (
+            pygame.K_SPACE in self.game.just_pressed
+            or pygame.K_w in self.game.just_pressed
+            or pygame.K_UP in self.game.just_pressed
+        ):
+            self.player.jump()
+
         self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
         return
 
         # get our events so windows thinks we are responding
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.perform_quit()
 
             # handle controller mappings
             # dpad up is 11
@@ -113,29 +141,6 @@ class JackNinjas(Scene):
 
                 # right
                 if event.button == 14:
-                    self.movement[1] = False
-
-            # check for keyboard events
-            if event.type == pygame.KEYDOWN:
-                # if the user presses escape or F5 key, quit the event loop.
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_F5:
-                    self.perform_quit()
-
-                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.movement[0] = True
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.movement[1] = True
-                if (
-                    event.key == pygame.K_SPACE
-                    or event.key == pygame.K_w
-                    or event.key == pygame.K_UP
-                ):
-                    self.player.jump()
-
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.movement[0] = False
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.movement[1] = False
 
     def draw_background(self):
