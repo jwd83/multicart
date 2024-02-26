@@ -1,7 +1,7 @@
 import os
 import pygame
 
-BASE_IMAGE_PATH = "scenes/jackninjas/data/images/"
+BASE_IMAGE_PATH = "assets/jackninjas/images/"
 
 
 # load a single image
