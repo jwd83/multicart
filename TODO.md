@@ -6,6 +6,10 @@
 -   [ ] Create a roguelike game
 -   [ ] finish up jack ninjas
 
+## Minor goals
+
+-   [ ] 4jacks: convert board to numpy, improve minimax algorithm
+
 ## Completed
 
 -   [x] Create game selection screen
