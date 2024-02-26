@@ -17,6 +17,8 @@ class FourJacksGameBoard(Scene):
         self.current_turn = 0
         self.ai_delay_start = 0
         self.ai_delay_total = 0.2
+        self.ai_first_turn = True
+        self.last_ai_move = ""
 
         rows, cols = (6, 7)
         self.board_map = [[0 for i in range(cols)] for j in range(rows)]
@@ -225,6 +227,18 @@ class FourJacksGameBoard(Scene):
             + " AI Easy: "
             + str(self.game.four_jacks_easy)
         )
+
+        if self.ai_first_turn:
+            self.ai_first_turn = False
+
+            # ai should always drop on the middle column first turn
+            self.selected_column = 3
+            self.drop_piece(self.selected_column, self.colors[self.current_turn], self.board_map)
+            self.board_score = self.score_board(self.board_map)
+            self.current_turn += 1
+            return
+
+
         if self.game.four_jacks_easy:
             self.ai_turn_easy()
         else:
@@ -500,6 +514,19 @@ class FourJacksGameBoard(Scene):
                     pygame.draw.circle(
                         self.board, self.key_color, (50 * col + 50, 40 * row + 40), 18
                     )
+
+        # check if this is an ai match
+        if self.game.four_jacks_ai is not None:
+            # check if the ai is thinking and overlay the thinking text
+            if self.game.four_jacks_ai == self.current_turn:
+                thinking_text = self.standard_text(
+                    "AI is thinking..."
+                )
+                # rotate text 90 degrees
+                thinking_text = pygame.transform.rotate(thinking_text, 90)
+
+                self.screen.blit(thinking_text, (0,0))
+
 
         if settings.DEBUG:
             self.game.debug_scene.data = []
