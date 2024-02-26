@@ -17,10 +17,10 @@ class GameSelect(Scene):
         self.standard_font_size = 20
         self.options = [
             self.standard_text("4 Jacks"),
-            self.standard_text("Via Galactica"),
-            self.standard_text("Roguelike"),
             self.standard_text("Jack Ninjas"),
             self.standard_text("Jack Ninjas Editor"),
+            self.standard_text("Via Galactica"),
+            self.standard_text("Roguelike"),
             self.standard_text("Font Test"),
             self.standard_text("Options"),
             self.standard_text("Quit to Desktop"),
@@ -46,13 +46,13 @@ class GameSelect(Scene):
             if self.selected == 0:
                 self.game.scene_replace = "FourJacksTitle"
             elif self.selected == 1:
-                self.game.scene_replace = "ViaStarfield"
-            elif self.selected == 2:
-                self.game.scene_replace = "Roguelike"
-            elif self.selected == 3:
                 self.game.scene_replace = "JackNinjas"
-            elif self.selected == 4:
+            elif self.selected == 2:
                 self.game.scene_replace = "JackNinjasEditor"
+            elif self.selected == 3:
+                self.game.scene_replace = "ViaStarfield"
+            elif self.selected == 4:
+                self.game.scene_replace = "Roguelike"
             elif self.selected == 5:
                 self.game.scene_replace = "FontTest"
             elif self.selected == 6:
