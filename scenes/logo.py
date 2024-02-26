@@ -9,9 +9,9 @@ class Logo(Scene):
 
         # load the title image
         if settings.RESOLUTION == (320, 180):
-            self.img_title, _ = self.load_png("dragon-title-180p.png")
+            self.img_title, _ = self.load_png("dalle-binary-dragon-studios-2-180p.png")
         else:
-            self.img_title, _ = self.load_png("dragon-title-360p.png")
+            self.img_title, _ = self.load_png("dalle-binary-dragon-studios-2-360p.png")
 
         # draw a black fade in over the title
         self.fade = pygame.Surface(settings.RESOLUTION)
