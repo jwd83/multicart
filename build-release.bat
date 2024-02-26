@@ -8,26 +8,49 @@ REM Usage: build-release.bat
 REM make sure we are in the right directory
 cd %~dp0
 
+echo ------------------------------------------------------
+echo Cleaning up old files
+echo ------------------------------------------------------
+
 REM remove the old build, dist and JackGamesMulticart folders if they are still around
 rmdir /s /q dist
 rmdir /s /q build
 rmdir /s /q JackGamesMulticart
 
+REM wait for a second to let the user see the message
+
+echo ------------------------------------------------------
+echo Cleaning up complete, building new release
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
+
 REM make the new dist folder
 pyinstaller --onefile --noconsole --name=JackGamesMulticart main.py
 
-REM post build cleanup
-REM remove the build folder
-rmdir /s /q build
+echo ------------------------------------------------------
+echo Build complete, packaging up assets
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
 
-REM remove the .spec file
-del *.spec
 
 REM copy the assets folder to the dist folder
 xcopy /E assets dist\assets\
 
+echo ------------------------------------------------------
+echo Asset packaging complete, renaming the dist folder
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
+
+
 REM rename the dist folder to JackGamesMulticart
 ren dist JackGamesMulticart
+
+
+echo ------------------------------------------------------
+echo Rename complete
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
+
 
 REM compress the JackGamesMulticart folder into a zip file using 7z
 REM include the current timestamp in the zip file name
@@ -62,11 +85,19 @@ if %hh%==9 set hh=09
 
 REM Let's see the result.
 echo ------------------------------------------------------
-echo Build stage finished, packing zip at %dow% %yy%-%mm%-%dd% @ %hh%:%min%:%ss%
+echo Packing zip at %dow% %yy%-%mm%-%dd% @ %hh%:%min%:%ss%
 echo ------------------------------------------------------
+timeout /t 1 /nobreak
+
 7z a -tzip JackGamesMulticart-%yy%-%mm%-%dd%-at-%hh%-%min%-%ss%.zip JackGamesMulticart
+
+echo ------------------------------------------------------
+echo Cleanup
+echo ------------------------------------------------------
+timeout /t 1 /nobreak
 
 REM remove the old build, dist and JackGamesMulticart folders if they are still around
 rmdir /s /q dist
 rmdir /s /q build
 rmdir /s /q JackGamesMulticart
+del *.spec
