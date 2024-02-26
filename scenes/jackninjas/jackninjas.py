@@ -47,7 +47,7 @@ class JackNinjas(Scene):
 
         self.tilemap = Tilemap(self, tile_size=16)
         try:
-            self.tilemap.load("scenes/jackninjas/map.json")
+            self.tilemap.load("assets/jackninjas/map.json")
         except FileNotFoundError:
             pass
 
