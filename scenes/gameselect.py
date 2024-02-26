@@ -3,7 +3,6 @@ import pygame
 import settings
 from scene import Scene
 
-
 class GameSelect(Scene):
     def __init__(self, game):
         super().__init__(game)

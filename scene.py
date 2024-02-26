@@ -4,10 +4,13 @@ import pygame
 import settings
 import os
 
-
 class Scene:
     def __init__(self, game):
-        self.game = game
+        # prevent circular import by importing game here for type hinting
+        import game as g
+
+        # store the reference to the game object
+        self.game: g.Game = game
         self.active = True
         self.screen: pygame.Surface = game.screen
         self.start = time.time()
