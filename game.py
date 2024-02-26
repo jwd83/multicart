@@ -50,9 +50,14 @@ class Game:
                 self.sfx[sound_name] = pygame.mixer.Sound("assets/sounds/" + sound)
 
         # create a window
-        self.screen: pygame.Surface = pygame.display.set_mode(
-            settings.RESOLUTION, pygame.FULLSCREEN | pygame.SCALED
-        )
+        if settings.WASM:
+            self.screen: pygame.Surface = pygame.display.set_mode(
+                settings.RESOLUTION
+            )
+        else:
+            self.screen: pygame.Surface = pygame.display.set_mode(
+                settings.RESOLUTION, pygame.FULLSCREEN | pygame.SCALED
+            )
         pygame.display.set_caption(settings.TITLE)
 
         # create a pygame clock to limit the game to 60 fps
