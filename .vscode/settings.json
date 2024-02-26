@@ -14,6 +14,7 @@
         "galactica",
         "gameselect",
         "jackgames",
+        "jackninjas",
         "JOYBUTTONDOWN",
         "JOYBUTTONUP",
         "jsxfr",
@@ -28,7 +29,7 @@
         "viagalactica",
         "vialevel",
         "viastarfield",
-        "viatitle",
+        "viatitle"
     ],
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true

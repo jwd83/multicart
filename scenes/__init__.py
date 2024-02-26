@@ -17,3 +17,7 @@ from .fourjacks.fourjacksgameover import FourJacksGameOver
 
 # font test
 from .fonttest.fonttest import FontTest
+
+# jackninjas
+
+from .jackninjas.jackninjas import JackNinjas

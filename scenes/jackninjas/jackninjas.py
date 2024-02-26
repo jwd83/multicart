@@ -47,7 +47,7 @@ class JackNinjas(Scene):
 
         self.tilemap = Tilemap(self, tile_size=16)
         try:
-            self.tilemap.load("map.json")
+            self.tilemap.load("scenes/jackninjas/map.json")
         except FileNotFoundError:
             pass
 
@@ -68,7 +68,16 @@ class JackNinjas(Scene):
         pygame.quit()
         sys.exit()
 
-    def get_events(self):
+    def update(self):
+
+        # need to rewrite the hell out of this one...
+        if pygame.K_ESCAPE in self.game.just_pressed:
+            self.game.scene_push = "Menu"
+
+        self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+
+        return
+
         # get our events so windows thinks we are responding
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -134,67 +143,60 @@ class JackNinjas(Scene):
         # self.display.fill((15,220,250))
         self.display.blit(self.assets["background"], (0, 0))
 
-    def run(self):
-        while True:
-            self.draw_background()
+    def draw(self):
+        self.draw_background()
 
-            # adjust camera position
-            self.scroll[0] += (
-                self.player.rect().centerx
-                - self.display.get_width() / 2
-                - self.scroll[0]
-            ) / 30
-            self.scroll[1] += (
-                (self.player.rect().centery - 20)
-                - self.display.get_height() / 2
-                - self.scroll[1]
-            ) / 8
-            # calculate integer scroll for rendering to fix jitter
-            render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
+        # adjust camera position
+        self.scroll[0] += (
+            self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]
+        ) / 30
+        self.scroll[1] += (
+            (self.player.rect().centery - 20)
+            - self.display.get_height() / 2
+            - self.scroll[1]
+        ) / 8
+        # calculate integer scroll for rendering to fix jitter
+        render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
-            # draw our clouds
-            self.clouds.update()
-            self.clouds.render(self.display, offset=render_scroll)
+        # draw our clouds
+        self.clouds.update()
+        self.clouds.render(self.display, offset=render_scroll)
 
-            # draw our tilemap
-            self.tilemap.render(self.display, offset=render_scroll)
+        # draw our tilemap
+        self.tilemap.render(self.display, offset=render_scroll)
 
-            # update and draw our player
-            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display, offset=render_scroll)
+        # update and draw our player
+        self.player.render(self.display, offset=render_scroll)
 
-            # spawn leaf particles
-            for rect in self.leaf_spawners:
-                if random.random() * 50000 < rect.width * rect.height:
-                    pos = (
-                        rect.x + random.random() * rect.width,
-                        rect.y + random.random() * rect.height,
+        # spawn leaf particles
+        for rect in self.leaf_spawners:
+            if random.random() * 50000 < rect.width * rect.height:
+                pos = (
+                    rect.x + random.random() * rect.width,
+                    rect.y + random.random() * rect.height,
+                )
+                self.particles.append(
+                    Particle(
+                        self,
+                        "leaf",
+                        pos,
+                        velocity=[-0.1, 0.3],
+                        frame=random.randint(0, 100),
                     )
-                    self.particles.append(
-                        Particle(
-                            self,
-                            "leaf",
-                            pos,
-                            velocity=[-0.1, 0.3],
-                            frame=random.randint(0, 100),
-                        )
-                    )
+                )
 
-            # handle particle effects
-            for particle in self.particles.copy():
-                kill = particle.update()
-                if particle.type == "leaf":
-                    particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3
-                particle.render(self.display, offset=render_scroll)
-                if kill:
-                    self.particles.remove(particle)
+        # handle particle effects
+        for particle in self.particles.copy():
+            kill = particle.update()
+            if particle.type == "leaf":
+                particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3
+            particle.render(self.display, offset=render_scroll)
+            if kill:
+                self.particles.remove(particle)
 
-            # FRAME COMPLETE
-            # we finished drawing our frame, lets render it to the screen and
-            # get our input events ready for the next frame and sleep for a bit
-            self.screen.blit(
-                pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
-            )
-            pygame.display.update()
-            self.get_events()
-            self.clock.tick(60)  # run at 60 fps
+        # FRAME COMPLETE
+        # we finished drawing our frame, lets render it to the screen and
+        # get our input events ready for the next frame and sleep for a bit
+        self.screen.blit(
+            pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
+        )
