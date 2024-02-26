@@ -64,6 +64,10 @@ class GameSelect(Scene):
         self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
 
         for i, option in enumerate(self.options):
+            if i == self.selected:
+                option.set_alpha(255)
+            else:
+                option.set_alpha(150)
             self.screen.blit(option, (100, 100 + i * y_spacing))
 
         self.screen.blit(
