@@ -21,7 +21,7 @@ class GameSelect(Scene):
             self.standard_text("Roguelike"),
             self.standard_text("Font Test"),
             self.standard_text("Options"),
-            self.standard_text("Quit"),
+            self.standard_text("Quit to Desktop"),
         ]
         self.selected = 0
 
