@@ -16,6 +16,8 @@ class Game:
         self.pressed = []
         self.just_pressed = []
         self.just_released = []
+        self.just_mouse_down = []
+        self.just_mouse_up = []
         self.sfx = {}
         self.volume_music = 20
         self.volume_effects = 20
@@ -109,6 +111,8 @@ class Game:
         self.pressed = pygame.key.get_pressed()
         self.just_pressed = []
         self.just_released = []
+        self.just_mouse_down = []
+        self.just_mouse_up = []
 
         # get events
         for event in pygame.event.get():
@@ -118,6 +122,10 @@ class Game:
                 self.just_pressed.append(event.key)
             elif event.type == pygame.KEYUP:
                 self.just_released.append(event.key)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.just_mouse_down.append(event.button)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.just_mouse_up.append(event.button)
 
         # check for escape key to quit
         if pygame.K_ESCAPE in self.just_pressed:
