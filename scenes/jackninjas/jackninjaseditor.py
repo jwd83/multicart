@@ -96,22 +96,6 @@ class JackNinjasEditor(Scene):
             pygame.K_F5 in self.game.just_pressed
         ):
             self.game.scene_push = "Menu"
-        if (pygame.K_LEFT in self.game.just_pressed) or (
-            pygame.K_a in self.game.just_pressed
-        ):
-            self.movement[0] = True
-        if (pygame.K_RIGHT in self.game.just_pressed) or (
-            pygame.K_d in self.game.just_pressed
-        ):
-            self.movement[1] = True
-        if (pygame.K_UP in self.game.just_pressed) or (
-            pygame.K_w in self.game.just_pressed
-        ):
-            self.movement[2] = True
-        if (pygame.K_DOWN in self.game.just_pressed) or (
-            pygame.K_s in self.game.just_pressed
-        ):
-            self.movement[3] = True
         if pygame.K_o in self.game.just_pressed:
             self.tilemap.save("assets/jackninjas/map.json")
         if pygame.K_t in self.game.just_pressed:
@@ -121,24 +105,32 @@ class JackNinjasEditor(Scene):
         if pygame.K_LSHIFT in self.game.just_pressed:
             self.shift = True
 
-        # key up checks
-        if (pygame.K_LEFT in self.game.just_pressed) or (
-            pygame.K_a in self.game.just_pressed
-        ):
+        # movement checks
+        if self.game.pressed[pygame.K_LEFT] or self.game.pressed[pygame.K_a]:
+            self.movement[0] = True
+        else:
             self.movement[0] = False
-        if (pygame.K_RIGHT in self.game.just_pressed) or (
-            pygame.K_d in self.game.just_pressed
-        ):
+
+        if self.game.pressed[pygame.K_RIGHT] or self.game.pressed[pygame.K_d]:
+            self.movement[1] = True
+        else:
             self.movement[1] = False
-        if (pygame.K_UP in self.game.just_pressed) or (
-            pygame.K_w in self.game.just_pressed
-        ):
+
+        if self.game.pressed[pygame.K_UP] or self.game.pressed[pygame.K_w]:
+            self.movement[2] = True
+        else:
             self.movement[2] = False
-        if (pygame.K_DOWN in self.game.just_pressed) or (
-            pygame.K_s in self.game.just_pressed
-        ):
+
+        if self.game.pressed[pygame.K_DOWN] or self.game.pressed[pygame.K_s]:
+            self.movement[3] = True
+        else:
             self.movement[3] = False
-        if pygame.K_LSHIFT in self.game.just_pressed:
+
+        # handle shift modifier
+
+        if self.game.pressed[pygame.K_LSHIFT]:
+            self.shift = True
+        else:
             self.shift = False
 
     def draw(self):

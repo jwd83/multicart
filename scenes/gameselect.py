@@ -20,6 +20,7 @@ class GameSelect(Scene):
             self.standard_text("Via Galactica"),
             self.standard_text("Roguelike"),
             self.standard_text("Jack Ninjas"),
+            self.standard_text("Jack Ninjas Editor"),
             self.standard_text("Font Test"),
             self.standard_text("Options"),
             self.standard_text("Quit to Desktop"),
@@ -51,10 +52,12 @@ class GameSelect(Scene):
             elif self.selected == 3:
                 self.game.scene_replace = "JackNinjas"
             elif self.selected == 4:
-                self.game.scene_replace = "FontTest"
+                self.game.scene_replace = "JackNinjasEditor"
             elif self.selected == 5:
-                self.game.scene_push = "Menu"
+                self.game.scene_replace = "FontTest"
             elif self.selected == 6:
+                self.game.scene_push = "Menu"
+            elif self.selected == 7:
                 self.game.quit = True
 
     def draw(self):
