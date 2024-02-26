@@ -48,13 +48,13 @@ class Menu(Scene):
                 pass
             if self.selected == 1:
                 pass
-            if self.selected == 2:
+            if self.selected == 2 and not settings.WASM:
                 print("toggle fullscreen")
                 pygame.display.toggle_fullscreen()
             if self.selected == 3:
                 self.play_sound("jsxfr-select")
                 self.game.scene_replace = "GameSelect"
-            if self.selected == 4:
+            if self.selected == 4 and not settings.WASM:
                 self.game.quit = True
 
         if pygame.K_UP in self.game.just_pressed:

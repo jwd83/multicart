@@ -27,7 +27,7 @@ class GameSelect(Scene):
         self.selected = 0
 
     def update(self):
-        if pygame.K_ESCAPE in self.game.just_pressed:
+        if pygame.K_ESCAPE in self.game.just_pressed and not settings.WASM:
             self.game.quit = True
 
         if pygame.K_DOWN in self.game.just_pressed:
@@ -56,7 +56,7 @@ class GameSelect(Scene):
                 self.game.scene_replace = "FontTest"
             elif self.selected == 6:
                 self.game.scene_push = "Menu"
-            elif self.selected == 7:
+            elif self.selected == 7 and not settings.WASM:
                 self.game.quit = True
 
     def draw(self):
