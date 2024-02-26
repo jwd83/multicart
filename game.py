@@ -4,6 +4,7 @@ import settings
 from scene import Scene
 import scenes
 import sys
+import asyncio
 
 
 class Game:
@@ -67,10 +68,12 @@ class Game:
         self.scene_push = None
         self.scene_pop = None
 
-    def run(self):
+    # pygbag requires this be async to run the game
+    async def run(self):
         self.debug_scene = scenes.Debug(self)
 
         while not self.quit:
+
 
             # process scene change requests (if any)
             self.change_scenes()
@@ -97,6 +100,9 @@ class Game:
 
             # update the display
             pygame.display.flip()
+
+            # pygbag requires this to run the game
+            await asyncio.sleep(0)
 
             # limit the game to 60 fps
             self.clock.tick(settings.FPS)

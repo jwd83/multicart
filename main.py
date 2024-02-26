@@ -1,4 +1,5 @@
 from game import Game
+import asyncio
 
 if __name__ == "__main__":
-    Game().run()
+    asyncio.run(Game().run())
