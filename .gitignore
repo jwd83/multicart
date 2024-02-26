@@ -1,4 +1,8 @@
 # ingore pycache
 __pycache__/
 .DS_Store
-.pyc
+.pyc\
+dist/
+build/
+JackGamesMulticart/
+JackGamesMulticart*.zip
