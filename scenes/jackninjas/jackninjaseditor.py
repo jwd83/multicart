@@ -32,7 +32,7 @@ class Game:
         # attempt to load our tilemap
         self.tilemap = Tilemap(self, tile_size=16)
         try:
-            self.tilemap.load("scenes/jackninjas/map.json")
+            self.tilemap.load("assets/jackninjas/map.json")
         except FileNotFoundError:
             pass
 
@@ -189,7 +189,7 @@ class Game:
                     if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         self.movement[3] = True
                     if event.key == pygame.K_o:
-                        self.tilemap.save("scenes/jackninjas/map.json")
+                        self.tilemap.save("assets/jackninjas/map.json")
                     if event.key == pygame.K_t:
                         self.tilemap.autotile()
                     if event.key == pygame.K_g:
