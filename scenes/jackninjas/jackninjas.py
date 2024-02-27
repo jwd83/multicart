@@ -106,6 +106,8 @@ class JackNinjas(Scene):
 
         self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
+        # TODO - rewrite the joystick/gamepad input logic.
+
         return
 
         # get our events so windows thinks we are responding
