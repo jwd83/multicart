@@ -14,5 +14,8 @@ class SuperBallTitle(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
+        if pygame.K_RETURN in self.game.just_pressed:
+            self.game.scene_replace = "SuperBallField"
+
     def draw(self):
         self.screen.blit(self.background, (0, 0))

@@ -25,4 +25,5 @@ from .jackninjas.jackninjaseditor import JackNinjasEditor
 
 # superball
 from .superball.superballtitle import SuperBallTitle
+from .superball.superballfield import SuperBallField
 
