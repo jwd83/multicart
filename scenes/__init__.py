@@ -22,3 +22,7 @@ from .fonttest.fonttest import FontTest
 
 from .jackninjas.jackninjas import JackNinjas
 from .jackninjas.jackninjaseditor import JackNinjasEditor
+
+# superball
+from .superball.superballtitle import SuperBallTitle
+
