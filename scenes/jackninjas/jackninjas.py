@@ -38,6 +38,9 @@ class JackNinjas(Scene):
             "particle/leaf": Animation(
                 load_images("particles/leaf"), img_dur=12, loop=False
             ),
+            "particle/particle": Animation(
+                load_images("particles/particle"), img_dur=6, loop=False
+            ),
         }
         # print our loaded assets
         print(self.assets)
@@ -103,6 +106,9 @@ class JackNinjas(Scene):
             or pygame.K_UP in self.game.just_pressed
         ):
             self.player.jump()
+
+        if (pygame.K_x in self.game.just_pressed):
+            self.player.dash()
 
         self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 

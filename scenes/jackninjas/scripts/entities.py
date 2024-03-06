@@ -1,4 +1,7 @@
+import math
+import random
 import pygame
+from .particle import Particle
 
 GRAVITY = 0.1
 MAX_FALL_SPEED = 5
@@ -106,6 +109,19 @@ class Player(PhysicsEntity):
         self.jumps = self.max_jumps = 2
         self.space_jump = False
         self.wall_slide = False
+        self.dashing = 0
+
+    def render(self, surf, offset=(0, 0)):
+        if abs(self.dashing) <= 50:
+            super().render(surf, offset)
+
+    def dash(self):
+        if not self.dashing:
+            if self.flip:
+                self.dashing = -60
+            else:
+                self.dashing = 60
+
 
     def jump(self):
         if self.wall_slide:
@@ -167,6 +183,38 @@ class Player(PhysicsEntity):
                 self.set_action("run")
             else:
                 self.set_action("idle")
+
+        # check if we are dashing
+        if self.dashing:
+            if self.dashing > 0:
+                self.dashing = max(0, self.dashing - 1)
+            elif self.dashing < 0:
+                self.dashing = min(0, self.dashing + 1)
+
+        # apply dashing for first 10 frames of dash
+        if abs(self.dashing) > 50:
+            # + or - 8 depending on direction
+            # divide by abs(dashing) to get 1 or -1
+            self.velocity[0] = abs(self.dashing) / self.dashing * 8
+
+            # create a particle effect
+            particle_angle = random.random() * math.pi * 2 # radians
+            particle_speed = random.random() * 0.5 + 0.5
+            particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+            self.game.particles.append(
+                Particle(
+                    self.game,
+                    'particle',
+                    self.rect().center,
+                    velocity=particle_velocity,
+                    frame=random.randint(0,7)
+                )
+            )
+
+        # slow down after the dash
+        if abs(self.dashing) == 50:
+            self.velocity[0] *= 0.1
+
 
         # air resistance/friction to slow us down
         if self.velocity[0] > 0:
