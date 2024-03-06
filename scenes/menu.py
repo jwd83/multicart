@@ -13,7 +13,6 @@ class Menu(Scene):
 
         self.create_text()
 
-
     def create_text(self):
 
         self.standard_font_size = 40
@@ -45,17 +44,33 @@ class Menu(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_pop = True
 
+        if pygame.K_LEFT in self.game.just_pressed:
+            if self.selected == 0:
+                self.game.volume_effects = (
+                    self.game.volume_effects - 10) % 110
+                self.create_text()
+            if self.selected == 1:
+                self.game.volume_music = (self.game.volume_music - 10) % 110
+                self.create_text()
+
+        if pygame.K_RIGHT in self.game.just_pressed:
+            if self.selected == 0:
+                self.game.volume_effects = (
+                    self.game.volume_effects + 10) % 110
+                self.create_text()
+            if self.selected == 1:
+                self.game.volume_music = (self.game.volume_music + 10) % 110
+                self.create_text()
+
         if pygame.K_RETURN in self.game.just_pressed:
 
             if self.selected == 0:
-                # make the changes
-                # todo
-                # then
+                self.game.volume_effects = (
+                    self.game.volume_effects + 10) % 110
                 self.create_text()
             if self.selected == 1:
-                # make the changes
-                # todo
-                # then
+                self.game.volume_music = (self.game.volume_music + 10) % 110
+
                 self.create_text()
             if self.selected == 2 and not settings.WASM:
                 print("toggle fullscreen")
@@ -77,7 +92,8 @@ class Menu(Scene):
 
     def draw(self):
         self.draw_box(
-            (40, 50), (settings.RESOLUTION[0] - 120, settings.RESOLUTION[1] - 70)
+            (40, 50), (settings.RESOLUTION[0] -
+                       120, settings.RESOLUTION[1] - 70)
         )
 
         # wait for the box to finish drawing before drawing the text
@@ -97,5 +113,6 @@ class Menu(Scene):
 
         self.screen.blit(
             self.img_cursor,
-            (50, 105 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 6),
+            (50, 105 + self.selected * y_spacing +
+             math.sin(self.elapsed() * 4) * 6),
         )
