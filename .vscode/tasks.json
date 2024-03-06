@@ -4,7 +4,7 @@
         {
             "label": "Run Multicart",
             "type": "shell",
-            "command": "python3",
+            "command": "python",
             "args": [
                 "main.py"
             ],
