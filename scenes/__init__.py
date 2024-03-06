@@ -3,6 +3,7 @@ from scenes.logo import Logo
 from scenes.menu import Menu
 from .jackgames import JackGames
 from .gameselect import GameSelect
+from .tvstatic import TVStatic
 
 
 # via galactica
