@@ -59,6 +59,7 @@ class Menu(Scene):
                 self.create_text()
             if self.selected == 2 and not settings.WASM:
                 print("toggle fullscreen")
+                self.game.fullscreen = not self.game.fullscreen
                 pygame.display.toggle_fullscreen()
             if self.selected == 3:
                 self.play_sound("jsxfr-select")

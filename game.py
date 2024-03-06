@@ -5,6 +5,7 @@ from scene import Scene
 import scenes
 import sys
 import asyncio
+import configparser
 
 
 class Game:
@@ -20,9 +21,16 @@ class Game:
         self.just_mouse_down = []
         self.just_mouse_up = []
         self.sfx = {}
-        self.volume_music = 20
-        self.volume_effects = 20
+        self.volume_music = 50
+        self.volume_effects = 50
         self.winner = None
+        self.fullscreen = False
+
+        # load settings from config file
+        self.config = configparser.ConfigParser()
+        self.__load_settings()
+
+
 
         # initialize pygame
         pygame.init()
@@ -50,14 +58,22 @@ class Game:
                 self.sfx[sound_name] = pygame.mixer.Sound("assets/sounds/" + sound)
 
         # create a window
+        # check if browser or desktop
         if settings.WASM:
+            # browser
             self.screen: pygame.Surface = pygame.display.set_mode(
                 settings.RESOLUTION
             )
         else:
-            self.screen: pygame.Surface = pygame.display.set_mode(
-                settings.RESOLUTION, pygame.FULLSCREEN | pygame.SCALED
-            )
+            # desktop
+            if self.fullscreen:
+                self.screen: pygame.Surface = pygame.display.set_mode(
+                    settings.RESOLUTION, pygame.FULLSCREEN | pygame.SCALED
+                )
+            else:
+                self.screen: pygame.Surface = pygame.display.set_mode(
+                    settings.RESOLUTION, pygame.SCALED
+                )
         pygame.display.set_caption(settings.TITLE)
 
         # create a pygame clock to limit the game to 60 fps
@@ -113,9 +129,8 @@ class Game:
             self.clock.tick(settings.FPS)
 
         # quit the game
-        print("quit=True")
-        pygame.quit()
-        sys.exit()
+        self.__quit()
+
 
     def get_events_and_input(self):
         # get input
@@ -203,3 +218,56 @@ class Game:
         else:
             print("WARNING: Invalid scene name! Loading start scene!")
             return eval("scenes." + settings.SCENE_START + "(self)")
+
+    def __load_settings(self):
+
+        # set default settings
+        self.fullscreen = False
+        self.volume_effects = 50
+        self.volume_music = 50
+
+        # load settings from config file
+        self.config.read("config.ini")
+        # check if the main section exists
+        if "main" in self.config:
+            # check if the fullscreen setting exists
+            if "fullscreen" in self.config["main"]:
+                self.fullscreen = self.config["main"].getboolean("fullscreen")
+
+            # check if the volume settings exist and load them
+            if "volume_music" in self.config["main"]:
+                self.volume_music = int(self.config["main"]["volume_music"])
+
+            if "volume_effects" in self.config["main"]:
+                self.volume_effects = int(self.config["main"]["volume_effects"])
+
+
+
+    def __save_settings(self):
+        print("__save_settings")
+
+        # check if the main section exists
+        if "main" not in self.config:
+            self.config["main"] = {}
+
+
+        # save settings to config file
+        self.config["main"]["volume_music"] = str(self.volume_music)
+        self.config["main"]["volume_effects"] = str(self.volume_effects)
+        self.config["main"]["fullscreen"] = str(self.fullscreen)
+
+
+        with open("config.ini", "w") as config_file:
+            self.config.write(config_file)
+
+    def __quit(self):
+
+        # quit the game
+        print("__quit")
+
+        # save settings
+        self.__save_settings()
+
+        print("shutting down...")
+        pygame.quit()
+        sys.exit()
