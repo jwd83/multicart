@@ -39,5 +39,9 @@
         "viatitle"
     ],
     "python.analysis.typeCheckingMode": "off",
-    "python.analysis.autoImportCompletions": true
+    "python.analysis.autoImportCompletions": true,
+    // hide pycache garbage
+    "files.exclude": {
+        "**/__pycache__": true
+    }
 }
