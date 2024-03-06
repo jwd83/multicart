@@ -2,6 +2,7 @@ import math
 import random
 import pygame
 from .particle import Particle
+from scene import Scene
 
 GRAVITY = 0.1
 MAX_FALL_SPEED = 5
@@ -11,8 +12,8 @@ JUMP_WALL = 2.5
 
 
 class PhysicsEntity:
-    def __init__(self, game, e_type, pos, size):
-        self.game = game
+    def __init__(self, scene: Scene, e_type, pos, size):
+        self.scene = scene
         self.type = e_type
 
         # create a new list so we don't modify or share with another entity
@@ -35,7 +36,7 @@ class PhysicsEntity:
         # only change the animation if it's different
         if action != self.action:
             self.action = action
-            self.animation = self.game.assets[self.type + "/" + self.action].copy()
+            self.animation = self.scene.assets[self.type + "/" + self.action].copy()
             self.animation.frame = 0
 
     def rect(self):
@@ -103,8 +104,8 @@ class PhysicsEntity:
 
 
 class Player(PhysicsEntity):
-    def __init__(self, game, pos, size):
-        super().__init__(game, "player", pos, size)
+    def __init__(self, scene: Scene, pos, size):
+        super().__init__(scene, "player", pos, size)
         self.air_time = 0
         self.jumps = self.max_jumps = 2
         self.space_jump = False
@@ -134,12 +135,14 @@ class Player(PhysicsEntity):
                 self.velocity[0] = -JUMP_WALL_REBOUND
             else:
                 self.velocity[0] = JUMP_WALL_REBOUND
+            self.scene.play_sound("jump")
             return True  # jump successful
 
         elif self.jumps or self.space_jump:
             if self.velocity[1] >= 0:
                 self.velocity[1] = -JUMP_STANDARD
                 self.jumps -= 1
+                self.scene.play_sound("jump")
                 return True  # jump successful
 
     def update(self, tilemap, movement=(0, 0)):
@@ -194,9 +197,9 @@ class Player(PhysicsEntity):
             particle_angle = random.random() * math.pi * 2 # radians
             particle_speed = random.random() * 0.5 + 0.5
             particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
-            self.game.particles.append(
+            self.scene.particles.append(
                 Particle(
-                    self.game,
+                    self.scene,
                     'particle',
                     self.rect().center,
                     velocity=particle_velocity,
@@ -213,9 +216,9 @@ class Player(PhysicsEntity):
                 particle_angle = random.random() * math.pi * 2 # radians
                 particle_speed = random.random() * 0.5 + 0.5
                 particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
-                self.game.particles.append(
+                self.scene.particles.append(
                     Particle(
-                        self.game,
+                        self.scene,
                         'particle',
                         self.rect().center,
                         velocity=particle_velocity,
