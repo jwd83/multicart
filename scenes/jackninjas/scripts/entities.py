@@ -118,6 +118,7 @@ class Player(PhysicsEntity):
 
     def dash(self):
         if not self.dashing:
+            self.scene.play_sound("dash")
             if self.flip:
                 self.dashing = -60
             else:
