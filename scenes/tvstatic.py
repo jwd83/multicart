@@ -10,6 +10,7 @@ class TVStatic(Scene):
         self.time_static = 0.25
         self.time_blank = 0.1
         self.time_total = self.time_static + self.time_blank
+        self.play_sound("dash")
 
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.
@@ -17,6 +18,7 @@ class TVStatic(Scene):
             self.game.scene_push = "Menu"
 
         if self.elapsed() > self.time_total:
+            self.play_sound("music")
             self.game.scene_replace = "JackGames"
 
     def draw(self):
