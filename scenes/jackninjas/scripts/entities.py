@@ -184,13 +184,6 @@ class Player(PhysicsEntity):
             else:
                 self.set_action("idle")
 
-        # check if we are dashing
-        if self.dashing:
-            if self.dashing > 0:
-                self.dashing = max(0, self.dashing - 1)
-            elif self.dashing < 0:
-                self.dashing = min(0, self.dashing + 1)
-
         # apply dashing for first 10 frames of dash
         if abs(self.dashing) > 50:
             # + or - 8 depending on direction
@@ -211,9 +204,29 @@ class Player(PhysicsEntity):
                 )
             )
 
+        # burst of particle at start and end of dash
+        if abs(self.dashing) in {60, 50}:
+
+            for _ in range(20):
+
+                # create a particle effect
+                particle_angle = random.random() * math.pi * 2 # radians
+                particle_speed = random.random() * 0.5 + 0.5
+                particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+                self.game.particles.append(
+                    Particle(
+                        self.game,
+                        'particle',
+                        self.rect().center,
+                        velocity=particle_velocity,
+                        frame=random.randint(0,7)
+                    )
+                )
+
+
         # slow down after the dash
         if abs(self.dashing) == 50:
-            self.velocity[0] *= 0.1
+            self.velocity[0] *= 0.2
 
 
         # air resistance/friction to slow us down
@@ -221,3 +234,10 @@ class Player(PhysicsEntity):
             self.velocity[0] = max(0, self.velocity[0] - 0.1)
         elif self.velocity[0] < 0:
             self.velocity[0] = min(0, self.velocity[0] + 0.1)
+
+        # decrement dash
+        if self.dashing:
+            if self.dashing > 0:
+                self.dashing = max(0, self.dashing - 1)
+            elif self.dashing < 0:
+                self.dashing = min(0, self.dashing + 1)
