@@ -8,6 +8,8 @@ import asyncio
 import configparser
 
 
+__DEFAULT_VOLUME = 50
+
 class Game:
     def __init__(self):
         # game specific variables
@@ -21,8 +23,8 @@ class Game:
         self.just_mouse_down = []
         self.just_mouse_up = []
         self.sfx = {}
-        self.volume_music = 50
-        self.volume_effects = 50
+        self.volume_music = __DEFAULT_VOLUME
+        self.volume_effects = __DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
 
@@ -223,8 +225,8 @@ class Game:
 
         # set default settings
         self.fullscreen = False
-        self.volume_effects = 50
-        self.volume_music = 50
+        self.volume_effects = __DEFAULT_VOLUME
+        self.volume_music = __DEFAULT_VOLUME
 
         # load settings from config file
         self.config.read("config.ini")
