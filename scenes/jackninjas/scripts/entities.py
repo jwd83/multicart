@@ -111,13 +111,37 @@ class Player(PhysicsEntity):
         self.space_jump = False
         self.wall_slide = False
         self.dashing = 0
+        self.dash_ready = True
 
     def render(self, surf, offset=(0, 0)):
+        # hide the player for the first 10 frames of the dash
         if abs(self.dashing) <= 50:
             super().render(surf, offset)
+        frame = self.animation.img().copy()
+
+        if self.dash_ready:
+            # swap all the red and green color channel values
+            for x in range(frame.get_width()):
+                for y in range(frame.get_height()):
+
+                    r,g,b,a = frame.get_at((x, y))
+
+                    frame.set_at((x, y), (g, r, b, a))
+
+        surf.blit(
+            pygame.transform.flip(frame, self.flip, False),
+            (
+                self.pos[0] - offset[0] + self.anim_offset[0],
+                self.pos[1] - offset[1] + self.anim_offset[1],
+            ),
+        )
+
 
     def dash(self):
-        if not self.dashing:
+        # old check was
+        # if not self.dashing
+        if self.dash_ready:
+            self.dash_ready = False
             self.scene.play_sound("dash")
             if self.flip:
                 self.dashing = -60
@@ -157,6 +181,7 @@ class Player(PhysicsEntity):
         if self.collisions["down"]:
             self.air_time = 0
             self.jumps = self.max_jumps
+            self.dash_ready = True
         else:
             # we are in the air, check if we are colliding with a wall
             if (
