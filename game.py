@@ -233,7 +233,7 @@ class Game:
         self.volume_music = self.__DEFAULT_VOLUME
 
         # load settings from config file
-        self.config.read("config.ini")
+        self.config.read("assets/config.ini")
         # check if the main section exists
         if "main" in self.config:
             # check if the fullscreen setting exists
@@ -263,7 +263,7 @@ class Game:
         self.config["main"]["fullscreen"] = str(self.fullscreen)
 
 
-        with open("config.ini", "w") as config_file:
+        with open("assets/config.ini", "w") as config_file:
             self.config.write(config_file)
 
     def __quit(self):
