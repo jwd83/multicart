@@ -33,6 +33,13 @@ class PhysicsEntity:
         self.last_movement = [0, 0]
 
     def set_action(self, action):
+
+        # if we are in the air and have not jumped yet then we should deduct a jump for falling off a ledge
+        if action == "fall":
+            if self.jumps == self.max_jumps:
+                self.jumps -= 1
+
+
         # only change the animation if it's different
         if action != self.action:
             self.action = action
@@ -127,6 +134,23 @@ class Player(PhysicsEntity):
                     r,g,b,a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (g, r, b, a))
+
+        if self.jumps == 1:
+            for x in range(frame.get_width()):
+                for y in range(frame.get_height()):
+
+                    r,g,b,a = frame.get_at((x, y))
+
+                    frame.set_at((x, y), (r | b, g, b, a))
+
+
+        if self.jumps == 0:
+            for x in range(frame.get_width()):
+                for y in range(frame.get_height()):
+
+                    r,g,b,a = frame.get_at((x, y))
+
+                    frame.set_at((x, y), (r | b, g | b, b, a))
 
         surf.blit(
             pygame.transform.flip(frame, self.flip, False),
