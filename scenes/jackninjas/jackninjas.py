@@ -19,6 +19,8 @@ class JackNinjas(Scene):
 
         self.clock = pygame.time.Clock()
 
+        self.play_music("sounds/ambience.wav")
+
         self.assets = {
             "decor": load_images("tiles/decor"),
             "grass": load_images("tiles/grass"),
