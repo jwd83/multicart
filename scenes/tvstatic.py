@@ -18,7 +18,6 @@ class TVStatic(Scene):
             self.game.scene_push = "Menu"
 
         if self.elapsed() > self.time_total:
-            self.play_music("sounds/music.wav")
             self.game.scene_replace = "JackGames"
 
     def draw(self):

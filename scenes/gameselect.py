@@ -27,6 +27,9 @@ class GameSelect(Scene):
         ]
         self.selected = 0
 
+        # play the default music
+        self.play_music("sounds/music.wav")
+
     def update(self):
         if pygame.K_ESCAPE in self.game.just_pressed and not settings.WASM:
             self.game.quit = True
