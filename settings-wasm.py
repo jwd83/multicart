@@ -11,7 +11,7 @@
 RESOLUTION = (640, 360)
 FPS = 60
 TITLE = "Jack Games Multicart"
-SCENE_START = "JackGames"
+SCENE_START = "TVStatic"
 FONT = "upheavtt.ttf"
 DEBUG = False
 WASM = True
