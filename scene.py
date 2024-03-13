@@ -252,17 +252,42 @@ class Scene:
         target.blit(source, source_position)
 
     def play_sound(self, sound):
+        print("play_sound: " + sound)
+
         # verify the sound is loaded
         if sound not in self.game.sfx:
-            print("Sound not found: " + sound)
+            print("play_sound: Sound not found: " + sound)
             return
 
-        print("play_sound: " + sound)
 
         # set the volume of the sound based on the settings
         self.game.sfx[sound].set_volume(self.game.volume_effects / 100)
 
         pygame.mixer.Sound.play(self.game.sfx[sound])
+
+    def play_music(self, path_in_assets): # play a sound in an endless loop
+        print("play_music: " + path_in_assets)
+        # stop any music that is currently playing
+        pygame.mixer.music.stop()
+
+        # check if path_in_assets exists in ./assets/
+        if not os.path.exists("assets/" + path_in_assets):
+            print("play_music: Music not found: " + path_in_assets)
+            return
+
+        # load the music
+        pygame.mixer.music.load("assets/" + path_in_assets)
+
+        # set the volume of the music based on the settings
+        pygame.mixer.music.set_volume(self.game.volume_music / 100)
+
+        # play the music in an endless loop
+        pygame.mixer.music.play(-1)
+
+
+
+
+
 
     # from the pygame tutorial:
     # https://www.pygame.org/docs/tut/tom_games3.html
