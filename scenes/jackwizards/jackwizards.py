@@ -2,10 +2,19 @@
 
 import pygame
 from scene import Scene
+from utils import SpriteSheet
 
 class JackWizards(Scene):
     def __init__(self, game):
         super().__init__(game)
+
+        self.sheets = {
+            "tilemap": SpriteSheet("jackwizards/tilemap.png"),
+            "fireball": SpriteSheet("jackwizards/tilemap.png"),
+        }
+
+
+
 
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.
