@@ -1,4 +1,4 @@
-from vector2 import Vector2
+from utils import Vector2
 import scene
 
 
