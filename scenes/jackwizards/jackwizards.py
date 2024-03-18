@@ -33,7 +33,7 @@ class JackWizards(Scene):
         self.transition_duration = 35
         self.transition_direction = None
 
-    def make_room(self, hallway_north: bool, hallway_south: bool, hallway_east: bool, hallway_west: bool):
+    def make_room(self, hallway_north: bool = False, hallway_south: bool = False, hallway_east: bool = False, hallway_west: bool = False):
         # wipe the prior room
         self.room.fill((0, 0, 0))
 
