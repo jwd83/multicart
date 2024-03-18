@@ -5,6 +5,8 @@ from .jackgames import JackGames
 from .gameselect import GameSelect
 from .tvstatic import TVStatic
 
+# jack wizards
+from .jackwizards.jackwizards import JackWizards
 
 # via galactica
 from .viagalactica.viatitle import ViaTitle

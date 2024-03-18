@@ -19,7 +19,7 @@ class GameSelect(Scene):
             self.standard_text("Jack Ninjas"),
             self.standard_text("Jack Ninjas Editor"),
             self.standard_text("Via Galactica"),
-            self.standard_text("Roguelike"),
+            self.standard_text("Jack Wizards"),
             self.standard_text("Superball"),
             self.standard_text("Font Test"),
             self.standard_text("Options"),
@@ -55,7 +55,7 @@ class GameSelect(Scene):
             elif self.selected == 3:
                 self.game.scene_replace = "ViaStarfield"
             elif self.selected == 4:
-                self.game.scene_replace = "Roguelike"
+                self.game.scene_replace = "JackWizards"
             elif self.selected == 5:
                 self.game.scene_replace = "SuperBallTitle"
             elif self.selected == 6:

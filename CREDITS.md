@@ -1,6 +1,6 @@
 # Credits
 
-## dafluffypotato
+## DaFluffyPotato
 
 JackNinjas code & art
 
