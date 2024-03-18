@@ -103,7 +103,7 @@ class Game:
 
 
             # process scene change requests (if any)
-            self.change_scenes()
+            self.__change_scenes()
 
             # handle events and input
             self.get_events_and_input()
@@ -172,7 +172,7 @@ class Game:
     def valid_scene_name(self, scene: str):
         return scene in dir(scenes)
 
-    def change_scenes(self):
+    def __change_scenes(self):
         # check for scene changes
 
         # start off by looking for a replacement scene to rebuild the stack
