@@ -105,37 +105,34 @@ class JackWizards(Scene):
 
 
     def update(self):
+        # if the user presses escape or F5 key, quit the event loop.
+        if pygame.K_ESCAPE in self.game.just_pressed:
+            self.game.scene_push = "Menu"
+
+
+        # leave if we are in a transition
         if self.transition > 0:
-            pass
-            # self.transition -= 1 # we will do this in draw to avoid flicker on the transition
+            return
+
+        if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
+
+            self.transition = self.transition_duration
+            self.old_room.blit(self.room, (0, 0))
+            self.make_room(True, True, True, True)
+
+            if pygame.K_RIGHT in self.game.just_pressed:
+                self.transition_direction = "EAST"
+            if pygame.K_LEFT in self.game.just_pressed:
+                self.transition_direction = "WEST"
+            if pygame.K_UP in self.game.just_pressed:
+                self.transition_direction = "NORTH"
+            if pygame.K_DOWN in self.game.just_pressed:
+                self.transition_direction = "SOUTH"
 
 
-        else:
+        if pygame.K_RETURN in self.game.just_pressed:
 
-            if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
-
-                self.transition = self.transition_duration
-                self.old_room.blit(self.room, (0, 0))
-                self.make_room(True, True, True, True)
-
-                if pygame.K_RIGHT in self.game.just_pressed:
-                    self.transition_direction = "EAST"
-                if pygame.K_LEFT in self.game.just_pressed:
-                    self.transition_direction = "WEST"
-                if pygame.K_UP in self.game.just_pressed:
-                    self.transition_direction = "NORTH"
-                if pygame.K_DOWN in self.game.just_pressed:
-                    self.transition_direction = "SOUTH"
-
-
-
-            # if the user presses escape or F5 key, quit the event loop.
-            if pygame.K_ESCAPE in self.game.just_pressed:
-                self.game.scene_push = "Menu"
-
-            if pygame.K_RETURN in self.game.just_pressed:
-
-                self.make_room(choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False]))
+            self.make_room(choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False]))
 
     def draw(self):
         if self.transition > 0:
