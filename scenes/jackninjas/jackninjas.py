@@ -14,7 +14,7 @@ class JackNinjas(Scene):
     def __init__(self, game):
         super().__init__(game)
 
-        # we will render at 320x180 and then scale it up by 4x
+        # we will render at 320x180 and then scale it up
         self.display = pygame.Surface((320, 180))
 
         self.clock = pygame.time.Clock()
