@@ -159,6 +159,10 @@ class Game:
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.just_mouse_up.append(event.button)
 
+        # check if ctrl and backquote was pressed to instantly quit the game
+        if pygame.K_BACKQUOTE in self.just_pressed and (self.pressed[pygame.K_LCTRL] or self.pressed[pygame.K_RCTRL]):
+            self.quit = True
+
         # check for escape key to quit
         if pygame.K_ESCAPE in self.just_pressed:
             pass
