@@ -33,8 +33,23 @@ class Game:
         self.winner = None
         self.fullscreen = False
         # set the performance timer to the current time high resolution
-        self.__perf_start = time.perf_counter_ns()
-        self.__perf_stop = time.perf_counter_ns()
+        best_test = 1e9
+        worst_test = 0
+        results = []
+        for j in range(20):
+            self.__perf_start = time.perf_counter_ns()
+            self.__perf_stop = time.perf_counter_ns()
+            # print("perf_test: " + str(j) + " " + str(self.__perf_stop - self.__perf_start) + " ns")
+            result = self.__perf_stop - self.__perf_start
+            results.append(result)
+            best_test = min(best_test, result)
+            worst_test = max(worst_test, result)
+
+
+        print("best result: " + str(best_test) + " ns")
+        print("worst result: " + str(worst_test) + " ns")
+        print("average result: " + str(sum(results) / len(results)) + " ns")
+        print("raw results: " + str(results) + " ns")
 
         # load settings from config file
         self.config = configparser.ConfigParser()
