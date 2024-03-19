@@ -28,6 +28,7 @@ class JackWizards(Scene):
         # load our assets
         self.assets = {
             "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
+            "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
         }
 
         self.tiles = self.sheets["tileset"].dice(16, 16)
@@ -39,6 +40,8 @@ class JackWizards(Scene):
         self.transition_duration = 35
         self.transition_direction = None
         self.torches_top = [(80,15), (240,15)]
+        self.torches_left_side = [(16, 180*.25), (16, 180*.75)]
+        self.torches_right_side = [(320-32, 180*.25), (320-32, 180*.75)]
 
     def make_room(self, hallway_north: bool = False, hallway_south: bool = False, hallway_east: bool = False, hallway_west: bool = False):
         # wipe the prior room
@@ -128,6 +131,7 @@ class JackWizards(Scene):
             return
 
         self.assets["torch_top"].update()
+        self.assets["torch_side"].update()
 
         if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
 
@@ -188,6 +192,15 @@ class JackWizards(Scene):
 
         for torch_position in self.torches_top:
             self.frame.blit(self.assets["torch_top"].img(), torch_position)
+
+        side_torch_image_this_frame = self.assets["torch_side"].img()
+        side_torch_image_this_frame_flipped = pygame.transform.flip(side_torch_image_this_frame, True, False)
+
+        for torch_position in self.torches_left_side:
+            self.frame.blit(side_torch_image_this_frame, torch_position)
+
+        for torch_position in self.torches_right_side:
+            self.frame.blit(side_torch_image_this_frame_flipped, torch_position)
 
 
     def draw(self):
