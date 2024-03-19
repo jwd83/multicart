@@ -25,11 +25,16 @@ class JackWizards(Scene):
 
         # load our assets
         self.assets = {
-            "idle": Animation(load_tpng_folder("jackwizards/animations/idle"), img_dur=15, loop=True),
+            "player/idle/up": Animation(load_tpng_folder("jackwizards/animations/player/idle/up"), img_dur=15, loop=True),
+            "player/idle/left": Animation(load_tpng_folder("jackwizards/animations/player/idle/left"), img_dur=15, loop=True),
+            "player/idle/right": Animation(load_tpng_folder("jackwizards/animations/player/idle/right"), img_dur=15, loop=True),
+            "player/idle/down": Animation(load_tpng_folder("jackwizards/animations/player/idle/down"), img_dur=15, loop=True),
             "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
             "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
 
         }
+
+        self.facing = "down"
 
         self.tiles = self.sheets["tileset"].dice(16, 16)
         # self.sheets["tileset"].dice_to_folder(16, 16, "tileset")
@@ -130,9 +135,11 @@ class JackWizards(Scene):
         if self.transition > 0:
             return
 
-        self.assets["idle"].update()
-        self.assets["torch_top"].update()
-        self.assets["torch_side"].update()
+        # update each asset that is an animation that is looping
+        for asset in self.assets:
+            if isinstance(self.assets[asset], Animation):
+                if self.assets[asset].loop:
+                    self.assets[asset].update()
 
         if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
 
@@ -142,12 +149,16 @@ class JackWizards(Scene):
 
             if pygame.K_RIGHT in self.game.just_pressed:
                 self.transition_direction = "EAST"
+                self.facing = "right"
             if pygame.K_LEFT in self.game.just_pressed:
                 self.transition_direction = "WEST"
+                self.facing = "left"
             if pygame.K_UP in self.game.just_pressed:
                 self.transition_direction = "NORTH"
+                self.facing = "up"
             if pygame.K_DOWN in self.game.just_pressed:
                 self.transition_direction = "SOUTH"
+                self.facing = "down"
 
 
         if pygame.K_RETURN in self.game.just_pressed:
@@ -206,7 +217,7 @@ class JackWizards(Scene):
             self.frame.blit(side_torch_image_this_frame_flipped, torch_position)
 
         # draw our character
-        self.frame.blit(self.assets["idle"].img(), (160, 90))
+        self.frame.blit(self.assets["player/idle/" + self.facing].img(), (160, 90))
 
 
     def draw(self):
