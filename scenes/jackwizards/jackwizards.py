@@ -27,8 +27,10 @@ class JackWizards(Scene):
 
         # load our assets
         self.assets = {
+            "idle": Animation(load_tpng_folder("jackwizards/animations/idle"), img_dur=15, loop=True),
             "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
             "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
+
         }
 
         self.tiles = self.sheets["tileset"].dice(16, 16)
@@ -130,6 +132,7 @@ class JackWizards(Scene):
         if self.transition > 0:
             return
 
+        self.assets["idle"].update()
         self.assets["torch_top"].update()
         self.assets["torch_side"].update()
 
@@ -188,8 +191,10 @@ class JackWizards(Scene):
 
     def draw_standard(self):
 
+        # draw the room to start off
         self.frame.blit(self.room, (0, 0))
 
+        # draw the torches
         for torch_position in self.torches_top:
             self.frame.blit(self.assets["torch_top"].img(), torch_position)
 
@@ -201,6 +206,9 @@ class JackWizards(Scene):
 
         for torch_position in self.torches_right_side:
             self.frame.blit(side_torch_image_this_frame_flipped, torch_position)
+
+        # draw our character
+        self.frame.blit(self.assets["idle"].img(), (160, 90))
 
 
     def draw(self):
