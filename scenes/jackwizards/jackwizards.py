@@ -2,7 +2,7 @@ from email.mime import base
 from turtle import right
 import pygame
 from scene import Scene
-from utils import SpriteSheet
+from utils import SpriteSheet, Animation, load_tpng_folder
 from random import choice
 
 class JackWizards(Scene):
@@ -24,6 +24,12 @@ class JackWizards(Scene):
             "tileset": SpriteSheet("jackwizards/tileset.png"),
             "fireball": SpriteSheet("jackwizards/tileset.png"),
         }
+
+        # load our assets
+        self.assets = {
+            "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
+        }
+
         self.tiles = self.sheets["tileset"].dice(16, 16)
         # self.sheets["tileset"].dice_to_folder(16, 16, "tileset")
 
@@ -32,6 +38,7 @@ class JackWizards(Scene):
         self.transition = 0
         self.transition_duration = 35
         self.transition_direction = None
+        self.torches_top = [(80,15), (240,15)]
 
     def make_room(self, hallway_north: bool = False, hallway_south: bool = False, hallway_east: bool = False, hallway_west: bool = False):
         # wipe the prior room
@@ -39,7 +46,7 @@ class JackWizards(Scene):
 
         tilemap = [
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [0 , 1 , 1 , 1 , 83, 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 83, 1 , 1 , 1 ,  5],
+            [0 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,  5],
             [0 , 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 14,  5],
             [0 , 21, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 24,  5],
             [0 , 21, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 24,  5],
@@ -61,18 +68,24 @@ class JackWizards(Scene):
         if hallway_north:
             tilemap[0][9] = 37
             tilemap[0][10] = 37
+            tilemap[0][11] = 37
             tilemap[1][9] = 37
             tilemap[1][10] = 37
+            tilemap[1][11] = 37
             tilemap[2][9] = 37
             tilemap[2][10] = 37
+            tilemap[2][11] = 37
 
         if hallway_south:
             tilemap[9][9] = 37
             tilemap[9][10] = 37
+            tilemap[9][11] = 37
             tilemap[10][9] = 37
             tilemap[10][10] = 37
+            tilemap[10][11] = 37
             tilemap[11][9] = 37
             tilemap[11][10] = 37
+            tilemap[11][11] = 37
 
         if hallway_east:
             tilemap[5][18] = 37
@@ -114,6 +127,8 @@ class JackWizards(Scene):
         if self.transition > 0:
             return
 
+        self.assets["torch_top"].update()
+
         if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
 
             self.transition = self.transition_duration
@@ -134,10 +149,7 @@ class JackWizards(Scene):
 
             self.make_room(choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False]))
 
-    def draw(self):
-        if self.transition > 0:
-
-
+    def draw_transition(self):
             # the east/west transitions are easier as we can just slide the room over
             if self.transition_direction in ["EAST", "WEST"]:
                 step = self.transition_duration - self.transition
@@ -168,12 +180,22 @@ class JackWizards(Scene):
                     self.frame.blit(self.old_room, (0, int(-180 * progress)))
                     self.frame.blit(self.room, (0, int(180 - (180 * progress))))
 
-
-
             self.transition -= 1
-        else:
 
-            self.frame.blit(self.room, (0, 0))
+    def draw_standard(self):
+
+        self.frame.blit(self.room, (0, 0))
+
+        for torch_position in self.torches_top:
+            self.frame.blit(self.assets["torch_top"].img(), torch_position)
+
+
+    def draw(self):
+        if self.transition > 0:
+            self.draw_transition()
+        else:
+            self.draw_standard()
+
 
         # fill the top 16 pixels black for the ui
         pygame.draw.rect(self.frame, (0, 0, 0), (0, 0, 320, 16))
