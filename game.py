@@ -32,24 +32,15 @@ class Game:
         self.volume_effects = self.__DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
-        # set the performance timer to the current time high resolution
-        best_test = 1e9
-        worst_test = 0
-        results = []
-        for j in range(20):
-            self.__perf_start = time.perf_counter_ns()
-            self.__perf_stop = time.perf_counter_ns()
-            # print("perf_test: " + str(j) + " " + str(self.__perf_stop - self.__perf_start) + " ns")
-            result = self.__perf_stop - self.__perf_start
-            results.append(result)
-            best_test = min(best_test, result)
-            worst_test = max(worst_test, result)
 
+        self.__perf_start = time.perf_counter_ns()
+        self.__perf_stop = time.perf_counter_ns()
+        self.__perf_index = 0
+        self.__perf_results = [0] * 640
+        self.__perf_surface = pygame.Surface((640, 360))
 
-        print("best result: " + str(best_test) + " ns")
-        print("worst result: " + str(worst_test) + " ns")
-        print("average result: " + str(sum(results) / len(results)) + " ns")
-        print("raw results: " + str(results) + " ns")
+        if settings.DEBUG:
+            self.__test_performance()
 
         # load settings from config file
         self.config = configparser.ConfigParser()
@@ -114,6 +105,9 @@ class Game:
         self.scene_push = None
         self.scene_pop = None
 
+        # create the surface for our performance counter
+        self.__perf_surface = pygame.Surface((640,360), pygame.SRCALPHA, 32).convert_alpha()
+
     # pygbag requires this be async to run the game
     async def run(self):
         self.debug_scene = scenes.Debug(self)
@@ -147,27 +141,42 @@ class Game:
             # update the display
             self.__perf_stop = time.perf_counter_ns()
 
-            frame_time_ns = (self.__perf_stop - self.__perf_start)
-            frame_time_ms = frame_time_ns / 1000000
+            self.frame_time_ns = (self.__perf_stop - self.__perf_start)
+            self.frame_time_ms = self.frame_time_ns / 1000000
 
-            frame_load = frame_time_ms / (1000 / settings.FPS) * 100
+            self.frame_load = self.frame_time_ms / (1000 / settings.FPS) * 100
 
-
-
+            self.__perf_results[self.__perf_index] = self.frame_load
 
             # print performance data
             if settings.DEBUG:
-                # every 20 frames, print performance data
-                if pygame.time.get_ticks() % 20 == 0:
-                    print(
-                        "FPS: "
-                        + str(int(self.clock.get_fps()))
-                        + ", "
-                        + "Frame Time: "
-                        + str(round(frame_time_ms, 2))
-                        + " ms, Frame Load: "
-                        + str(round(frame_load, 2)) + " %"
-                    )
+
+                # use the debug scene's make_text method for us to render the performance data to a surfrace we can blit to the screen
+                self.frame_report = self.debug_scene.make_text(
+                    text="Frame Time: " + str(round(self.frame_time_ms, 1)) + "    Frame Load: " + str(round(self.frame_load, 1)) + " %",
+                    color=(255,255,255),
+                    font="assets/fonts/"+settings.FONT_SMALL,
+                    fontSize=5,
+                    stroke=True,
+                    strokeColor=(0,0,0),
+                    strokeThickness=1
+                )
+
+                # blit the performance data to the screen
+                self.screen.blit(self.frame_report, (0, 0))
+
+                # draw a clear vertical line on the performance surface to clear any prior result
+                pygame.draw.line(self.__perf_surface, (0,0,0,0), (self.__perf_index, 0), (self.__perf_index, 360), 1)
+
+                # draw a translucent red vertical line on the performance surface to represent 1% of frame load per pixel
+                pygame.draw.line(self.__perf_surface, (255,0,0,50), (self.__perf_index, 360), (self.__perf_index, 360-self.__perf_results[self.__perf_index]), 1)
+
+                # blit the performance surface to the screen
+                self.screen.blit(self.__perf_surface, (0, 0))
+
+            # increment the performance index
+            self.__perf_index = (self.__perf_index + 1) % len(self.__perf_results)
+
 
             pygame.display.flip()
 
@@ -183,6 +192,26 @@ class Game:
         # quit the game
         self.__quit()
 
+    def __test_performance(self):
+        results = []
+        # set the performance timer to the current time high resolution
+        best_test = 1e9
+        worst_test = 0
+
+        for j in range(200):
+            self.__perf_start = time.perf_counter_ns()
+            self.__perf_stop = time.perf_counter_ns()
+            # print("perf_test: " + str(j) + " " + str(self.__perf_stop - self.__perf_start) + " ns")
+            result = self.__perf_stop - self.__perf_start
+            results.append(result)
+            best_test = min(best_test, result)
+            worst_test = max(worst_test, result)
+
+
+        print("best result: " + str(best_test) + " ns")
+        print("worst result: " + str(worst_test) + " ns")
+        print("average result: " + str(sum(results) / len(results)) + " ns")
+        print("raw results: " + str(results) + " ns")
 
     def get_events_and_input(self):
         # get input
