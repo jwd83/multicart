@@ -1,5 +1,3 @@
-from email.mime import base
-from turtle import right
 import pygame
 from scene import Scene
 from utils import SpriteSheet, Animation, load_tpng_folder
