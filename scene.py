@@ -183,6 +183,9 @@ class Scene:
         pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
         surface.blit(shape_surf, rect)
 
+    def make_surface(self, size): # an alias for make_transparent_surface
+        return self.make_transparent_surface(size)
+
     def make_transparent_surface(self, size):
         return pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 

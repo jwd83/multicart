@@ -6,6 +6,7 @@ import scenes
 import sys
 import asyncio
 import configparser
+import time
 
 
 
@@ -31,6 +32,9 @@ class Game:
         self.volume_effects = self.__DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
+        # set the performance timer to the current time high resolution
+        self.__perf_start = time.perf_counter_ns()
+        self.__perf_stop = time.perf_counter_ns()
 
         # load settings from config file
         self.config = configparser.ConfigParser()
@@ -126,6 +130,30 @@ class Game:
                 self.debug_scene.draw()
 
             # update the display
+            self.__perf_stop = time.perf_counter_ns()
+
+            frame_time_ns = (self.__perf_stop - self.__perf_start)
+            frame_time_ms = frame_time_ns / 1000000
+
+            frame_load = frame_time_ms / (1000 / settings.FPS) * 100
+
+
+
+
+            # print performance data
+            if settings.DEBUG:
+                # every 20 frames, print performance data
+                if pygame.time.get_ticks() % 20 == 0:
+                    print(
+                        "FPS: "
+                        + str(int(self.clock.get_fps()))
+                        + ", "
+                        + "Frame Time: "
+                        + str(round(frame_time_ms, 2))
+                        + " ms, Frame Load: "
+                        + str(round(frame_load, 2)) + " %"
+                    )
+
             pygame.display.flip()
 
             # pygbag requires this to run the game
@@ -133,6 +161,9 @@ class Game:
 
             # limit the game to 60 fps
             self.clock.tick(settings.FPS)
+
+            # update the performance timer
+            self.__perf_start = time.perf_counter_ns()
 
         # quit the game
         self.__quit()

@@ -1,3 +1,4 @@
+import math
 import pygame
 from scene import Scene
 from utils import SpriteSheet, Animation, load_tpng_folder
@@ -8,14 +9,16 @@ class JackWizards(Scene):
         super().__init__(game)
 
         # make the frame surface to draw each frame on
-        self.frame = pygame.Surface((320, 180))
+        self.frame = self.make_surface((320, 180))
 
         # make a surface to keep the room on so we don't have to redraw it
-        self.room = pygame.Surface((320, 180))
+        self.room = self.make_surface((320, 180))
 
         # last room we were in for transition
-        self.old_room = pygame.Surface((320, 180))
+        self.old_room = self.make_surface((320, 180))
 
+        # create the shadow for the room
+        self.shadow = self.make_surface((320, 180))
 
         # load the tileset and dice it into 16x16 tiles
         self.sheets = {
@@ -44,9 +47,12 @@ class JackWizards(Scene):
         self.transition = 0
         self.transition_duration = 35
         self.transition_direction = None
-        self.torches_top = [(80,15), (240,15)]
+        self.torches_top = [(80,15), (224,15)]
         self.torches_left_side = [(16, 180*.25), (16, 180*.75)]
         self.torches_right_side = [(320-32, 180*.25), (320-32, 180*.75)]
+
+    def torch_count(self):
+        return len(self.torches_top) + len(self.torches_left_side) + len(self.torches_right_side)
 
     def make_room(self, hallway_north: bool = False, hallway_south: bool = False, hallway_east: bool = False, hallway_west: bool = False):
         # wipe the prior room
@@ -76,24 +82,18 @@ class JackWizards(Scene):
         if hallway_north:
             tilemap[0][9] = 37
             tilemap[0][10] = 37
-            tilemap[0][11] = 37
             tilemap[1][9] = 37
             tilemap[1][10] = 37
-            tilemap[1][11] = 37
             tilemap[2][9] = 37
             tilemap[2][10] = 37
-            tilemap[2][11] = 37
 
         if hallway_south:
             tilemap[9][9] = 37
             tilemap[9][10] = 37
-            tilemap[9][11] = 37
             tilemap[10][9] = 37
             tilemap[10][10] = 37
-            tilemap[10][11] = 37
             tilemap[11][9] = 37
             tilemap[11][10] = 37
-            tilemap[11][11] = 37
 
         if hallway_east:
             tilemap[5][18] = 37
@@ -215,6 +215,28 @@ class JackWizards(Scene):
 
         for torch_position in self.torches_right_side:
             self.frame.blit(side_torch_image_this_frame_flipped, torch_position)
+
+        # fill the shadow surface with a translucent black
+        self.shadow.fill((0, 0, 0, 0.3*255))
+
+
+        # cut out circles for the torches
+        for torch_position in self.torches_top:
+            pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+12+math.sin(self.elapsed()*3)*2), 32)
+            pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+12+math.sin(self.elapsed()*3)), 24)
+
+        for torch_position in self.torches_left_side:
+            pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
+            pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
+
+        for torch_position in self.torches_right_side:
+            pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
+            pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
+
+
+
+        self.frame.blit(self.shadow, (0, 0))
+
 
         # draw our character
         self.frame.blit(self.assets["player/idle/" + self.facing].img(), (160, 90))

@@ -13,5 +13,5 @@ FPS = 60
 TITLE = "Jack Games Multicart"
 SCENE_START = "TVStatic"
 FONT = "upheavtt.ttf"
-DEBUG = False
+DEBUG = True
 WASM = False
