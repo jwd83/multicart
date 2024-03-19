@@ -212,6 +212,8 @@ class JackWizards(Scene):
 
 
     def draw(self):
+
+        # perform the transition if we are in one
         if self.transition > 0:
             self.draw_transition()
         else:
