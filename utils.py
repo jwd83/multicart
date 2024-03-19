@@ -3,6 +3,31 @@ import math
 import os
 
 
+# load a single image
+def load_tpng(assets_path):
+    img = pygame.image.load("assets/" + assets_path).convert_alpha()
+    return img
+
+
+# load all images in a directory
+def load_tpng_folder(assets_path):
+
+    images = []
+
+    # remove trailing slash in case it was added
+    if assets_path[-1] == "/":
+        assets_path = assets_path[:-1]
+
+    full_path = "assets/" + assets_path
+
+    for img_name in sorted(
+        os.listdir(full_path)
+    ):  # sorted is used for OS interoperability
+        images.append(load_tpng(assets_path + "/" + img_name))
+
+    return images
+
+
 class Vector2:
     def __init__(self, x, y):
         self.x = x
