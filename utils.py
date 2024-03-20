@@ -236,3 +236,20 @@ if __name__ == "__main__":
 
     d = Vector2(1)
     print(d.pos())
+
+def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
+
+    mask = pygame.mask.from_surface(source)
+    mask.invert()
+    mask = mask.to_surface()
+    mask.set_colorkey((255, 255, 255))
+
+
+    x = dest[0]
+    y = dest[1]
+
+    target.blit(mask, (x - 1, y))
+    target.blit(mask, (x + 1, y))
+    target.blit(mask, (x, y - 1))
+    target.blit(mask, (x, y + 1))
+
