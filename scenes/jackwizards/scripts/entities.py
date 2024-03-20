@@ -1,5 +1,5 @@
 import pygame
-from utils import Animation, load_tpng_folder, Vector2
+from utils import *
 from scene import Scene
 
 
@@ -60,10 +60,10 @@ class Player(Entity):
             "swim/down": Animation(load_tpng_folder("jackwizards/animations/player/swim/down"), img_dur=15, loop=True),
 
             # walk
-            "walk/up": Animation(load_tpng_folder("jackwizards/animations/player/walk/up"), img_dur=15, loop=True),
-            "walk/left": Animation(load_tpng_folder("jackwizards/animations/player/walk/left"), img_dur=15, loop=True),
-            "walk/right": Animation(load_tpng_folder("jackwizards/animations/player/walk/right"), img_dur=15, loop=True),
-            "walk/down": Animation(load_tpng_folder("jackwizards/animations/player/walk/down"), img_dur=15, loop=True),
+            "walk/up": Animation(load_tpng_folder("jackwizards/animations/player/walk/up"), img_dur=10, loop=True),
+            "walk/left": Animation(load_tpng_folder("jackwizards/animations/player/walk/left"), img_dur=10, loop=True),
+            "walk/right": Animation(load_tpng_folder("jackwizards/animations/player/walk/right"), img_dur=10, loop=True),
+            "walk/down": Animation(load_tpng_folder("jackwizards/animations/player/walk/down"), img_dur=10, loop=True),
         }
 
     def update(self):
@@ -149,8 +149,15 @@ class Player(Entity):
         # get the current animation frame
         img = self.animations[self.action + "/" + self.facing].img()
 
-        # draw the frame centered on the current position
-        self.frame.blit(img, (self.center.x - img.get_width() // 2, self.center.y - img.get_height() // 2))
+        # calculate the position to draw the image
+        x = self.center.x - img.get_width() // 2
+        y = self.center.y - img.get_height() // 2
+
+        # draw the outline
+        blit_outline(img, self.frame, (x,y))
+
+        # draw the image
+        self.frame.blit(img, (x, y))
 
 
 
