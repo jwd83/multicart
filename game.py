@@ -9,10 +9,13 @@ import configparser
 import time
 
 
-
-
 class Game:
     def __init__(self):
+        # initialize pygame
+        pygame.init()
+        pygame.mixer.init()
+        pygame.joystick.init()
+
         # hardcode some default values
 
         self.__DEFAULT_VOLUME = 50
@@ -48,12 +51,8 @@ class Game:
 
 
 
-        # initialize pygame
-        pygame.init()
-        pygame.mixer.init()
 
         # joystick support
-        pygame.joystick.init()
         self.joysticks = [
             pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())
         ]
