@@ -1,5 +1,5 @@
 import pygame
-from utils import Animation, load_tpng_folder
+from utils import Animation, load_tpng_folder, Vector2
 from scene import Scene
 
 
@@ -9,11 +9,13 @@ class Entity:
         self.scene = scene
         self.game = scene.game
         self.frame: pygame.Surface = scene.frame
-        self.center = center
+        self.center: Vector2 = Vector2(center)
+        self.velocity: Vector2 = Vector2(0, 0)
         self.hitbox = hitbox
         self.action = None
         self.animations = {}
         self.facing = 'down'
+        self.animation_locked = False
 
     def update(self):
         self.animations[self.action + "/" + self.facing].update()
@@ -46,10 +48,10 @@ class Player(Entity):
             "idle/down": Animation(load_tpng_folder("jackwizards/animations/player/idle/down"), img_dur=15, loop=True),
 
             # roll
-            "roll/up": Animation(load_tpng_folder("jackwizards/animations/player/roll/up"), img_dur=15, loop=True),
-            "roll/left": Animation(load_tpng_folder("jackwizards/animations/player/roll/left"), img_dur=15, loop=True),
-            "roll/right": Animation(load_tpng_folder("jackwizards/animations/player/roll/right"), img_dur=15, loop=True),
-            "roll/down": Animation(load_tpng_folder("jackwizards/animations/player/roll/down"), img_dur=15, loop=True),
+            "roll/up": Animation(load_tpng_folder("jackwizards/animations/player/roll/up"), img_dur=6, loop=False),
+            "roll/left": Animation(load_tpng_folder("jackwizards/animations/player/roll/left"), img_dur=6, loop=False),
+            "roll/right": Animation(load_tpng_folder("jackwizards/animations/player/roll/right"), img_dur=6, loop=False),
+            "roll/down": Animation(load_tpng_folder("jackwizards/animations/player/roll/down"), img_dur=6, loop=False),
 
             # swim
             "swim/up": Animation(load_tpng_folder("jackwizards/animations/player/swim/up"), img_dur=15, loop=True),
@@ -65,22 +67,61 @@ class Player(Entity):
         }
 
     def update(self):
+        # todo: check if we took damage
+
+
+
+        if self.animation_locked:
+            # check if our animation is completed
+            if self.animations[self.action + "/" + self.facing].done:
+                self.animation_locked = False
+
+        if not self.animation_locked:
+
+            self.action = "idle"
+
+            self.velocity = Vector2(0, 0)
+
+            if self.game.pressed[pygame.K_RIGHT]:
+                self.facing = "right"
+                self.action = "walk"
+                self.velocity.x = 1
+
+            if self.game.pressed[pygame.K_LEFT]:
+                self.facing = "left"
+                self.action = "walk"
+                self.velocity.x = -1
+
+            if self.game.pressed[pygame.K_UP]:
+                self.facing = "up"
+                self.action = "walk"
+                self.velocity.y = -1
+
+            if self.game.pressed[pygame.K_DOWN]:
+                self.facing = "down"
+                self.action = "walk"
+                self.velocity.y = 1
+
+            # just pressed
+            if pygame.K_SPACE in self.game.just_pressed:
+
+                self.action = "roll"
+                self.animation_locked = True
+
+        self.center += self.velocity
+
+        self.center.x = max(16, min(self.center.x, 320-16))
+        self.center.y = max(16, min(self.center.y, 180-16))
+
+
         self.animations[self.action + "/" + self.facing].update()
-        if pygame.K_RIGHT in self.game.just_pressed:
-            self.facing = "right"
-        if pygame.K_LEFT in self.game.just_pressed:
-            self.facing = "left"
-        if pygame.K_UP in self.game.just_pressed:
-            self.facing = "up"
-        if pygame.K_DOWN in self.game.just_pressed:
-            self.facing = "down"
 
     def draw(self):
         # get the current animation frame
         img = self.animations[self.action + "/" + self.facing].img()
 
         # draw the frame centered on the current position
-        self.frame.blit(img, (self.center[0] - img.get_width() // 2, self.center[1] - img.get_height() // 2))
+        self.frame.blit(img, (self.center.x - img.get_width() // 2, self.center.y - img.get_height() // 2))
 
 
 
