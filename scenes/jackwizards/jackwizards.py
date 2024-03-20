@@ -5,6 +5,8 @@ from scene import Scene
 from utils import *
 from random import choice
 from .scripts.entities import Player
+from .scripts.map import *
+import numpy as np
 
 class JackWizards(Scene):
     def __init__(self, game):
@@ -34,14 +36,24 @@ class JackWizards(Scene):
             "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
 
         }
-
-        self.facing = "down"
-
         self.tiles = self.sheets["tileset"].dice(16, 16)
         # self.sheets["tileset"].dice_to_folder(16, 16, "tileset")
 
-        self.make_room(True, True, True, True)
+        # start making our level and rooms
+        self.level = make_floor(minimum_rooms=8)
+        print(self.level)
 
+        self.level_x: int = 8
+        self.level_y: int= 8
+
+        self.hallway_north: bool = False
+        self.hallway_south: bool = False
+        self.hallway_east: bool = False
+        self.hallway_west: bool = False
+
+        self.make_room()
+
+        self.facing = "down"
         self.transition = 0
         self.transition_duration = 35
         self.transition_direction = None
@@ -59,7 +71,28 @@ class JackWizards(Scene):
     def torch_count(self):
         return len(self.torches_top) + len(self.torches_left_side) + len(self.torches_right_side)
 
-    def make_room(self, hallway_north: bool = False, hallway_south: bool = False, hallway_east: bool = False, hallway_west: bool = False):
+    def make_room(self):
+
+        # grab the room's int from the level map and figure out how it is connected
+        room_flags = self.level[self.level_x, self.level_y]
+
+        self.hallway_north = False
+        self.hallway_south = False
+        self.hallway_east = False
+        self.hallway_west = False
+
+        if room_flags & 1:
+            self.hallway_north = True
+
+        if room_flags & 2:
+            self.hallway_east = True
+
+        if room_flags & 4:
+            self.hallway_south = True
+
+        if room_flags & 8:
+            self.hallway_west = True
+
         # wipe the prior room
         self.room.fill((0, 0, 0))
 
@@ -84,7 +117,7 @@ class JackWizards(Scene):
         bottom_wall_spice = [32, 32, 32, 32, 32, 32, 32, 32, 33, 47, 48]
 
         # draw the hallways
-        if hallway_north:
+        if self.hallway_north:
             tilemap[0][9] = 37
             tilemap[0][10] = 37
             tilemap[1][9] = 37
@@ -92,7 +125,7 @@ class JackWizards(Scene):
             tilemap[2][9] = 37
             tilemap[2][10] = 37
 
-        if hallway_south:
+        if self.hallway_south:
             tilemap[9][9] = 37
             tilemap[9][10] = 37
             tilemap[10][9] = 37
@@ -100,13 +133,13 @@ class JackWizards(Scene):
             tilemap[11][9] = 37
             tilemap[11][10] = 37
 
-        if hallway_east:
+        if self.hallway_east:
             tilemap[5][18] = 37
             tilemap[5][19] = 37
             tilemap[6][18] = 37
             tilemap[6][19] = 37
 
-        if hallway_west:
+        if self.hallway_west:
             tilemap[5][0] = 37
             tilemap[5][1] = 37
             tilemap[6][0] = 37
@@ -148,13 +181,65 @@ class JackWizards(Scene):
         # self.update_stuff()
         self.player.update()
 
+        # look for an the player reaching an exit zone
+
+        # left : 22, 90 +/- 8
+        # right: 298, 90 +/- 8
+
+        # top: 160, 32 (top)
+        # bottom: 160, 154 (bottom)
+
+        # todo: in the future we should to check that the user is actively pressing
+        # the direction we are looking to transition to and not sliding along the wall
+        # to prevent accidental transitions
+
+        door_slack = 14
+
+        if self.hallway_west:
+            if self.player.center.x == 22 and abs(self.player.center.y - 90) <= door_slack:
+                print("transitioning west")
+                self.player.center.x = 297
+                self.player.center.y = 90
+                self.level_x -= 1
+                self.make_room()
+
+        if self.hallway_east:
+            if self.player.center.x == 298 and abs(self.player.center.y - 90) <= door_slack:
+                print("transitioning east")
+                self.player.center.x = 23
+                self.player.center.y = 90
+                self.level_x += 1
+                self.make_room()
+
+        if self.hallway_north:
+            if self.player.center.y == 32 and abs(self.player.center.x - 160) <= door_slack:
+                print("transitioning north")
+                self.player.center.x = 160
+                self.player.center.y = 153
+                self.level_y -= 1
+                self.make_room()
+
+        if self.hallway_south:
+            if self.player.center.y == 154 and abs(self.player.center.x - 160) <= door_slack:
+                print("transitioning south")
+                self.player.center.x = 160
+                self.player.center.y = 33
+                self.level_y += 1
+                self.make_room()
+
+        if self.game.frame_count() % 60 == 0:
+            print(self.player.center)
+
+
+
+
     def update_stuff(self):
 
         if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
 
             self.transition = self.transition_duration
             self.old_room.blit(self.room, (0, 0))
-            self.make_room(True, True, True, True)
+            self.make_room()
 
             if pygame.K_RIGHT in self.game.just_pressed:
                 self.transition_direction = "EAST"
@@ -179,9 +264,6 @@ class JackWizards(Scene):
                 "swim",
                 "walk"
             ])
-
-
-            self.make_room(choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False]))
 
 
     def draw_transition(self):
