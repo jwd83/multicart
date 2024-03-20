@@ -22,7 +22,7 @@ class JackWizards(Scene):
         self.old_room = self.make_surface((320, 180))
 
         # create the shadow for the room
-        self.shadow = self.make_surface((320, 180))
+        # self.shadow = self.make_surface((320, 180))
 
         # load the tileset and dice it into 16x16 tiles
         self.sheets = {
@@ -345,27 +345,27 @@ class JackWizards(Scene):
         for torch_position in self.torches_right_side:
             self.frame.blit(side_torch_image_this_frame_flipped, torch_position)
 
-        # fill the shadow surface with a translucent black
-        self.shadow.fill((0, 0, 0, 0.3*255))
+        # # fill the shadow surface with a translucent black
+        # self.shadow.fill((0, 0, 0, 0.3*255))
 
 
-        # cut out circles for the torches
-        for torch_position in self.torches_top:
-            pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+12+math.sin(self.elapsed()*3)*2), 32)
-            pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+12+math.sin(self.elapsed()*3)), 24)
+        # # cut out circles for the torches
+        # for torch_position in self.torches_top:
+        #     pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+12+math.sin(self.elapsed()*3)*2), 32)
+        #     pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+12+math.sin(self.elapsed()*3)), 24)
 
-        for torch_position in self.torches_left_side:
-            pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
-            pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
+        # for torch_position in self.torches_left_side:
+        #     pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
+        #     pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
 
-        for torch_position in self.torches_right_side:
-            pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
-            pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
+        # for torch_position in self.torches_right_side:
+        #     pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
+        #     pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
 
 
         self.player.draw()
 
-        self.frame.blit(self.shadow, (0, 0))
+        # self.frame.blit(self.shadow, (0, 0))
 
 
 
