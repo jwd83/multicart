@@ -36,6 +36,7 @@ class Game:
         self.winner = None
         self.fullscreen = False
 
+        self.__frame_count = 0
         self.__perf_start = time.perf_counter_ns()
         self.__perf_stop = time.perf_counter_ns()
         self.__perf_index = 0
@@ -178,6 +179,7 @@ class Game:
 
 
             pygame.display.flip()
+            self.__frame_count += 1
 
             # pygbag requires this to run the game
             await asyncio.sleep(0)
@@ -343,6 +345,9 @@ class Game:
 
         with open("assets/config.ini", "w") as config_file:
             self.config.write(config_file)
+
+    def frame_count(self):
+        return self.__frame_count
 
     def __quit(self):
 
