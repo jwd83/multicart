@@ -55,7 +55,7 @@ class JackWizards(Scene):
 
         self.facing = "down"
         self.transition = 0
-        self.transition_duration = 35
+        self.transition_duration = 20
         self.transition_direction = None
         self.torches_top = [(80,15), (224,15)]
         self.torches_left_side = [(16, 180*.25), (16, 180*.75)]
@@ -178,8 +178,20 @@ class JackWizards(Scene):
             if isinstance(self.assets[asset], Animation):
                 if self.assets[asset].loop:
                     self.assets[asset].update()
+
         # self.update_stuff()
         self.player.update()
+
+        # check if the player is leaving the room
+        self.change_rooms()
+
+        # periodically print the player's position
+        #
+        # if self.game.frame_count() % 60 == 0:
+        #     print(self.player.center)
+
+
+    def change_rooms(self):
 
         # look for an the player reaching an exit zone
 
@@ -197,7 +209,11 @@ class JackWizards(Scene):
 
         if self.hallway_west:
             if self.player.center.x == 22 and abs(self.player.center.y - 90) <= door_slack:
-                print("transitioning west")
+                # setup the transition
+                self.transition_direction = "WEST"
+                self.transition = self.transition_duration
+                self.old_room.blit(self.room, (0, 0))
+
                 self.player.center.x = 297
                 self.player.center.y = 90
                 self.level_x -= 1
@@ -205,7 +221,11 @@ class JackWizards(Scene):
 
         if self.hallway_east:
             if self.player.center.x == 298 and abs(self.player.center.y - 90) <= door_slack:
-                print("transitioning east")
+                # setup the transition
+                self.transition_direction = "EAST"
+                self.transition = self.transition_duration
+                self.old_room.blit(self.room, (0, 0))
+
                 self.player.center.x = 23
                 self.player.center.y = 90
                 self.level_x += 1
@@ -213,7 +233,11 @@ class JackWizards(Scene):
 
         if self.hallway_north:
             if self.player.center.y == 32 and abs(self.player.center.x - 160) <= door_slack:
-                print("transitioning north")
+                # setup the transition
+                self.transition_direction = "NORTH"
+                self.transition = self.transition_duration
+                self.old_room.blit(self.room, (0, 0))
+
                 self.player.center.x = 160
                 self.player.center.y = 153
                 self.level_y -= 1
@@ -221,16 +245,20 @@ class JackWizards(Scene):
 
         if self.hallway_south:
             if self.player.center.y == 154 and abs(self.player.center.x - 160) <= door_slack:
-                print("transitioning south")
+                # setup the transition
+                self.transition_direction = "SOUTH"
+                self.transition = self.transition_duration
+                self.old_room.blit(self.room, (0, 0))
+
+                # move the player to their new position
                 self.player.center.x = 160
                 self.player.center.y = 33
+
+                # move the player to the next room
                 self.level_y += 1
+
+                # make the new room
                 self.make_room()
-
-        if self.game.frame_count() % 60 == 0:
-            print(self.player.center)
-
-
 
 
     def update_stuff(self):
@@ -352,6 +380,17 @@ class JackWizards(Scene):
 
         # fill the top 16 pixels black for the ui
         pygame.draw.rect(self.frame, (0, 0, 0), (0, 0, 320, 16))
+
+        # draw a white pixel for every room in the map
+        for x in range(16):
+            for y in range(16):
+                room = self.level[x, y]
+                if room:
+                    self.frame.set_at((320-16+x, y), (255, 255, 255))
+
+        # draw a green pixel for the player location
+        self.frame.set_at((320-16+self.level_x, self.level_y), (0, 180, 0))
+
 
         # FRAME COMPLETE
         # we finished drawing our frame, lets render it to the screen
