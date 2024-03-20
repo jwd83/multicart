@@ -119,6 +119,10 @@ class Animation:
         self.done = False
         self.frame = 0
 
+    def reset(self):
+        self.done = False
+        self.frame = 0
+
     def copy(self):
         return Animation(self.images, self.img_duration, self.loop)
 
