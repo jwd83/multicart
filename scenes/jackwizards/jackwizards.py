@@ -1,8 +1,10 @@
 import math
 import pygame
+import random
 from scene import Scene
 from utils import SpriteSheet, Animation, load_tpng_folder
 from random import choice
+from .scripts.entities import Player
 
 class JackWizards(Scene):
     def __init__(self, game):
@@ -28,10 +30,6 @@ class JackWizards(Scene):
 
         # load our assets
         self.assets = {
-            "player/idle/up": Animation(load_tpng_folder("jackwizards/animations/player/idle/up"), img_dur=15, loop=True),
-            "player/idle/left": Animation(load_tpng_folder("jackwizards/animations/player/idle/left"), img_dur=15, loop=True),
-            "player/idle/right": Animation(load_tpng_folder("jackwizards/animations/player/idle/right"), img_dur=15, loop=True),
-            "player/idle/down": Animation(load_tpng_folder("jackwizards/animations/player/idle/down"), img_dur=15, loop=True),
             "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
             "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
 
@@ -50,6 +48,13 @@ class JackWizards(Scene):
         self.torches_top = [(80,15), (224,15)]
         self.torches_left_side = [(16, 180*.25), (16, 180*.75)]
         self.torches_right_side = [(320-32, 180*.25), (320-32, 180*.75)]
+
+        # create the player
+        self.player = Player(
+            center=(160, 90),
+            hitbox=(16, 16),
+            scene=self
+        )
 
     def torch_count(self):
         return len(self.torches_top) + len(self.torches_left_side) + len(self.torches_right_side)
@@ -160,10 +165,21 @@ class JackWizards(Scene):
                 self.transition_direction = "SOUTH"
                 self.facing = "down"
 
-
         if pygame.K_RETURN in self.game.just_pressed:
+            # set a new action for the player
+            self.player.action = random.choice([
+                "attack",
+                "block",
+                "idle",
+                "roll",
+                "swim",
+                "walk"
+            ])
+
 
             self.make_room(choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False]))
+
+        self.player.update()
 
     def draw_transition(self):
             # the east/west transitions are easier as we can just slide the room over
@@ -234,12 +250,10 @@ class JackWizards(Scene):
             pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
 
 
+        self.player.draw()
 
         self.frame.blit(self.shadow, (0, 0))
 
-
-        # draw our character
-        self.frame.blit(self.assets["player/idle/" + self.facing].img(), (160, 90))
 
 
     def draw(self):
