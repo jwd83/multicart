@@ -2,7 +2,7 @@ import math
 import pygame
 import random
 from scene import Scene
-from utils import SpriteSheet, Animation, load_tpng_folder
+from utils import *
 from random import choice
 from .scripts.entities import Player
 
