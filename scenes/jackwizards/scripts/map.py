@@ -3,12 +3,12 @@
 
 import numpy as np
 
-
+# count the number of rooms in the map
 def count_rooms(floor_map: np.ndarray) -> int:
 
     return len(floor_map.nonzero()[0])
 
-
+# count the number of dead ends in the map
 def count_dead_ends(floor_map: np.ndarray) -> int:
     dead_ends = 0
     for x in range(floor_map.shape[0]):
@@ -35,8 +35,6 @@ def count_dead_ends(floor_map: np.ndarray) -> int:
 #
 # Any value with a bit set at all will be considered a room
 # and it's connections will be determined by the bits set.
-
-
 def make_floor(minimum_rooms=10, desired_dead_ends=0, size=16):
 
     if minimum_rooms > size * size:
@@ -137,16 +135,3 @@ def make_floor(minimum_rooms=10, desired_dead_ends=0, size=16):
 
     return floor_map
 
-
-def main():
-    while True:
-        make_floor(
-            minimum_rooms=int(input("How many rooms? ")),
-            desired_dead_ends=int(
-                input("How many dead ends? (0 for random): ")),
-        )
-
-
-if __name__ == "__main__":
-
-    main()
