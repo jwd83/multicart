@@ -30,9 +30,23 @@ def load_tpng_folder(assets_path):
 
 
 class Vector2:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y = None):
+
+        # if we didn't get a y check if we got a tuple
+        # and if we did, unpack it. Otherwise, set y to x
+
+        if y is None:
+            if type(x) is tuple:
+                self.x = x[0]
+                self.y = x[1]
+            else:
+                self.x = x
+                self.y = x
+
+        # in this case we got both x and y so we can just set them
+        else:
+            self.x = x
+            self.y = y
 
     def magnitude(self):
         return math.sqrt(self.x**2 + self.y**2)
@@ -165,7 +179,7 @@ class Seed:
 
         # generate md5 hash from the seed and the name
         result = md5((self.__seed + name).encode()).hexdigest()
-        print("Seed: ", self.__seed, "Name: ", name, "Hash: ", result)
+        # print("Seed: ", self.__seed, "Name: ", name, "Hash: ", result)
         return result
 
     def float(self, name: str = "default") -> float:
@@ -201,8 +215,20 @@ class Seed:
 if __name__ == "__main__":
     # test the Seed class
     seed = Seed("Peach")
-    for i in range(100):
+    for i in range(8):
         print(seed.int("testing the seed trial #" + str(i)))
         print(seed.bool("testing the seed trial #" + str(i)))
         print(seed.float("testing the seed trial #" + str(i)))
 
+    # test the Vector2 class
+    a = Vector2(1, 2)
+    print(a.pos())
+
+    b = Vector2((1, 2))
+    print(b.pos())
+
+    c = a + b
+    print(c.pos())
+
+    d = Vector2(1)
+    print(d.pos())
