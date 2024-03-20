@@ -30,10 +30,10 @@ class Player(Entity):
         self.animations = {
 
             # attack
-            "attack/up": Animation(load_tpng_folder("jackwizards/animations/player/attack/up"), img_dur=8, loop=True),
-            "attack/left": Animation(load_tpng_folder("jackwizards/animations/player/attack/left"), img_dur=8, loop=True),
-            "attack/right": Animation(load_tpng_folder("jackwizards/animations/player/attack/right"), img_dur=8, loop=True),
-            "attack/down": Animation(load_tpng_folder("jackwizards/animations/player/attack/down"), img_dur=8, loop=True),
+            "attack/up": Animation(load_tpng_folder("jackwizards/animations/player/attack/up"), img_dur=4, loop=False),
+            "attack/left": Animation(load_tpng_folder("jackwizards/animations/player/attack/left"), img_dur=4, loop=False),
+            "attack/right": Animation(load_tpng_folder("jackwizards/animations/player/attack/right"), img_dur=4, loop=False),
+            "attack/down": Animation(load_tpng_folder("jackwizards/animations/player/attack/down"), img_dur=4, loop=False),
 
             # block
             "block/up": Animation(load_tpng_folder("jackwizards/animations/player/block/up"), img_dur=15, loop=True),
@@ -48,10 +48,10 @@ class Player(Entity):
             "idle/down": Animation(load_tpng_folder("jackwizards/animations/player/idle/down"), img_dur=15, loop=True),
 
             # roll
-            "roll/up": Animation(load_tpng_folder("jackwizards/animations/player/roll/up"), img_dur=6, loop=False),
-            "roll/left": Animation(load_tpng_folder("jackwizards/animations/player/roll/left"), img_dur=6, loop=False),
-            "roll/right": Animation(load_tpng_folder("jackwizards/animations/player/roll/right"), img_dur=6, loop=False),
-            "roll/down": Animation(load_tpng_folder("jackwizards/animations/player/roll/down"), img_dur=6, loop=False),
+            "roll/up": Animation(load_tpng_folder("jackwizards/animations/player/roll/up"), img_dur=7, loop=False),
+            "roll/left": Animation(load_tpng_folder("jackwizards/animations/player/roll/left"), img_dur=7, loop=False),
+            "roll/right": Animation(load_tpng_folder("jackwizards/animations/player/roll/right"), img_dur=7, loop=False),
+            "roll/down": Animation(load_tpng_folder("jackwizards/animations/player/roll/down"), img_dur=7, loop=False),
 
             # swim
             "swim/up": Animation(load_tpng_folder("jackwizards/animations/player/swim/up"), img_dur=15, loop=True),
@@ -74,6 +74,7 @@ class Player(Entity):
         if self.animation_locked:
             # check if our animation is completed
             if self.animations[self.action + "/" + self.facing].done:
+                self.animations[self.action + "/" + self.facing].reset()
                 self.animation_locked = False
 
         if not self.animation_locked:
@@ -102,18 +103,46 @@ class Player(Entity):
                 self.action = "walk"
                 self.velocity.y = 1
 
+            if self.game.pressed[pygame.K_x]:
+                self.action = "block"
+                self.velocity.x = 0
+                self.velocity.y = 0
+                self.animation_locked = False
+
             # just pressed
             if pygame.K_SPACE in self.game.just_pressed:
-
+                # if not holding a direction, dodge backwards to how we are facing
+                # like in dark souls
+                if self.velocity.x == 0 and self.velocity.y == 0:
+                    if self.facing == "up":
+                        self.velocity.y = 1
+                    elif self.facing == "down":
+                        self.velocity.y = -1
+                    elif self.facing == "left":
+                        self.velocity.x = 1
+                    elif self.facing == "right":
+                        self.velocity.x = -1
                 self.action = "roll"
                 self.animation_locked = True
 
+            elif pygame.K_z in self.game.just_pressed:
+                self.velocity.x = 0
+                self.velocity.y = 0
+                self.action = "attack"
+                self.animation_locked = True
+
+        # scale the velocity to 1 if we are moving diagonally
+        if abs(self.velocity.x) >= 1 and abs(self.velocity.y) >= 1:
+            self.velocity.scale_velocity()
+
+        # move the player
         self.center += self.velocity
 
-        self.center.x = max(16, min(self.center.x, 320-16))
-        self.center.y = max(16, min(self.center.y, 180-16))
+        # clamp the player to the room bounds
+        self.center.x = max(22, min(self.center.x, 298))
+        self.center.y = max(32, min(self.center.y, 154))
 
-
+        # update the current animation
         self.animations[self.action + "/" + self.facing].update()
 
     def draw(self):
