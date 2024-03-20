@@ -76,6 +76,9 @@ class Vector2:
     def __add__(self, other):
         return Vector2(self.x + other.x, self.y + other.y)
 
+    def __str__(self) -> str:
+        return f"({self.x}, {self.y})"
+
 class SpriteSheet:
     def __init__ (self, asset_path: str, colorkey: tuple = None):
         self.asset_path = "assets/" + asset_path
