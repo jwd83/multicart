@@ -145,6 +145,10 @@ class JackWizards(Scene):
             if isinstance(self.assets[asset], Animation):
                 if self.assets[asset].loop:
                     self.assets[asset].update()
+        # self.update_stuff()
+        self.player.update()
+
+    def update_stuff(self):
 
         if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
 
@@ -179,40 +183,39 @@ class JackWizards(Scene):
 
             self.make_room(choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False]))
 
-        self.player.update()
 
     def draw_transition(self):
-            # the east/west transitions are easier as we can just slide the room over
-            if self.transition_direction in ["EAST", "WEST"]:
-                step = self.transition_duration - self.transition
-                progress = step / self.transition_duration
+        # the east/west transitions are easier as we can just slide the room over
+        if self.transition_direction in ["EAST", "WEST"]:
+            step = self.transition_duration - self.transition
+            progress = step / self.transition_duration
 
 
-                if self.transition_direction == "EAST":
-                    self.frame.blit(self.old_room, (int(-320 * progress), 0))
-                    self.frame.blit(self.room, (int(320 - (320 * progress)), 0))
-                if self.transition_direction == "WEST":
-                    self.frame.blit(self.old_room, (int(320 * progress), 0))
-                    self.frame.blit(self.room, (int(-320 + (320 * progress)), 0))
+            if self.transition_direction == "EAST":
+                self.frame.blit(self.old_room, (int(-320 * progress), 0))
+                self.frame.blit(self.room, (int(320 - (320 * progress)), 0))
+            if self.transition_direction == "WEST":
+                self.frame.blit(self.old_room, (int(320 * progress), 0))
+                self.frame.blit(self.room, (int(-320 + (320 * progress)), 0))
 
-            # the north/south transitions are a bit more complicated as the top row
-            # of each room is blank, we need to adjust the y position of a room
-            # to make it looks like it's sliding in edge to edge without a gap
+        # the north/south transitions are a bit more complicated as the top row
+        # of each room is blank, we need to adjust the y position of a room
+        # to make it looks like it's sliding in edge to edge without a gap
 
-            if self.transition_direction in ["NORTH", "SOUTH"]:
+        if self.transition_direction in ["NORTH", "SOUTH"]:
 
-                step = self.transition_duration - self.transition
-                progress = step / self.transition_duration
+            step = self.transition_duration - self.transition
+            progress = step / self.transition_duration
 
-                if self.transition_direction == "NORTH":
-                    self.frame.blit(self.old_room, (0, int(180 * progress)))
-                    self.frame.blit(self.room, (0, int(-180 + (180 * progress))))
+            if self.transition_direction == "NORTH":
+                self.frame.blit(self.old_room, (0, int(180 * progress)))
+                self.frame.blit(self.room, (0, int(-180 + (180 * progress))))
 
-                if self.transition_direction == "SOUTH":
-                    self.frame.blit(self.old_room, (0, int(-180 * progress)))
-                    self.frame.blit(self.room, (0, int(180 - (180 * progress))))
+            if self.transition_direction == "SOUTH":
+                self.frame.blit(self.old_room, (0, int(-180 * progress)))
+                self.frame.blit(self.room, (0, int(180 - (180 * progress))))
 
-            self.transition -= 1
+        self.transition -= 1
 
     def draw_standard(self):
 
