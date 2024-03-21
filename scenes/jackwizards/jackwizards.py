@@ -12,6 +12,8 @@ class JackWizards(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        self.r = Seed("jack")
+
         # make the frame surface to draw each frame on
         self.frame = self.make_surface((320, 180))
 
@@ -30,9 +32,6 @@ class JackWizards(Scene):
         # create the smaller inner glow for the torches
         # rgb for orange is 255, 165, 0
         self.glow_24 = self.make_glow(24, (9, 6,0))
-
-
-
 
         # load the tileset and dice it into 16x16 tiles
         self.sheets = {
@@ -121,7 +120,7 @@ class JackWizards(Scene):
             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
         ]
 
-        floor_spice       = [22, 23, 38, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37]
+        floor_spice       = [22, 23, 38, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37]
         left_wall_spice   = [21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 36]
         right_wall_spice  = [24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 39]
         bottom_wall_spice = [32, 32, 32, 32, 32, 32, 32, 32, 33, 47, 48]
@@ -158,14 +157,15 @@ class JackWizards(Scene):
         # randomly spice up some of the basic floor tiles
         for y, row in enumerate(tilemap):
             for x, tile in enumerate(row):
+                choice_seed = f"{self.level_x}-{self.level_y}-{x}-{y}"
                 if tile == 37:
-                    tilemap[y][x] = choice(floor_spice)
+                    tilemap[y][x] = self.r.choice(choice_seed, floor_spice)
                 if tile == 21:
-                    tilemap[y][x] = choice(left_wall_spice)
+                    tilemap[y][x] = self.r.choice(choice_seed, left_wall_spice)
                 if tile == 24:
-                    tilemap[y][x] = choice(right_wall_spice)
+                    tilemap[y][x] = self.r.choice(choice_seed, right_wall_spice)
                 if tile == 32:
-                    tilemap[y][x] = choice(bottom_wall_spice)
+                    tilemap[y][x] = self.r.choice(choice_seed, bottom_wall_spice)
 
         # render out the room to the room surface
         for y, row in enumerate(tilemap):
