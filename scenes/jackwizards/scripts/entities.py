@@ -16,6 +16,7 @@ class Entity:
         self.animations = {}
         self.facing = 'down'
         self.animation_locked = False
+        self.health = 10
 
     def update(self):
         self.animations[self.action + "/" + self.facing].update()
