@@ -3,7 +3,6 @@ import pygame
 import random
 from scene import Scene
 from utils import *
-from random import choice
 from .scripts.entities import Player
 from .scripts.map import *
 import numpy as np
@@ -171,7 +170,7 @@ class JackWizards(Scene):
                 self.room.blit(self.tiles[tile], (x * 16, y * 16))
 
         # decide if the room will have an occult symbol
-        if self.r.float(f"{self.level_x}-{self.level_y}") < 0.5:
+        if self.r.float(f"{self.level_x}-{self.level_y}") < 0.1:
             x = (320 / 2) - (self.assets["occult_symbol"].get_width() // 2)
             y = (180 / 2) - (self.assets["occult_symbol"].get_height() // 2) + 16
             self.assets["occult_symbol"].set_alpha(200)
@@ -360,10 +359,7 @@ class JackWizards(Scene):
         #     pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
         #     pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
 
-
         # self.frame.blit(self.shadow, (0, 0))
-
-
 
     def draw(self):
 
@@ -377,15 +373,20 @@ class JackWizards(Scene):
         # fill the top 16 pixels black for the ui
         pygame.draw.rect(self.frame, (0, 0, 0), (0, 0, 320, 16))
 
+        # color the top right 16x16 a parchment color for the map
+        pygame.draw.rect(self.frame, (80, 80, 50), (320-16, 0, 16, 16))
+
         # draw a white pixel for every room in the map
         for x in range(16):
             for y in range(16):
                 room = self.level[x, y]
                 if room:
-                    self.frame.set_at((320-16+x, y), (255, 255, 255))
+                    self.frame.set_at((320-16+x, y), (0, 0, 0))
 
-        # draw a green pixel for the player location
-        self.frame.set_at((320-16+self.level_x, self.level_y), (0, 180, 0))
+        # draw a white pixel for the player location
+        intensity = math.sin(self.elapsed()*5)*20 + 220
+
+        self.frame.set_at((320-16+self.level_x, self.level_y), (intensity, intensity, intensity))
 
 
         # FRAME COMPLETE
