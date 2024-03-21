@@ -253,6 +253,7 @@ def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
     target.blit(mask, (x, y - 1))
     target.blit(mask, (x, y + 1))
 
+# test our utilities if ran directly
 if __name__ == "__main__":
     # test the Seed class
     seed = Seed("Peach")
