@@ -203,7 +203,7 @@ class JackWizards(Scene):
 
     def change_rooms(self):
 
-        # look for an the player reaching an exit zone
+        # look for the player reaching an exit zone
 
         # left : 22, 90 +/- 8
         # right: 298, 90 +/- 8
@@ -269,39 +269,6 @@ class JackWizards(Scene):
 
                 # make the new room
                 self.make_room()
-
-
-    def update_stuff(self):
-
-        if (pygame.K_UP in self.game.just_pressed) or (pygame.K_DOWN in self.game.just_pressed) or (pygame.K_LEFT in self.game.just_pressed) or (pygame.K_RIGHT in self.game.just_pressed):
-
-            self.transition = self.transition_duration
-            self.old_room.blit(self.room, (0, 0))
-            self.make_room()
-
-            if pygame.K_RIGHT in self.game.just_pressed:
-                self.transition_direction = "EAST"
-                self.facing = "right"
-            if pygame.K_LEFT in self.game.just_pressed:
-                self.transition_direction = "WEST"
-                self.facing = "left"
-            if pygame.K_UP in self.game.just_pressed:
-                self.transition_direction = "NORTH"
-                self.facing = "up"
-            if pygame.K_DOWN in self.game.just_pressed:
-                self.transition_direction = "SOUTH"
-                self.facing = "down"
-
-        if pygame.K_RETURN in self.game.just_pressed:
-            # set a new action for the player
-            self.player.action = random.choice([
-                "attack",
-                "block",
-                "idle",
-                "roll",
-                "swim",
-                "walk"
-            ])
 
 
     def draw_transition(self):
