@@ -69,8 +69,6 @@ class Player(Entity):
     def update(self):
         # todo: check if we took damage
 
-
-
         if self.animation_locked:
             # check if our animation is completed
             if self.animations[self.action + "/" + self.facing].done:
@@ -158,10 +156,6 @@ class Player(Entity):
 
         # draw the image
         self.frame.blit(img, (x, y))
-
-
-
-
 
 class Monster(Entity):
     def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None):
