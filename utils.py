@@ -218,6 +218,18 @@ class Seed:
         result = self.__hashed(name)
         return int(result, 16) % (max - min) + min
 
+    def choice(self, name: str = "default", choices: list = []) -> any:
+        """
+        The function to return a random choice from a list based on the seed and the name.
+        """
+
+        if len(choices) == 0:
+            return None
+
+        
+        result = self.__hashed(name)
+        return choices[int(result, 16) % len(choices)]
+
 
 if __name__ == "__main__":
     # test the Seed class
