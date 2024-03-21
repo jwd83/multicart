@@ -360,13 +360,19 @@ class JackWizards(Scene):
 
         self.player.draw()
 
-        # join the three torches lists into one big list
-        torches_all = self.torches_top + self.torches_left_side + self.torches_right_side
+        for torch_position in self.torches_top:
+            self.frame.blit(self.glow_32, (torch_position[0]-24, torch_position[1]-20+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
+            self.frame.blit(self.glow_24, (torch_position[0]-16, torch_position[1]-12+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
 
-        for torch_position in torches_all:
+
+        for torch_position in self.torches_left_side:
             self.frame.blit(self.glow_32, (torch_position[0]-24, torch_position[1]-24+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
             self.frame.blit(self.glow_24, (torch_position[0]-16, torch_position[1]-16+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
 
+
+        for torch_position in self.torches_right_side:
+            self.frame.blit(self.glow_32, (torch_position[0]-24, torch_position[1]-24+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
+            self.frame.blit(self.glow_24, (torch_position[0]-16, torch_position[1]-16+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
 
 
         # # cut out circles for the torches
