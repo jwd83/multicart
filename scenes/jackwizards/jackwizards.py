@@ -24,6 +24,16 @@ class JackWizards(Scene):
         # create the shadow for the room
         # self.shadow = self.make_surface((320, 180))
 
+        # create the larger outer glow for the torches
+        self.glow_32 = self.make_glow(32, (6,6,0))
+
+        # create the smaller inner glow for the torches
+        # rgb for orange is 255, 165, 0
+        self.glow_24 = self.make_glow(24, (9, 6,0))
+
+
+
+
         # load the tileset and dice it into 16x16 tiles
         self.sheets = {
             "tileset": SpriteSheet("jackwizards/tileset.png"),
@@ -40,7 +50,7 @@ class JackWizards(Scene):
         # self.sheets["tileset"].dice_to_folder(16, 16, "tileset")
 
         # start making our level and rooms
-        self.level = make_floor(minimum_rooms=8)
+        self.level = make_floor(minimum_rooms=16)
         print(self.level)
 
         self.level_x: int = 8
@@ -348,6 +358,16 @@ class JackWizards(Scene):
         # # fill the shadow surface with a translucent black
         # self.shadow.fill((0, 0, 0, 0.3*255))
 
+        self.player.draw()
+
+        # join the three torches lists into one big list
+        torches_all = self.torches_top + self.torches_left_side + self.torches_right_side
+
+        for torch_position in torches_all:
+            self.frame.blit(self.glow_32, (torch_position[0]-24, torch_position[1]-24+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
+            self.frame.blit(self.glow_24, (torch_position[0]-16, torch_position[1]-16+(math.sin(self.elapsed()*3)*2)),special_flags=pygame.BLEND_RGB_ADD)
+
+
 
         # # cut out circles for the torches
         # for torch_position in self.torches_top:
@@ -362,8 +382,6 @@ class JackWizards(Scene):
         #     pygame.draw.circle(self.shadow, (0, 0, 0, 0.1  * 255), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)*2), 32)
         #     pygame.draw.circle(self.shadow, (0, 0, 0, 0), (torch_position[0]+8, torch_position[1]+8+math.sin(self.elapsed()*3)), 24)
 
-
-        self.player.draw()
 
         # self.frame.blit(self.shadow, (0, 0))
 
@@ -397,3 +415,8 @@ class JackWizards(Scene):
         self.screen.blit(
             pygame.transform.scale(self.frame, self.screen.get_size()), (0, 0)
         )
+
+    def make_glow(self, radius, color=(20,20,20)):
+        glow = self.make_surface((radius*2, radius*2))
+        pygame.draw.circle(glow, color, (radius, radius), radius)
+        return glow
