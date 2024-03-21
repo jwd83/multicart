@@ -12,7 +12,7 @@ class JackWizards(Scene):
     def __init__(self, game):
         super().__init__(game)
 
-        self.r = Seed("jack")
+        self.r = Seed()
 
         # make the frame surface to draw each frame on
         self.frame = self.make_surface((320, 180))
@@ -26,12 +26,9 @@ class JackWizards(Scene):
         # create the shadow for the room
         # self.shadow = self.make_surface((320, 180))
 
-        # create the larger outer glow for the torches
-        self.glow_32 = self.make_glow(32, (6,6,0))
 
-        # create the smaller inner glow for the torches
-        # rgb for orange is 255, 165, 0
-        self.glow_24 = self.make_glow(24, (9, 6,0))
+        self.glow_32 = self.make_glow(32, (6,6,0)) # create the larger outer glow for the torches
+        self.glow_24 = self.make_glow(24, (9, 6,0)) # create the smaller inner glow for the torches
 
         # load the tileset and dice it into 16x16 tiles
         self.sheets = {
@@ -43,8 +40,9 @@ class JackWizards(Scene):
         self.assets = {
             "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
             "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
-
+            "occult_symbol": load_tpng("jackwizards/dall-e-occult.png"),
         }
+
         self.tiles = self.sheets["tileset"].dice(16, 16)
         # self.sheets["tileset"].dice_to_folder(16, 16, "tileset")
 
@@ -171,6 +169,13 @@ class JackWizards(Scene):
         for y, row in enumerate(tilemap):
             for x, tile in enumerate(row):
                 self.room.blit(self.tiles[tile], (x * 16, y * 16))
+
+        # decide if the room will have an occult symbol
+        if self.r.float(f"{self.level_x}-{self.level_y}") < 0.5:
+            x = (320 / 2) - (self.assets["occult_symbol"].get_width() // 2)
+            y = (180 / 2) - (self.assets["occult_symbol"].get_height() // 2) + 16
+            self.assets["occult_symbol"].set_alpha(200)
+            self.room.blit(self.assets["occult_symbol"], (x,y))
 
 
     def update(self):
