@@ -2,10 +2,11 @@ import pygame
 import math
 import os
 from hashlib import md5
+import random
 
 
 # load a single image
-def load_tpng(assets_path):
+def load_tpng(assets_path) -> pygame.Surface:
     img = pygame.image.load("assets/" + assets_path).convert_alpha()
     return img
 
@@ -145,21 +146,26 @@ class Seed:
     This class represents a Seed object.
 
     Attributes:
-        __seed (str): The seed value. Default is "Peach".
+        __seed (str): The seed value. Default is None which
+        generates a random seed.
 
     Methods:
         get_seed(): Returns the current seed value.
         set_seed(seed: str): Sets a new seed value.
     """
 
-    def __init__(self, seed: str = "Peach"):
+    def __init__(self, seed: str|None= None):
         """
         The constructor for Seed class.
 
         Parameters:
             seed (str): The seed value. Default is "Peach".
         """
-        self.__seed = seed
+        if seed is None:
+            # generate a random string to be used as a seed
+            self.__seed = str(random.random())
+        else:
+            self.__seed = seed
 
     def get_seed(self):
         """
@@ -226,10 +232,26 @@ class Seed:
         if len(choices) == 0:
             return None
 
-        
+
         result = self.__hashed(name)
         return choices[int(result, 16) % len(choices)]
 
+
+def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
+
+    mask = pygame.mask.from_surface(source)
+    mask.invert()
+    mask = mask.to_surface()
+    mask.set_colorkey((255, 255, 255))
+
+
+    x = dest[0]
+    y = dest[1]
+
+    target.blit(mask, (x - 1, y))
+    target.blit(mask, (x + 1, y))
+    target.blit(mask, (x, y - 1))
+    target.blit(mask, (x, y + 1))
 
 if __name__ == "__main__":
     # test the Seed class
@@ -252,19 +274,9 @@ if __name__ == "__main__":
     d = Vector2(1)
     print(d.pos())
 
-def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
-
-    mask = pygame.mask.from_surface(source)
-    mask.invert()
-    mask = mask.to_surface()
-    mask.set_colorkey((255, 255, 255))
-
-
-    x = dest[0]
-    y = dest[1]
-
-    target.blit(mask, (x - 1, y))
-    target.blit(mask, (x + 1, y))
-    target.blit(mask, (x, y - 1))
-    target.blit(mask, (x, y + 1))
-
+    for i in range(10):
+        r = Seed()
+        sum = 0
+        for j in range(100000):
+            sum += r.float(f"test {j}:{i}")
+        print(sum)
