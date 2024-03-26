@@ -31,14 +31,20 @@ def count_dead_ends(floor_map: np.ndarray) -> int:
 # as follows: 1 = up, 2 = right, 4 = down, 8 = left
 #
 # bits above the 8 value will be used for...
-# 16 = starting room
+# 16 = starting room where the player spawns
+# 32 = boss room
+# 64 = compass room
+# 128 = map room
 #
 # Any value with a bit set at all will be considered a room
 # and it's connections will be determined by the bits set.
-def make_floor(minimum_rooms=10, desired_dead_ends=0, size=16):
+def make_floor(minimum_rooms=10, desired_dead_ends=3, size=16):
 
     if minimum_rooms > size * size:
         minimum_rooms = size * size
+
+    if desired_dead_ends < 3:
+        desired_dead_ends = 3
 
     midpoint = int(size / 2)
 
@@ -47,6 +53,9 @@ def make_floor(minimum_rooms=10, desired_dead_ends=0, size=16):
 
     # generate the empty map
     floor_map = np.zeros((size, size), dtype=int)
+
+    # set the starting room bit
+    floor_map[x, y] |= 16
 
     while count_rooms(floor_map) < minimum_rooms:
 
@@ -69,10 +78,6 @@ def make_floor(minimum_rooms=10, desired_dead_ends=0, size=16):
             floor_map[x, y] |= 8
             x -= 1
             floor_map[x, y] |= 2
-
-        # # print the current stats
-        # print("Rooms: ", count_rooms(floor_map))
-        # print("Dead Ends: ", count_dead_ends(floor_map))
 
 
     if desired_dead_ends > count_dead_ends(floor_map):
@@ -124,7 +129,59 @@ def make_floor(minimum_rooms=10, desired_dead_ends=0, size=16):
                 if desired_dead_ends <= count_dead_ends(floor_map):
                     break
 
-    # now that the set the starting room bit
+    # set the boss room as the furthest dead end room from the starting room
+
+    # variables to hold the furthest room from the starting room
+    search_x = midpoint
+    search_y = midpoint
+    search_distance = 0
+
+    # loop through the map and find the furthest room from the starting room
+    # to place the boss in.
+    for x in range(floor_map.shape[0]):
+        for y in range(floor_map.shape[1]):
+            if floor_map[x, y] in [1, 2, 4, 8]:
+                distance = abs(midpoint - x) + abs(midpoint - y)
+                if distance > search_distance:
+                    search_x = x
+                    search_y = y
+                    search_distance = distance
+
+    floor_map[search_x, search_y] |= 32
+
+    # place the compass room in the room closest dead end to the starting room
+    search_x = midpoint
+    search_y = midpoint
+    search_distance = size * 4 # set to a high value to ensure the first room is closer
+
+    for x in range(floor_map.shape[0]):
+        for y in range(floor_map.shape[1]):
+            if floor_map[x, y] in [1, 2, 4, 8]:
+                distance = abs(midpoint - x) + abs(midpoint - y)
+                if distance < search_distance:
+                    search_x = x
+                    search_y = y
+                    search_distance = distance
+
+    floor_map[search_x, search_y] |= 64
+
+
+    # place the map room in the next closest dead end to the starting room
+    search_x = midpoint
+    search_y = midpoint
+    search_distance = size * 4 # set to a high value to ensure the first room is closer
+
+    for x in range(floor_map.shape[0]):
+        for y in range(floor_map.shape[1]):
+            if floor_map[x, y] in [1, 2, 4, 8]:
+                distance = abs(midpoint - x) + abs(midpoint - y)
+                if distance < search_distance:
+                    search_x = x
+                    search_y = y
+                    search_distance = distance
+
+    floor_map[search_x, search_y] |= 128
+
 
 
     print("Final map:")

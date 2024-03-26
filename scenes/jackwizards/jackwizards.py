@@ -1,6 +1,5 @@
 import math
 import pygame
-import random
 from scene import Scene
 from utils import *
 from .scripts.entities import Player
@@ -37,6 +36,7 @@ class JackWizards(Scene):
 
         # load our assets
         self.assets = {
+            "boss_placeholder": load_tpng("jackwizards/dall-e-boss-dragon-placeholder.png"),
             "torch_top": Animation(load_tpng_folder("jackwizards/animations/torch_top"), img_dur=5, loop=True),
             "torch_side": Animation(load_tpng_folder("jackwizards/animations/torch_side"), img_dur=5, loop=True),
             "occult_symbol": load_tpng("jackwizards/dall-e-occult.png"),
@@ -57,8 +57,6 @@ class JackWizards(Scene):
         self.hallway_east: bool = False
         self.hallway_west: bool = False
 
-        self.make_room()
-
         self.facing = "down"
         self.transition = 0
         self.transition_duration = 20
@@ -73,6 +71,10 @@ class JackWizards(Scene):
             hitbox=(16, 16),
             scene=self
         )
+
+        # make room depends on the player being created
+
+        self.make_room()
 
     def torch_count(self):
         return len(self.torches_top) + len(self.torches_left_side) + len(self.torches_right_side)
@@ -175,6 +177,38 @@ class JackWizards(Scene):
             y = (180 / 2) - (self.assets["occult_symbol"].get_height() // 2) + 16
             self.assets["occult_symbol"].set_alpha(200)
             self.room.blit(self.assets["occult_symbol"], (x,y))
+
+        # check if this is the boss room
+        if room_flags & 32:
+            x = (320 / 2) - (self.assets["boss_placeholder"].get_width() // 2)
+            y = (180 / 2) - (self.assets["boss_placeholder"].get_height() // 2) + 16
+            self.room.blit(self.assets["boss_placeholder"], (x,y))
+
+        # check if this is the compass room
+        if room_flags & 64:
+            if "compass" not in self.player.inventory:
+                self.player.inventory.append("compass")
+
+            # write the text "COMPASS FOUND" on the floor of the room
+            t_compass = self.standard_text("COMPASS")
+            t_found = self.standard_text("FOUND")
+            self.blit_centered(t_compass, self.room, (0.5, 0.5))
+            self.blit_centered(t_found, self.room, (0.5, 0.65))
+
+
+
+        # check if this is the map room
+        if room_flags & 128:
+            if "map" not in self.player.inventory:
+                self.player.inventory.append("map")
+
+            # write the text "COMPASS FOUND" on the floor of the room
+            text = self.standard_text("MAP FOUND")
+            self.blit_centered(text, self.room, (0.5, 0.5))
+
+
+
+
 
 
     def update(self):
@@ -376,17 +410,31 @@ class JackWizards(Scene):
         # color the top right 16x16 a parchment color for the map
         pygame.draw.rect(self.frame, (80, 80, 50), (320-16, 0, 16, 16))
 
-        # draw a white pixel for every room in the map
+        # make a glowing indicator level
+
+        intensity = math.sin(self.elapsed()*5)*20 + 220
+
+        # draw a pixel for every room in the map and color the boss room
         for x in range(16):
             for y in range(16):
                 room = self.level[x, y]
                 if room:
-                    self.frame.set_at((320-16+x, y), (0, 0, 0))
+                    # check if player has the map in their inventory
+                    if "map" in self.player.inventory:
+                        # draw a black pixel for the room
+                        self.frame.set_at((320-16+x, y), (0, 0, 0))
 
-        # draw a white pixel for the player location
-        intensity = math.sin(self.elapsed()*5)*20 + 220
 
+                    # check if the compass is in the player's inventory
+                    if "compass" in self.player.inventory:
+                        # draw a glowing red pixel for the boss room
+                        if room & 32:
+                            self.frame.set_at((320-16+x, y), (intensity, 0, 0))
+
+
+        # draw a glowing white pixel for the player location
         self.frame.set_at((320-16+self.level_x, self.level_y), (intensity, intensity, intensity))
+
 
 
         # FRAME COMPLETE
