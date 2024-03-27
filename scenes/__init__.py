@@ -7,6 +7,7 @@ from .tvstatic import TVStatic
 
 # jack wizards
 from .jackwizards.jackwizards import JackWizards
+from .jackwizards.jackwizardsmap import JackWizardsMap
 
 # via galactica
 from .viagalactica.viatitle import ViaTitle

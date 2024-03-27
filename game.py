@@ -35,6 +35,8 @@ class Game:
         self.volume_effects = self.__DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
+        self.level = None
+        self.has_map = False
 
         self.__frame_count = 0
         self.__perf_start = time.perf_counter_ns()

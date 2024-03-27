@@ -47,6 +47,7 @@ class JackWizards(Scene):
 
         # start making our level and rooms
         self.level = make_floor(minimum_rooms=16)
+        self.game.level = self.level.copy()
         print(self.level)
 
         self.level_x: int = 8
@@ -73,7 +74,6 @@ class JackWizards(Scene):
         )
 
         # make room depends on the player being created
-
         self.make_room()
 
     def torch_count(self):
@@ -215,6 +215,9 @@ class JackWizards(Scene):
         # if the user presses escape or F5 key, quit the event loop.
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
+
+        if pygame.K_TAB in self.game.just_pressed:
+            self.game.scene_push = "JackWizardsMap"
 
 
         # leave if we are in a transition
