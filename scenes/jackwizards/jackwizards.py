@@ -2,7 +2,7 @@ import math
 import pygame
 from scene import Scene
 from utils import *
-from .scripts.entities import Player, Monster
+from .scripts.entities import Player, Monster, Bat
 from .scripts.map import *
 import numpy as np
 
@@ -107,7 +107,7 @@ class JackWizards(Scene):
                 )
 
                 self.monsters.append(
-                    Monster(center=random_center,
+                    Bat(center=random_center,
                             hitbox=(16, 16),
                             scene=self,
                             player=self.player))

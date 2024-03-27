@@ -12,6 +12,9 @@ Various assets
 
 2D Dungeon Asset Pack - Purchased by jwd83
 
+Bat Animation: Free for commercial use and to modify by Caz
+<https://caz-creates-games.itch.io/bat>
+
 ## OpenGameArt
 
 Various assets

@@ -219,5 +219,73 @@ class Monster(Entity):
                 self.action = 'idle'
                 print("idle")
 
+class Bat(Entity):
+    def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None, player: Player = None):
+        super().__init__(center=center, hitbox=hitbox, scene=scene)
+
+        self.player = player
+        self.radius_engage = 100
+        self.radius_attack = 20
+        self.move_speed = 0.4
+
+        self.action = 'idle'
+
+        # load our animations
+        self.animations = {
+
+            "idle": Animation(load_tpng_folder("jackwizards/animations/bat/idle"), img_dur=12, loop=True),
+            "walk": Animation(load_tpng_folder("jackwizards/animations/bat/walk"), img_dur=12, loop=True),
+            "attack": Animation(load_tpng_folder("jackwizards/animations/bat/attack"), img_dur=12, loop=False),
+
+        }
+
+    def set_player(self, player: Player = None):
+        self.player = player
+
+    def draw(self):
+        # get the current animation frame
+        img = self.animations[self.action].img()
+
+        # calculate the position to draw the image
+        x = self.center.x - img.get_width() // 2
+        y = self.center.y - img.get_height() // 2
+
+        # draw the outline
+        blit_outline(img, self.frame, (x,y))
+
+        # draw the image
+        self.frame.blit(img, (x, y))
+
+    def update(self):
+        # reset our velocity back to zero
+        self.velocity = Vector2(0, 0)
+
+        # default to idle
+        self.action = 'idle'
+
+        # check if the center of the player is within the radius of the monster
+        if self.player:
+            if self.center.distance_to(self.player.center) < self.radius_attack:
+                self.action = 'attack'
+
+            elif self.center.distance_to(self.player.center) < self.radius_engage:
+                self.action = 'walk'
+
+                # set the velocity to the direction of the player
+                self.velocity = self.player.center - self.center
+
+                # scale the velocity
+                self.velocity.scale_to_length(self.move_speed)
+
+                # move the monster
+                self.center += self.velocity
+            else:
+                self.action = 'idle'
+
+
+
+        # update the current animation
+        self.animations[self.action].update()
+
 
 
