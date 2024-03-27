@@ -540,7 +540,7 @@ class FourJacksGameBoard(Scene):
                 for col in range(7):
                     if self.board_score[row][col] != 0:
                         # make text of the score
-                        text = self.game.make_text(
+                        text = self.make_text(
                             str(self.board_score[row][col]), (255, 255, 255), 16
                         )
 
