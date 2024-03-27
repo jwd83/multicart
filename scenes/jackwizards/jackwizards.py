@@ -195,8 +195,6 @@ class JackWizards(Scene):
             self.blit_centered(t_compass, self.room, (0.5, 0.5))
             self.blit_centered(t_found, self.room, (0.5, 0.65))
 
-
-
         # check if this is the map room
         if room_flags & 128:
             if "map" not in self.player.inventory:
@@ -205,11 +203,6 @@ class JackWizards(Scene):
             # write the text "COMPASS FOUND" on the floor of the room
             text = self.standard_text("MAP FOUND")
             self.blit_centered(text, self.room, (0.5, 0.5))
-
-
-
-
-
 
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.

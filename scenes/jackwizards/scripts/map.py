@@ -13,6 +13,9 @@ def count_dead_ends(floor_map: np.ndarray) -> int:
     dead_ends = 0
     for x in range(floor_map.shape[0]):
         for y in range(floor_map.shape[1]):
+            # and against 0001 1111 to get the hallway bits
+            # and the start room bit to not count the start
+            # room as a dead end.
             room_flags = floor_map[x, y] & 31
             if room_flags in [1, 2, 4, 8]:
                 dead_ends += 1
