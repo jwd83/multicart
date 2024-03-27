@@ -87,22 +87,22 @@ class Player(Entity):
             if self.game.pressed[pygame.K_RIGHT]:
                 self.facing = "right"
                 self.action = "walk"
-                self.velocity.x = 1
+                self.velocity.x += 1
 
             if self.game.pressed[pygame.K_LEFT]:
                 self.facing = "left"
                 self.action = "walk"
-                self.velocity.x = -1
+                self.velocity.x += -1
 
             if self.game.pressed[pygame.K_UP]:
                 self.facing = "up"
                 self.action = "walk"
-                self.velocity.y = -1
+                self.velocity.y += -1
 
             if self.game.pressed[pygame.K_DOWN]:
                 self.facing = "down"
                 self.action = "walk"
-                self.velocity.y = 1
+                self.velocity.y += 1
 
             if self.game.pressed[pygame.K_x]:
                 self.action = "block"
@@ -162,7 +162,7 @@ class Player(Entity):
 
 class Monster(Entity):
     def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None, player: Player = None):
-        super().__init__(center=center, hitbox=hitbox)
+        super().__init__(center=center, hitbox=hitbox, scene=scene)
 
         self.player = player
         self.radius_engage = 100
@@ -173,19 +173,51 @@ class Monster(Entity):
     def set_player(self, player: Player = None):
         self.player = player
 
+    def draw(self):
+        # lets just draw a rectangle for now
+        pygame.draw.rect(
+            self.frame,
+            (255, 0, 0),
+            (
+                self.center.x - self.hitbox[0] // 2,
+                self.center.y - self.hitbox[1] // 2,
+                self.hitbox[0],
+                self.hitbox[1]
+            )
+        )
+
+        pass
+
     def update(self):
-        # check if the center of the player is within the radius of the monster
+        # reset our velocity back to zero
+        self.velocity = Vector2(0, 0)
 
         # default to idle
         self.action = 'idle'
+
+        # check if the center of the player is within the radius of the monster
         if self.player:
             if self.center.distance_to(self.player.center) < self.radius_attack:
                 self.action = 'attack'
-                # self.velocity = Vector2(0, 0)
                 print("attacking")
             elif self.center.distance_to(self.player.center) < self.radius_engage:
                 self.action = 'walk'
+
+                # set the velocity to the direction of the player
+                self.velocity = self.player.center - self.center
+
+                # scale the velocity
+                self.velocity.scale_to_length(0.25)
+
+                # move the monster
+                self.center += self.velocity
+
+
+
                 print("engaging")
+            else:
+                self.action = 'idle'
+                print("idle")
 
 
 

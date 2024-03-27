@@ -2,7 +2,7 @@ import math
 import pygame
 from scene import Scene
 from utils import *
-from .scripts.entities import Player
+from .scripts.entities import Player, Monster
 from .scripts.map import *
 import numpy as np
 
@@ -73,8 +73,12 @@ class JackWizards(Scene):
             scene=self
         )
 
+        # make a list of active monsters
+        self.monsters = []
+
         # make room depends on the player being created
         self.make_room()
+
 
     def torch_count(self):
         return len(self.torches_top) + len(self.torches_left_side) + len(self.torches_right_side)
@@ -83,6 +87,32 @@ class JackWizards(Scene):
 
         # grab the room's int from the level map and figure out how it is connected
         room_flags = self.level[self.level_x, self.level_y]
+
+        # reset the list of active monsters
+        self.monsters = []
+
+        # load monsters if necessary
+
+        safe_room = room_flags & 0b11010000 # starting room, map room, compass room
+        if not safe_room:
+            # generate 0-4 monsters based on the room
+            monster_count = self.r.int(f"{self.level_x}-{self.level_y}-monster-count", 0, 6)
+            print(f"Generating {monster_count} monsters for room {self.level_x}-{self.level_y}")
+
+            for j in range(monster_count):
+                # generate a random position for each monster
+                random_center = (
+                    self.r.int(f"{self.level_x}-{self.level_y}-{j}-monster-x", 70, 320-70),
+                    self.r.int(f"{self.level_x}-{self.level_y}-{j}-monster-y", 70, 180-70),
+                )
+
+                self.monsters.append(
+                    Monster(center=random_center,
+                            hitbox=(16, 16),
+                            scene=self,
+                            player=self.player))
+
+
 
         self.hallway_north = False
         self.hallway_south = False
@@ -226,6 +256,10 @@ class JackWizards(Scene):
         # self.update_stuff()
         self.player.update()
 
+        for monster in self.monsters:
+            monster.update()
+
+
         # check if the player is leaving the room
         self.change_rooms()
 
@@ -358,6 +392,10 @@ class JackWizards(Scene):
 
         # # fill the shadow surface with a translucent black
         # self.shadow.fill((0, 0, 0, 0.3*255))
+
+        # draw the monsters
+        for monster in self.monsters:
+            monster.draw()
 
         self.player.draw()
 
