@@ -1,4 +1,4 @@
-from utils import Vector2
+from pygame.math import Vector2
 import scene
 
 
@@ -17,4 +17,4 @@ class Entity:
         pass
 
     def draw(self):
-        self.scene.screen.blit(self.sprite, self.position.pos())
+        self.scene.screen.blit(self.sprite, self.position)

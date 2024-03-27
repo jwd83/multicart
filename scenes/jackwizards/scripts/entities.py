@@ -1,6 +1,7 @@
 import pygame
 from utils import *
 from scene import Scene
+from pygame import Vector2
 
 
 class Entity:
@@ -133,7 +134,7 @@ class Player(Entity):
 
         # scale the velocity to 1 if we are moving diagonally
         if abs(self.velocity.x) >= 1 and abs(self.velocity.y) >= 1:
-            self.velocity.scale_velocity()
+            self.velocity.scale_to_length(1)
 
         # move the player
         self.center += self.velocity
@@ -160,5 +161,31 @@ class Player(Entity):
         self.frame.blit(img, (x, y))
 
 class Monster(Entity):
-    def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None):
+    def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None, player: Player = None):
         super().__init__(center=center, hitbox=hitbox)
+
+        self.player = player
+        self.radius_engage = 100
+        self.radius_attack = 20
+
+        self.action = 'idle'
+
+    def set_player(self, player: Player = None):
+        self.player = player
+
+    def update(self):
+        # check if the center of the player is within the radius of the monster
+
+        # default to idle
+        self.action = 'idle'
+        if self.player:
+            if self.center.distance_to(self.player.center) < self.radius_attack:
+                self.action = 'attack'
+                # self.velocity = Vector2(0, 0)
+                print("attacking")
+            elif self.center.distance_to(self.player.center) < self.radius_engage:
+                self.action = 'walk'
+                print("engaging")
+
+
+

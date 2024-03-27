@@ -33,7 +33,9 @@ class ViaLevel(Scene):
         if self.game.pressed[pygame.K_DOWN]:
             self.player.velocity.y += self.player_speed
 
-        self.player.velocity.scale_velocity()
+        # reduce speed when moving diagonally
+        if self.player.velocity.length() > 0:
+            self.player.velocity.scale_to_length(self.player_speed)
 
         self.player.position += self.player.velocity
         if self.player.position.x < 0:
