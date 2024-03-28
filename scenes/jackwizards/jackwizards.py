@@ -47,7 +47,6 @@ class JackWizards(Scene):
 
         # start making our level and rooms
         self.level = make_floor(minimum_rooms=16)
-        self.game.level = self.level.copy()
         print(self.level)
 
         self.level_x: int = 8

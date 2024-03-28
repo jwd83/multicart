@@ -30,6 +30,7 @@ class Player(Entity):
     def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None):
         super().__init__(center=center, hitbox=hitbox, scene=scene)
         self.action = 'idle'
+        # self.inventory = ['map', 'compass'] # start with these items
         self.animations = {
 
             # attack
@@ -109,6 +110,17 @@ class Player(Entity):
                 self.velocity.x = 0
                 self.velocity.y = 0
                 self.animation_locked = False
+
+            # if m, l and i are pressed add a compass and map to inventory
+            if self.game.pressed[pygame.K_m] and self.game.pressed[pygame.K_l] and self.game.pressed[pygame.K_i]:
+                if 'compass' not in self.inventory:
+                    print("Adding compass to inventory")
+                    self.inventory.append('compass')
+
+                if 'map' not in self.inventory:
+                    print("Adding map to inventory")
+                    self.inventory.append('map')
+
 
             # just pressed
             if pygame.K_SPACE in self.game.just_pressed:

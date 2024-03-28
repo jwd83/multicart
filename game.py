@@ -20,8 +20,14 @@ class Game:
 
         self.__DEFAULT_VOLUME = 50
 
-        # game specific variables
+        # game specific variables and references
+        # create a placeholder references to scenes that need to be accessed like jackwizards
+        # todo: for jw and others we should update our load function to purge this reference
+        # back to None if it leaves the scene stack so it can be picked up by the garbage collector
+        # instead of waiting for it to be reassigned later and for the last reference to
+        # an instance of jack wizards to be removed.
         self.four_jacks_easy = True
+        self.jw = None
 
         # set the quit flag to false at the start
         self.quit = False
@@ -35,8 +41,6 @@ class Game:
         self.volume_effects = self.__DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
-        self.level = None
-        self.has_map = False
 
         self.__frame_count = 0
         self.__perf_start = time.perf_counter_ns()
@@ -51,9 +55,6 @@ class Game:
         # load settings from config file
         self.config = configparser.ConfigParser()
         self.__load_settings()
-
-
-
 
         # joystick support
         self.joysticks = [
@@ -298,11 +299,27 @@ class Game:
 
     # return type is Scene
     def load_scene(self, scene: str) -> Scene:
+
+        # while we are in here let's clean out the garbage
+        # collect any old references to scenes that are no longer in the stack
+        # this will help the garbage collector clean up any old scenes that are
+        # no longer in use
+
+        # check if self.jw exists in the stack
+        if self.jw is not None:
+            if self.jw not in self.scene:
+                print("purging old jw reference")
+                self.jw = None
+
+
         print("load_scene: " + scene)
 
         # check if the string passed in matches the name of a class in the scenes module
         if scene in dir(scenes):
-            return eval("scenes." + scene + "(self)")
+            new_scene = eval("scenes." + scene + "(self)")
+            if scene == "JackWizards":
+                self.jw = new_scene
+            return new_scene
         else:
             print("WARNING: Invalid scene name! Loading start scene!")
             return eval("scenes." + settings.SCENE_START + "(self)")
