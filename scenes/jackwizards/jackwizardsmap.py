@@ -16,7 +16,7 @@ class JackWizardsMap(Scene):
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.
         if pygame.K_ESCAPE in self.game.just_pressed:
-            self.game.scene_push = "Menu"
+            self.game.scene_pop = True
 
         if pygame.K_TAB in self.game.just_pressed:
             self.game.scene_pop = True
