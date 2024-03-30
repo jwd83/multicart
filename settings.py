@@ -14,5 +14,5 @@ TITLE = "Jack Games Multicart"
 SCENE_START = "TVStatic"
 FONT = "upheavtt.ttf"
 FONT_SMALL = "TeenyTinyPixls-o2zo.ttf"
-DEBUG = True
+DEBUG = False
 WASM = False

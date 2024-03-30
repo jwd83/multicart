@@ -49,7 +49,7 @@ class GameSelect(Scene):
             if self.selected == 0:
                 self.game.scene_replace = "FourJacksTitle"
             elif self.selected == 1:
-                self.game.scene_replace = "JackNinjas"
+                self.game.scene_replace = "JackNinjasTitle"
             elif self.selected == 2:
                 self.game.scene_replace = "JackNinjasEditor"
             elif self.selected == 3:
