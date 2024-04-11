@@ -26,3 +26,7 @@ AI generated images and text
 ## bsfxr & jsfxr
 
 Various sound effects
+
+## Game Controller DB
+
+Source: <https://github.com/gabomdq/SDL_GameControllerDB>
