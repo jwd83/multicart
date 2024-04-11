@@ -1,4 +1,3 @@
-from ast import parse
 import sys
 
 class GameController:
@@ -21,7 +20,7 @@ class GameController:
     def update(self):
         self.reset()
 
-        
+
 
 
 
@@ -117,7 +116,9 @@ def get_platform():
 
 
 if __name__ == '__main__':
-    print("Detected: " + get_platform())
+    print("Running tests on : " + get_platform())
+
+    #
     print(mappings_by_guid('03000000c82d00000161000000010000'))
     print(mappings_by_name('8BitDo SN30 Pro'))
 
