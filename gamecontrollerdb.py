@@ -1,10 +1,38 @@
 import sys
+import pygame
+
 
 class GameController:
     def __init__(self, joystick, mappings):
-        self.joystick = joystick
-        self.mappings = mappings
+
         self.reset()
+
+        self.joystick = joystick
+        self.instance_id = joystick.get_instance_id()
+        self.mappings = mappings
+
+        self.build_lookups()
+
+
+    def extract_lookup(self, lookup):
+        for k in self.mappings:
+            if k.startswith(lookup + ":"):
+                print(f"Found lookup, {lookup}, at {k}")
+
+                # return the value of the mapping after the colon
+                return k.split(':')[1]
+
+
+
+    def build_lookups(self):
+        print(f"Lookups before build: {self.lookups}")
+        # build the lookups
+        self.lookups['a'] = int(self.extract_lookup('a')[1:])
+        self.lookups['b'] = int(self.extract_lookup('b')[1:])
+        self.lookups['x'] = int(self.extract_lookup('x')[1:])
+        self.lookups['y'] = int(self.extract_lookup('y')[1:])
+
+        print(f"Lookups after build: {self.lookups}")
 
     def reset(self):
         self.held = []
@@ -17,8 +45,95 @@ class GameController:
         self.hat = (0, 0)
 
 
+        self.__events_to_handle = [
+            pygame.JOYAXISMOTION,
+            pygame.JOYBALLMOTION,
+            pygame.JOYHATMOTION,
+            pygame.JOYBUTTONDOWN,
+            pygame.JOYBUTTONUP
+        ]
+
+        self.lookups = {
+            'a': None,
+            'b': None,
+            'x': None,
+            'y': None,
+            'l1': None,
+            'r1': None,
+            'select': None,
+            'start': None,
+            'l_thumb': None,
+            'r_thumb': None,
+            'l_trigger': None,
+            'r_trigger': None,
+            'up': None,
+            'down': None,
+            'left': None,
+            'right': None
+        }
+
+    def handle_events(self, event: pygame.event.Event):
+
+        # we only care about events that are related to the joystick
+        if event.type not in self.__events_to_handle:
+            return
+
+        # we only care about events that are related to this joystick
+        if event.instance_id != self.instance_id:
+            return
+
+        # handle the event
+        print(f"Handling event: {event}")
+
+    # logic for handling a generic button input each frame
+    def __update_button_input(self, button):
+
+        # check if the button is mapped
+        if self.lookups[button] is not None:
+
+            # check if the button is pressed
+            if self.joystick.get_button(self.lookups[button]):
+                # the button was pressed so ...
+
+                # check if the button is already pressed
+
+                if button in self.held:
+                    # the button was already pressed
+                    # make sure it's not in the pressed list
+                    # any longer
+                    if button in self.pressed:
+                        self.pressed.remove(button)
+
+                else:
+                    # the button was just pressed
+                    self.pressed.append(button)
+                    self.held.append(button)
+            else:
+                # check if the button was previously pressed
+                if button in self.held:
+                    # the button was previously pressed
+                    # so it is now released
+                    self.held.remove(button)
+                    if button in self.pressed:
+                        self.pressed.remove(button)
+                    self.released.append(button)
+                else:
+                    # the button was not previously held and still is not
+                    # make sure it's not in the released list any longer
+                    if button in self.released:
+                        self.released.remove(button)
+
+    # to be called once per frame
     def update(self):
-        self.reset()
+        self.__update_button_input('a')
+        self.__update_button_input('b')
+        self.__update_button_input('x')
+        self.__update_button_input('y')
+
+
+
+        # look in the mappings for the A button and see if it is pressed
+        pass
 
 
 
@@ -118,9 +233,63 @@ def get_platform():
 if __name__ == '__main__':
     print("Running tests on : " + get_platform())
 
+
     #
     print(mappings_by_guid('03000000c82d00000161000000010000'))
     print(mappings_by_name('8BitDo SN30 Pro'))
+
+
+
+
+    # start pygame
+    pygame.init()
+
+    pygame.joystick.init()
+    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+
+    print(f"Joysticks found: {len(joysticks)}")
+
+    for joystick in joysticks:
+        print(f"Joystick name: {joystick.get_name()}")
+        print(f"Joystick guid: {joystick.get_guid()}")
+        joy_map = mappings_by_name(joystick.get_name())
+        print(f"Joystick mappings: {mappings_by_name(joystick.get_name())}")
+
+        if joy_map is not None:
+            game_controller = GameController(joystick, joy_map)
+            print(f"Game controller created: {game_controller}")
+
+            # make a window to draw to
+
+            screen = pygame.display.set_mode((640, 480))
+            clock = pygame.time.Clock()
+
+
+
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit(0)
+
+                    # game_controller.handle_events(event)
+                # fill the screen with black and draw it
+
+                # update the game controller
+                game_controller.update()
+
+                for check in ['a', 'b', 'x', 'y']:
+                    if check in game_controller.pressed:
+                        print(f"{check} button pressed")
+
+                screen.fill((0, 0, 0))
+
+                pygame.display.flip()
+
+                # 60 fps
+                clock.tick(60)
+
+
+
 
 
 
