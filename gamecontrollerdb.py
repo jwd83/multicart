@@ -7,6 +7,8 @@ class GameController:
 
         self.reset()
 
+        print(f"Hats on Joystick: {joystick.get_numhats()}")
+
         self.joystick = joystick
         self.instance_id = joystick.get_instance_id()
         self.mappings = mappings
@@ -140,7 +142,7 @@ class GameController:
             # check if the hat is pressed in the direction of the button
             if button == "down" and y == -1:
                 hat_pressed = True
-            
+
 
             if button == "left" and x == -1:
                 hat_pressed = True
@@ -224,7 +226,7 @@ class GameController:
 
         # update the list of hats
         self.hats = [self.joystick.get_hat(i) for i in range(self.joystick.get_numhats())]
-        
+
 
 
         self.__update_button_input('a')
@@ -248,7 +250,6 @@ class GameController:
             self.__update_hat_input('down')
             self.__update_hat_input('left')
             self.__update_hat_input('right')
-            
 
         # if the hat is not (0,0) lets print it out for now
         hat_count = 0
@@ -375,8 +376,8 @@ if __name__ == '__main__':
     for joystick in joysticks:
         print(f"Joystick name: {joystick.get_name()}")
         print(f"Joystick guid: {joystick.get_guid()}")
-        joy_map = mappings_by_name(joystick.get_name())
-        print(f"Joystick mappings: {mappings_by_name(joystick.get_name())}")
+        joy_map = mappings_by_guid(joystick.get_guid())
+        print(f"Joystick mappings: {joy_map}")
 
         if joy_map is not None:
             game_controller = GameController(joystick, joy_map)
