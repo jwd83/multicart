@@ -11,7 +11,10 @@ class GameController:
         self.instance_id = joystick.get_instance_id()
         self.mappings = mappings
 
+        self.dpad_is_hat = True
         self.build_lookups()
+
+
 
 
     def extract_lookup(self, lookup):
@@ -34,6 +37,36 @@ class GameController:
         self.lookups['r1'] = int(self.extract_lookup('rightshoulder')[1:])
         self.lookups['l1'] = int(self.extract_lookup('leftshoulder')[1:])
 
+        # on some controllers dpad is buttons but on most it is a hat
+        # let's check dpad up to see if it's referencing a hat (h) or button (b)
+        dpup = str(self.extract_lookup('dpup'))
+        if str(dpup).startswith('h'):
+            self.dpad_is_hat = True
+
+            # grab the hat number in the character after the h
+            hat_num = int(dpup[1:2])
+
+            print(f"dpad bound to hat: {hat_num}")
+            self.lookups['up'] = hat_num
+            self.lookups['down'] = hat_num
+            self.lookups['left'] = hat_num
+            self.lookups['right'] = hat_num
+
+
+
+        else:
+            # bind the dpad to the buttons
+            self.dpad_is_hat = False
+
+            self.lookups['up'] = int(self.extract_lookup('dpup')[1:])
+            self.lookups['down'] = int(self.extract_lookup('dpdown')[1:])
+            self.lookups['left'] = int(self.extract_lookup('dpleft')[1:])
+            self.lookups['right'] = int(self.extract_lookup('dpright')[1:])
+
+
+        print(f"dpad_up: {dpup}")
+
+
         print(f"Lookups after build: {self.lookups}")
 
     def reset(self):
@@ -44,7 +77,7 @@ class GameController:
         self.r_trigger = 0.0
         self.l_thumb = (0.0, 0.0)
         self.r_thumb = (0.0, 0.0)
-        self.hat = (0, 0)
+        self.hats = []
 
 
         self.__events_to_handle = [
@@ -87,6 +120,67 @@ class GameController:
         # handle the event
         print(f"Handling event: {event}")
 
+
+    # logic for handling a generic hat input each frame
+    def __update_hat_input(self, button):
+
+        hat_pressed = False
+
+        # check if the button is mapped
+        if self.lookups[button] is not None:
+
+            # get the data from the hat
+            x, y = self.hats[self.lookups[button]]
+
+            #  print(f"Button: {button}, x: {x}, y: {y}")
+
+            if button == "up" and y == 1:
+                hat_pressed = True
+
+            # check if the hat is pressed in the direction of the button
+            if button == "down" and y == -1:
+                hat_pressed = True
+            
+
+            if button == "left" and x == -1:
+                hat_pressed = True
+
+            if button == "right" and x == 1:
+                hat_pressed = True
+
+
+            # check if the button is pressed
+            if hat_pressed:
+                # the button was pressed so ...
+
+                # check if the button is already pressed
+
+                if button in self.held:
+                    # the button was already pressed
+                    # make sure it's not in the pressed list
+                    # any longer
+                    if button in self.pressed:
+                        self.pressed.remove(button)
+
+                else:
+                    # the button was just pressed
+                    self.pressed.append(button)
+                    self.held.append(button)
+            else:
+                # check if the button was previously pressed
+                if button in self.held:
+                    # the button was previously pressed
+                    # so it is now released
+                    self.held.remove(button)
+                    if button in self.pressed:
+                        self.pressed.remove(button)
+                    self.released.append(button)
+                else:
+                    # the button was not previously held and still is not
+                    # make sure it's not in the released list any longer
+                    if button in self.released:
+                        self.released.remove(button)
+
     # logic for handling a generic button input each frame
     def __update_button_input(self, button):
 
@@ -127,6 +221,12 @@ class GameController:
 
     # to be called once per frame
     def update(self):
+
+        # update the list of hats
+        self.hats = [self.joystick.get_hat(i) for i in range(self.joystick.get_numhats())]
+        
+
+
         self.__update_button_input('a')
         self.__update_button_input('b')
         self.__update_button_input('x')
@@ -134,10 +234,28 @@ class GameController:
         self.__update_button_input('l1')
         self.__update_button_input('r1')
 
+        # check if the dpad is buttons or a hat
+        if not self.dpad_is_hat:
+            # perform button update of dpad
+            self.__update_button_input('up')
+            self.__update_button_input('down')
+            self.__update_button_input('left')
+            self.__update_button_input('right')
 
+        else:
+            # perform hat update of dpad
+            self.__update_hat_input('up')
+            self.__update_hat_input('down')
+            self.__update_hat_input('left')
+            self.__update_hat_input('right')
+            
 
-        # look in the mappings for the A button and see if it is pressed
-        pass
+        # if the hat is not (0,0) lets print it out for now
+        hat_count = 0
+        for hat in self.hats:
+            if hat != (0, 0):
+                print(f"hat {hat_count}: {hat}")
+            hat_count += 1
 
 
 
@@ -296,6 +414,11 @@ if __name__ == '__main__':
                     'y': 180,
                     'l1': 200,
                     'r1': 230,
+                    'up': 250,
+                    'down': 250,
+                    'left': 320,
+                    'right': 320
+
                 }
 
                 y_positions = {
@@ -313,7 +436,7 @@ if __name__ == '__main__':
                     text = font.render(k, True, white)
                     screen.blit(text, (0, v))
 
-                for check in ['a', 'b', 'x', 'y', 'r1', 'l1']:
+                for check in ['a', 'b', 'x', 'y', 'r1', 'l1', 'up', 'down', 'left', 'right']:
                     if check in game_controller.pressed:
                         print(f"{check} button pressed")
 
