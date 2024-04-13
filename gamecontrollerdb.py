@@ -247,6 +247,7 @@ if __name__ == '__main__':
     pygame.joystick.init()
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
 
+    font = pygame.font.Font(None, 36)
     print(f"Joysticks found: {len(joysticks)}")
 
     for joystick in joysticks:
@@ -267,6 +268,13 @@ if __name__ == '__main__':
 
 
             while True:
+                # clear the screen
+                screen.fill((0, 0, 0))
+
+                # draw text on the screen for held, pressed, released
+
+
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         sys.exit(0)
@@ -277,11 +285,56 @@ if __name__ == '__main__':
                 # update the game controller
                 game_controller.update()
 
+                x_positions = {
+                    'a': 100,
+                    'b': 120,
+                    'x': 140,
+                    'y': 160
+                }
+
+                y_positions = {
+                    'pressed': 0,
+                    'held': 40,
+                    'released': 80
+                }
+
+                white = (255, 255, 255)
+                blue = (0, 0, 255)
+                green = (0, 255, 0)
+                orange = (255, 165, 0)
+                for k, v in y_positions.items():
+                    text = font.render(k, True, white)
+                    screen.blit(text, (0, v))
+
                 for check in ['a', 'b', 'x', 'y']:
                     if check in game_controller.pressed:
                         print(f"{check} button pressed")
 
-                screen.fill((0, 0, 0))
+
+                        # draw the letter on the screen
+                        text = font.render(check, True, green)
+                        screen.blit(text, (x_positions[check], y_positions['pressed']))
+
+                    if check in game_controller.held:
+                        # this is a bit obnoxious on held in the terminal
+                        # maybe think about checking in pressed and writing
+                        # held there to let the user know it is now being
+                        # held.
+                        #
+                        # print(f"{check} button held")
+
+                        # draw the letter on the screen
+                        text = font.render(check, True, blue)
+                        screen.blit(text, (x_positions[check], y_positions['held']))
+
+                    if check in game_controller.released:
+                        print(f"{check} button released")
+
+
+                        # draw the letter on the screen
+                        text = font.render(check, True, orange)
+                        screen.blit(text, (x_positions[check], y_positions['released']))
+
 
                 pygame.display.flip()
 
