@@ -294,8 +294,8 @@ if __name__ == '__main__':
                     'b': 140,
                     'x': 160,
                     'y': 180,
-                    'r1': 180,
-                    'l1': 210
+                    'l1': 200,
+                    'r1': 230,
                 }
 
                 y_positions = {
@@ -308,11 +308,12 @@ if __name__ == '__main__':
                 blue = (0, 0, 255)
                 green = (0, 255, 0)
                 orange = (255, 165, 0)
+
                 for k, v in y_positions.items():
                     text = font.render(k, True, white)
                     screen.blit(text, (0, v))
 
-                for check in ['a', 'b', 'x', 'y']:
+                for check in ['a', 'b', 'x', 'y', 'r1', 'l1']:
                     if check in game_controller.pressed:
                         print(f"{check} button pressed")
 
