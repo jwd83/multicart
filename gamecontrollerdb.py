@@ -31,6 +31,8 @@ class GameController:
         self.lookups['b'] = int(self.extract_lookup('b')[1:])
         self.lookups['x'] = int(self.extract_lookup('x')[1:])
         self.lookups['y'] = int(self.extract_lookup('y')[1:])
+        self.lookups['r1'] = int(self.extract_lookup('rightshoulder')[1:])
+        self.lookups['l1'] = int(self.extract_lookup('leftshoulder')[1:])
 
         print(f"Lookups after build: {self.lookups}")
 
@@ -64,8 +66,8 @@ class GameController:
             'start': None,
             'l_thumb': None,
             'r_thumb': None,
-            'l_trigger': None,
-            'r_trigger': None,
+            'zl': None,
+            'zr': None,
             'up': None,
             'down': None,
             'left': None,
@@ -129,6 +131,8 @@ class GameController:
         self.__update_button_input('b')
         self.__update_button_input('x')
         self.__update_button_input('y')
+        self.__update_button_input('l1')
+        self.__update_button_input('r1')
 
 
 
@@ -286,10 +290,12 @@ if __name__ == '__main__':
                 game_controller.update()
 
                 x_positions = {
-                    'a': 100,
-                    'b': 120,
-                    'x': 140,
-                    'y': 160
+                    'a': 120,
+                    'b': 140,
+                    'x': 160,
+                    'y': 180,
+                    'r1': 180,
+                    'l1': 210
                 }
 
                 y_positions = {
