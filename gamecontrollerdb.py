@@ -38,10 +38,18 @@ class GameController:
         self.lookups['y'] = int(self.extract_lookup('y')[1:])
         self.lookups['r1'] = int(self.extract_lookup('rightshoulder')[1:])
         self.lookups['l1'] = int(self.extract_lookup('leftshoulder')[1:])
+        self.lookups['r2'] = int(self.extract_lookup('righttrigger')[1:])
+        self.lookups['l2'] = int(self.extract_lookup('lefttrigger')[1:])
         self.lookups['l3'] = int(self.extract_lookup('leftstick')[1:])
         self.lookups['r3'] = int(self.extract_lookup('rightstick')[1:])
         self.lookups['select'] = int(self.extract_lookup('back')[1:])
         self.lookups['start'] = int(self.extract_lookup('start')[1:])
+        self.lookups['lx'] = int(self.extract_lookup('leftx')[1:])
+        self.lookups['ly'] = int(self.extract_lookup('lefty')[1:])
+        self.lookups['rx'] = int(self.extract_lookup('rightx')[1:])
+        self.lookups['ry'] = int(self.extract_lookup('righty')[1:])
+
+
 
         # on some controllers dpad is buttons but on most it is a hat
         # let's check dpad up to see if it's referencing a hat (h) or button (b)
@@ -247,6 +255,14 @@ class GameController:
         self.__update_button_input('start')
 
 
+        # update sticks and triggers
+        self.l_thumb = (self.joystick.get_axis(self.lookups['lx']), self.joystick.get_axis(self.lookups['ly']))
+        self.r_thumb = (self.joystick.get_axis(self.lookups['rx']), self.joystick.get_axis(self.lookups['ry']))
+        self.l_trigger = self.joystick.get_axis(self.lookups['l2'])
+        self.r_trigger = self.joystick.get_axis(self.lookups['r2'])
+
+
+
         # check if the dpad is buttons or a hat
         if not self.dpad_is_hat:
             # perform button update of dpad
@@ -440,7 +456,12 @@ if __name__ == '__main__':
                 y_positions = {
                     'pressed': 0,
                     'held': 40,
-                    'released': 80
+                    'released': 80,
+                    'left stick': 120,
+                    'right stick': 160,
+                    'left trigger': 200,
+                    'right trigger': 240,
+
                 }
 
                 white = (255, 255, 255)
@@ -451,6 +472,18 @@ if __name__ == '__main__':
                 for k, v in y_positions.items():
                     text = font.render(k, True, white)
                     screen.blit(text, (0, v))
+
+                # draw analog stick and trigger values
+                text = font.render(f"{game_controller.l_thumb}", True, white)
+                screen.blit(text, (200, y_positions['left stick']))
+                text = font.render(f"{game_controller.r_thumb}", True, white)
+                screen.blit(text, (200, y_positions['right stick']))
+                text = font.render(f"{game_controller.l_trigger}", True, white)
+                screen.blit(text, (200, y_positions['left trigger']))
+                text = font.render(f"{game_controller.r_trigger}", True, white)
+                screen.blit(text, (200, y_positions['right trigger']))
+
+
 
                 for check in ['a', 'b', 'x', 'y', 'up', 'down', 'left', 'right',  'r1', 'l1', 'l3', 'r3', 'select', 'start']:
                     if check in game_controller.pressed:
@@ -480,6 +513,8 @@ if __name__ == '__main__':
                         # draw the letter on the screen
                         text = font.render(check, True, orange)
                         screen.blit(text, (x_positions[check], y_positions['released']))
+
+
 
 
                 pygame.display.flip()
