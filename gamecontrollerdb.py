@@ -40,6 +40,8 @@ class GameController:
         self.lookups['l1'] = int(self.extract_lookup('leftshoulder')[1:])
         self.lookups['l3'] = int(self.extract_lookup('leftstick')[1:])
         self.lookups['r3'] = int(self.extract_lookup('rightstick')[1:])
+        self.lookups['select'] = int(self.extract_lookup('back')[1:])
+        self.lookups['start'] = int(self.extract_lookup('start')[1:])
 
         # on some controllers dpad is buttons but on most it is a hat
         # let's check dpad up to see if it's referencing a hat (h) or button (b)
@@ -241,6 +243,8 @@ class GameController:
         self.__update_button_input('r1')
         self.__update_button_input('l3')
         self.__update_button_input('r3')
+        self.__update_button_input('select')
+        self.__update_button_input('start')
 
 
         # check if the dpad is buttons or a hat
@@ -427,7 +431,9 @@ if __name__ == '__main__':
                     'left': 320,
                     'right': 320,
                     'l3': 400,
-                    'r3': 440
+                    'r3': 440,
+                    'select': 480,
+                    'start': 520
 
                 }
 
@@ -446,7 +452,7 @@ if __name__ == '__main__':
                     text = font.render(k, True, white)
                     screen.blit(text, (0, v))
 
-                for check in ['a', 'b', 'x', 'y', 'r1', 'l1', 'up', 'down', 'left', 'right', 'l3', 'r3']:
+                for check in ['a', 'b', 'x', 'y', 'up', 'down', 'left', 'right',  'r1', 'l1', 'l3', 'r3', 'select', 'start']:
                     if check in game_controller.pressed:
                         print(f"{check} button pressed")
 
