@@ -38,6 +38,8 @@ class GameController:
         self.lookups['y'] = int(self.extract_lookup('y')[1:])
         self.lookups['r1'] = int(self.extract_lookup('rightshoulder')[1:])
         self.lookups['l1'] = int(self.extract_lookup('leftshoulder')[1:])
+        self.lookups['ls'] = int(self.extract_lookup('leftstick')[1:])
+        self.lookups['rs'] = int(self.extract_lookup('rightstick')[1:])
 
         # on some controllers dpad is buttons but on most it is a hat
         # let's check dpad up to see if it's referencing a hat (h) or button (b)
@@ -95,18 +97,20 @@ class GameController:
             'b': None,
             'x': None,
             'y': None,
+            'up': None,
+            'down': None,
+            'left': None,
+            'right': None,
             'l1': None,
             'r1': None,
+            'ls': None,
+            'rs': None,
             'select': None,
             'start': None,
             'l_thumb': None,
             'r_thumb': None,
             'zl': None,
             'zr': None,
-            'up': None,
-            'down': None,
-            'left': None,
-            'right': None
         }
 
     def handle_events(self, event: pygame.event.Event):
@@ -235,6 +239,9 @@ class GameController:
         self.__update_button_input('y')
         self.__update_button_input('l1')
         self.__update_button_input('r1')
+        self.__update_button_input('ls')
+        self.__update_button_input('rs')
+        
 
         # check if the dpad is buttons or a hat
         if not self.dpad_is_hat:
@@ -357,9 +364,9 @@ if __name__ == '__main__':
     print("Running tests on : " + get_platform())
 
 
-    #
-    print(mappings_by_guid('03000000c82d00000161000000010000'))
-    print(mappings_by_name('8BitDo SN30 Pro'))
+    # #
+    # print(mappings_by_guid('03000000c82d00000161000000010000'))
+    # print(mappings_by_name('8BitDo SN30 Pro'))
 
 
 
@@ -418,7 +425,9 @@ if __name__ == '__main__':
                     'up': 250,
                     'down': 250,
                     'left': 320,
-                    'right': 320
+                    'right': 320,
+                    'ls': 400,
+                    'rs': 440
 
                 }
 
@@ -437,7 +446,7 @@ if __name__ == '__main__':
                     text = font.render(k, True, white)
                     screen.blit(text, (0, v))
 
-                for check in ['a', 'b', 'x', 'y', 'r1', 'l1', 'up', 'down', 'left', 'right']:
+                for check in ['a', 'b', 'x', 'y', 'r1', 'l1', 'up', 'down', 'left', 'right', 'ls', 'rs']:
                     if check in game_controller.pressed:
                         print(f"{check} button pressed")
 
