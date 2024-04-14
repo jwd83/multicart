@@ -38,8 +38,8 @@ class GameController:
         self.lookups['y'] = int(self.extract_lookup('y')[1:])
         self.lookups['r1'] = int(self.extract_lookup('rightshoulder')[1:])
         self.lookups['l1'] = int(self.extract_lookup('leftshoulder')[1:])
-        self.lookups['ls'] = int(self.extract_lookup('leftstick')[1:])
-        self.lookups['rs'] = int(self.extract_lookup('rightstick')[1:])
+        self.lookups['l3'] = int(self.extract_lookup('leftstick')[1:])
+        self.lookups['r3'] = int(self.extract_lookup('rightstick')[1:])
 
         # on some controllers dpad is buttons but on most it is a hat
         # let's check dpad up to see if it's referencing a hat (h) or button (b)
@@ -103,8 +103,8 @@ class GameController:
             'right': None,
             'l1': None,
             'r1': None,
-            'ls': None,
-            'rs': None,
+            'l3': None,
+            'r3': None,
             'select': None,
             'start': None,
             'l_thumb': None,
@@ -239,9 +239,9 @@ class GameController:
         self.__update_button_input('y')
         self.__update_button_input('l1')
         self.__update_button_input('r1')
-        self.__update_button_input('ls')
-        self.__update_button_input('rs')
-        
+        self.__update_button_input('l3')
+        self.__update_button_input('r3')
+
 
         # check if the dpad is buttons or a hat
         if not self.dpad_is_hat:
@@ -392,7 +392,7 @@ if __name__ == '__main__':
 
             # make a window to draw to
 
-            screen = pygame.display.set_mode((640, 480))
+            screen = pygame.display.set_mode((800, 600))
             clock = pygame.time.Clock()
 
 
@@ -426,8 +426,8 @@ if __name__ == '__main__':
                     'down': 250,
                     'left': 320,
                     'right': 320,
-                    'ls': 400,
-                    'rs': 440
+                    'l3': 400,
+                    'r3': 440
 
                 }
 
@@ -446,7 +446,7 @@ if __name__ == '__main__':
                     text = font.render(k, True, white)
                     screen.blit(text, (0, v))
 
-                for check in ['a', 'b', 'x', 'y', 'r1', 'l1', 'up', 'down', 'left', 'right', 'ls', 'rs']:
+                for check in ['a', 'b', 'x', 'y', 'r1', 'l1', 'up', 'down', 'left', 'right', 'l3', 'r3']:
                     if check in game_controller.pressed:
                         print(f"{check} button pressed")
 
