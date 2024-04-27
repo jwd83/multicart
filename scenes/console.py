@@ -9,8 +9,10 @@ class Console(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.background = self.make_transparent_surface(self.screen.get_size())
+        self.terminal_output = self.make_transparent_surface(self.screen.get_size())
         self.background.fill((0, 0, 0, 200))
         self.history = []
+        self.command_history = []
         self.command = ""
         self.active = False
 
@@ -25,9 +27,39 @@ class Console(Scene):
                 self.command = self.command[:-1]
                 continue
 
+            if k == pygame.K_DOWN:
+                if len(self.command_history) == 0:
+                    continue
+                if self.history_pointer is None:
+                    continue
+                self.history_pointer += 1
+                if self.history_pointer >= len(self.command_history):
+                    self.history_pointer = len(self.command_history) - 1
+                self.command = self.command_history[self.history_pointer]
+                continue
+
+            if k == pygame.K_UP:
+                if len(self.command_history) == 0:
+                    continue
+                if self.history_pointer is None:
+                    self.history_pointer = len(self.command_history) - 1
+                else:
+                    self.history_pointer -= 1
+
+
+                if self.history_pointer < 0:
+                    self.history_pointer = 0
+                self.command = self.command_history[self.history_pointer]
+                continue
+
             # execute the command in the console
             if k == pygame.K_RETURN:
-                self.history.append("<<" + self.command)
+                self.history_pointer = None
+                self.history.append(self.command)
+                # if this command already exists in the history, remove it so we can add it to the end
+                if self.command in self.command_history:
+                    self.command_history.remove(self.command)
+                self.command_history.append(self.command)
 
                 # make the basic commands case insensitive
                 command_lower = self.command.lower()
