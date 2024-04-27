@@ -37,6 +37,7 @@
         "ndarray",
         "numhats",
         "offgrid",
+        "pygame",
         "pygbag",
         "RCTRL",
         "rects",
