@@ -215,6 +215,7 @@ class JackWizards(Scene):
 
         # check if this is the compass room
         if room_flags & 64:
+            self.game.log("Compass room found")
             if "compass" not in self.player.inventory:
                 self.player.inventory.append("compass")
 
@@ -340,7 +341,7 @@ class JackWizards(Scene):
 
         # test console logging
         if self.transition == self.transition_duration:
-            self.game.console.history.append(f"Player moved to room {self.level_x}-{self.level_y}")
+            self.game.log(f"Player moved to room {self.level_x}-{self.level_y}")
 
     def draw_transition(self):
         # the east/west transitions are easier as we can just slide the room over

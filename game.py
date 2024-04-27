@@ -465,3 +465,6 @@ class Game:
         print("shutting down...")
         pygame.quit()
         sys.exit()
+
+    def log(self, message: str):
+        self.console.history.append(message)
