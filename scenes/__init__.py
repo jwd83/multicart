@@ -5,6 +5,9 @@ from .jackgames import JackGames
 from .gameselect import GameSelect
 from .tvstatic import TVStatic
 
+# console
+from .console import Console
+
 # jack wizards
 from .jackwizards.jackwizards import JackWizards
 from .jackwizards.jackwizardsmap import JackWizardsMap

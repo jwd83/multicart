@@ -41,6 +41,7 @@ class Game:
         self.volume_effects = self.__DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
+        self.unicode = "" # text input this frame
 
         self.__frame_count = 0
         self.__perf_start = time.perf_counter_ns()
@@ -114,6 +115,7 @@ class Game:
     # pygbag requires this be async to run the game
     async def run(self):
         self.debug_scene = scenes.Debug(self)
+        self.console = scenes.Console(self)
 
         while not self.quit:
 
@@ -124,6 +126,11 @@ class Game:
             # handle events and input
             self.get_events_and_input()
 
+            # check if tilde was pressed to open the console
+            if pygame.K_BACKQUOTE in self.just_pressed:
+                self.__toggle_console()
+
+            
             # set all scenes to inactive except the top scene in the stack
             for scene in self.scene:
                 scene.active = False
@@ -219,11 +226,16 @@ class Game:
 
     def get_events_and_input(self):
         # get input
+        self.unicode = ""
         self.pressed = pygame.key.get_pressed()
         self.just_pressed = []
         self.just_released = []
         self.just_mouse_down = []
         self.just_mouse_up = []
+
+        # capture the list of modifiers being held down
+        ctrl = pygame.key.get_mods() & pygame.KMOD_CTRL
+        alt = pygame.key.get_mods() & pygame.KMOD_ALT
 
         # get events
         for event in pygame.event.get():
@@ -231,6 +243,34 @@ class Game:
                 self.quit = True
             elif event.type == pygame.KEYDOWN:
                 self.just_pressed.append(event.key)
+
+                reject_unicode = False
+
+
+                # attempt to append the unicode character to the unicode string
+                # if it's not in the list of keys to reject or a modifier key
+
+                # other than shift is being held
+                keys_to_reject = [
+                    pygame.K_RETURN,
+                    pygame.K_TAB,
+                    pygame.K_BACKSPACE,
+                    pygame.K_BACKQUOTE
+                ]
+
+                if event.key in keys_to_reject:
+                    reject_unicode = True
+
+                # check ctrl or alt are being held down
+                if ctrl or alt:
+                    reject_unicode = True
+                
+                if not reject_unicode:
+                    try:
+                        self.unicode += event.unicode
+                    except:
+                        pass
+
             elif event.type == pygame.KEYUP:
                 self.just_released.append(event.key)
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -367,6 +407,19 @@ class Game:
 
     def frame_count(self):
         return self.__frame_count
+    
+    def __toggle_console(self):
+        # toggle the console
+        self.console.active = not self.console.active
+
+        if self.console.active:
+            # if it is now active add it to the scene stack
+            self.just_pressed.remove(pygame.K_BACKQUOTE)
+            self.scene.append(self.console)
+        else:
+            # if it is now inactive remove it from the scene stack
+            self.scene_pop = 1
+            self.__change_scenes()
 
     def __quit(self):
 

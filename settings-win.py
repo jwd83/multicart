@@ -16,3 +16,4 @@ FONT = "upheavtt.ttf"
 FONT_SMALL = "TeenyTinyPixls-o2zo.ttf"
 DEBUG = False
 WASM = False
+CONSOLE = True
