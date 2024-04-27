@@ -23,18 +23,22 @@ class Scene:
         self.standard_stroke_thickness = 1
         self.standard_font_size = 40
         self.standard_color = (240, 240, 240)
+        self.standard_font = None # use the default font
 
     def standard_text(
         self,
         text: str,
         font_size: int | None = None,
     ):
+        
         if font_size is None:
             font_size = self.standard_font_size
+
         return self.make_text(
             text,
             self.standard_color,
             font_size,
+            font=self.standard_font,
             stroke=self.standard_stroke,
             strokeColor=self.standard_stroke_color,
             strokeThickness=self.standard_stroke_thickness,
@@ -201,6 +205,9 @@ class Scene:
     ):
         if font is None:
             font = "assets/fonts/" + settings.FONT
+
+        if font == "system-ui":
+            font = None
 
         # if we aren't stroking return the text directly
         if not stroke:
