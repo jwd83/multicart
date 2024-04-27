@@ -296,6 +296,7 @@ class JackWizards(Scene):
                 self.level_x -= 1
                 self.make_room()
 
+
         if self.hallway_east:
             if self.player.center.x == 298 and abs(self.player.center.y - 90) <= door_slack:
                 # setup the transition
@@ -337,6 +338,9 @@ class JackWizards(Scene):
                 # make the new room
                 self.make_room()
 
+        # test console logging
+        if self.transition == self.transition_duration:
+            self.game.console.history.append(f"Player moved to room {self.level_x}-{self.level_y}")
 
     def draw_transition(self):
         # the east/west transitions are easier as we can just slide the room over

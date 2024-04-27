@@ -19,7 +19,12 @@ class Console(Scene):
         self.command += self.game.unicode
 
         for k in self.game.just_pressed:
-        
+
+            # delete the last character in the command
+            if k == pygame.K_BACKSPACE:
+                self.command = self.command[:-1]
+                continue
+
             # execute the command in the console
             if k == pygame.K_RETURN:
                 self.history.append("<<" + self.command)
@@ -55,11 +60,10 @@ class Console(Scene):
                         
                 self.command = ""
                 continue
+
+    def execute_command(self, command):
+        pass
             
-            # delete the last character in the command
-            if k == pygame.K_BACKSPACE:
-                self.command = self.command[:-1]
-                continue
         
     def draw(self):
         self.screen.blit(self.background, (0, 0))
