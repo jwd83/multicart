@@ -15,6 +15,8 @@ class Console(Scene):
         self.command_history = []
         self.command = ""
         self.active = False
+        self.last_render = None
+        self.terminal_rows = 20
 
     def update(self):
 
@@ -89,14 +91,14 @@ class Console(Scene):
                         exec(self.command)
                     except Exception as e:
                         self.history.append(f">>Error: {e}")
-                        
+
                 self.command = ""
                 continue
 
     def execute_command(self, command):
         pass
-            
-        
+
+
     def draw(self):
         self.screen.blit(self.background, (0, 0))
         self.standard_font_size = 16
@@ -107,5 +109,16 @@ class Console(Scene):
         self.screen.blit(self.standard_text(self.command), (10, 20))
 
         # draw the last 5 history elements
-        for i, h in enumerate(self.history[-10:]):
-            self.screen.blit(self.standard_text(h), (10, 30 + 10 * i))
+        drawn_cache = ""
+        for dci in self.history[-self.terminal_rows:]:
+            drawn_cache += dci + "\n"
+
+        if drawn_cache != self.last_render:
+            self.last_render = drawn_cache
+
+            # create a fresh surface to draw the terminal output
+            self.terminal_output = self.make_transparent_surface(self.screen.get_size())
+            for i, h in enumerate(self.history[-self.terminal_rows:]):
+                self.terminal_output.blit(self.standard_text(h), (10, 30 + 10 * i))
+
+        self.screen.blit(self.terminal_output, (0, 0))
