@@ -100,7 +100,6 @@ class Console(Scene):
                         "debug         toggle debug mode",
                         "exit | quit   quit the game",
                         "help | ?      show this help",
-                        "clear = a"
                     ]
 
                     # self.history.append(*help_docs)
