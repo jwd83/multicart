@@ -16,7 +16,13 @@ class Console(Scene):
         self.command = ""
         self.active = False
         self.last_render = None
-        self.terminal_rows = 20
+        self.terminal_rows = 30
+        self.standard_font_size = 16
+        self.standard_stroke = 0
+        self.standard_font = "system-ui"
+        self.standard_color = (255, 255, 255)
+        self.title = "PyGame Console"
+        self.console_title = self.standard_text(self.title)
 
     def update(self):
 
@@ -26,7 +32,22 @@ class Console(Scene):
 
             # delete the last character in the command
             if k == pygame.K_BACKSPACE:
-                self.command = self.command[:-1]
+                # check if a modifier is being held
+
+
+                # capture the list of modifiers being held down
+                ctrl = pygame.key.get_mods() & pygame.KMOD_CTRL
+                alt = pygame.key.get_mods() & pygame.KMOD_ALT
+                super = pygame.key.get_mods() & pygame.KMOD_GUI
+
+                if ctrl or alt or super:
+                    # split the command into words
+                    words = self.command.split(" ")
+
+                    # rejoin the words without the last one
+                    self.command = " ".join(words[:-1])
+                else:
+                    self.command = self.command[:-1]
                 continue
 
             if k == pygame.K_DOWN:
@@ -75,10 +96,11 @@ class Console(Scene):
                         "This is a simple console. It will execute the given",
                         "python unless provided an exact command as follows:",
                         ">>HELP>>COMMAND LIST:",
-                        "exit | quit   quit the game",
                         "clear         clear the console",
-                        "help | ?      show this help",
                         "debug         toggle debug mode",
+                        "exit | quit   quit the game",
+                        "help | ?      show this help",
+                        "clear = a"
                     ]
 
                     # self.history.append(*help_docs)
@@ -100,13 +122,18 @@ class Console(Scene):
 
 
     def draw(self):
+
+        prompt_text = f'$ {self.command}'
+        prompt_texture = self.standard_text(prompt_text)
+
         self.screen.blit(self.background, (0, 0))
-        self.standard_font_size = 16
-        self.standard_stroke = 0
-        self.standard_font = "system-ui"
-        self.standard_color = (255, 255, 255)
-        self.screen.blit(self.standard_text("PyGame Console"), (10, 10))
-        self.screen.blit(self.standard_text(self.command), (10, 20))
+        self.screen.blit(self.console_title, (10, 10))
+        self.screen.blit(prompt_texture, (10, 20))
+
+        # draw a blinking cursor next to the prompt texture
+        if self.game.frame_count() % 60 < 30:
+            cursor = self.standard_text("_")
+            self.screen.blit(cursor, (10 + prompt_texture.get_width(), 20))
 
         # draw the last 5 history elements
         drawn_cache = ""
