@@ -1,5 +1,3 @@
-# this file is just for reference, it is not used in the game
-
 import pygame
 from scene import Scene
 from utils import *

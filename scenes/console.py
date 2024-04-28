@@ -1,5 +1,3 @@
-# this file is just for reference, it is not used in the game
-
 import pygame
 from scene import Scene
 from utils import *
@@ -21,8 +19,18 @@ class Console(Scene):
         self.standard_stroke = 0
         self.standard_font = "system-ui"
         self.standard_color = (255, 255, 255)
-        self.title = "PyGame Console"
-        self.console_title = self.standard_text(self.title)
+        self.console_title = self.standard_text( "PyGame Console")
+        self.help_docs = [
+            ">>HELP:",
+            "This is a simple console. It will execute the given",
+            "python unless provided an exact command as follows:",
+            ">>HELP>>COMMAND LIST:",
+            "clear         clear the console",
+            "debug         toggle debug mode",
+            "exit | quit   quit the game",
+            "help | ?      show this help",
+            "stack         show information about the scene stack"
+        ]   
 
     def update(self):
 
@@ -91,19 +99,7 @@ class Console(Scene):
                 elif command_lower == "clear":
                     self.history = []
                 elif command_lower == "help" or command_lower == "?":
-                    help_docs = [
-                        ">>HELP:",
-                        "This is a simple console. It will execute the given",
-                        "python unless provided an exact command as follows:",
-                        ">>HELP>>COMMAND LIST:",
-                        "clear         clear the console",
-                        "debug         toggle debug mode",
-                        "exit | quit   quit the game",
-                        "help | ?      show this help",
-                    ]
-
-                    # self.history.append(*help_docs)
-                    self.history.extend(help_docs)
+                    self.history.extend(self.help_docs)
                 elif command_lower == "debug":
                     settings.DEBUG = not settings.DEBUG
                 else:
