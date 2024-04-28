@@ -35,3 +35,9 @@ from .jackninjas.jackninjaseditor import JackNinjasEditor
 from .superball.superballtitle import SuperBallTitle
 from .superball.superballfield import SuperBallField
 
+# quadblox
+
+from .quadblox.quadbloxtitle import QuadBloxTitle
+from .quadblox.quadblox import QuadBlox
+
+

@@ -22,6 +22,7 @@ class GameSelect(Scene):
             self.standard_text("Jack Wizards"),
             self.standard_text("Superball"),
             self.standard_text("Font Test"),
+            self.standard_text("Quad Blox"),
             self.standard_text("Options"),
             self.standard_text("Quit to Desktop"),
         ]
