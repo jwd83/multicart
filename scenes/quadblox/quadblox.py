@@ -34,6 +34,8 @@ class QuadBlox(Scene):
         self.standard_font_size = 20
         self.standard_stroke = False
 
+        self.projected_piece = None
+
 
 
     def setup_opponents(self):
@@ -195,6 +197,22 @@ class QuadBlox(Scene):
             else:
                 self.place()
 
+        # solve projected piece and move to it if commanded to
+        projected = copy.deepcopy(self.player_piece)
+        while not projected.collides(self.player_board):
+            projected.y += 1
+
+        projected.y -= 1
+
+        if projected.y > self.player_piece.y:
+            self.projected_piece = projected
+        else:
+            self.projected_piece = None
+
+        if pygame.K_SPACE in self.game.just_pressed and self.projected_piece is not None:
+            self.drop_count = 0
+            self.player_piece = self.projected_piece
+
         # check for death
         for x in range(10):
             for y in range(4):
@@ -202,6 +220,8 @@ class QuadBlox(Scene):
                     self.died_at = self.elapsed
                     self.player_board.kill()
                     return
+                
+        
 
 
     def place(self):
@@ -218,12 +238,28 @@ class QuadBlox(Scene):
             self.play_sound("jsfxr-drop2")
         else:
             self.play_sound("jsfxr-drop2")
+    
+    def draw_projected_piece(self):
+        if self.projected_piece is not None:
+            for x in range(4):
+                for y in range(4):
+                    if self.projected_piece.grid[y][x]:
+                        pygame.draw.rect(
+                            self.screen,
+                            (255,255,255,100),
+                            (
+                                (self.projected_piece.x + x) * 12 + 100,
+                                (self.projected_piece.y + y) * 12 + 10,
+                                12 - 1,
+                                12 - 1)
+                        )
 
     def draw(self):
 
         # draw the player board
         self.screen.fill((0, 0, 0))
         self.draw_board(self.player_board)
+        self.draw_projected_piece()
 
         # draw the player stats
         pos = self.player_board.pos
