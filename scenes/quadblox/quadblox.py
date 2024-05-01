@@ -215,9 +215,9 @@ class QuadBlox(Scene):
         self.held_down_for = 0
 
         if random.choice([True, False]):
-            self.play_sound("jsfxr-drop2.wav")
+            self.play_sound("jsfxr-drop2")
         else:
-            self.play_sound("jsfxr-drop1.wav")
+            self.play_sound("jsfxr-drop2")
 
     def draw(self):
 
