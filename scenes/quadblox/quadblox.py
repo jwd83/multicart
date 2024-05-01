@@ -157,12 +157,6 @@ class QuadBlox(Scene):
                             if not sim_rotate.collides(self.player_board):
                                 self.player_piece = sim_rotate
 
-
-        
-
-
-
-
         # DOWN MOVEMENT / GRAVITY 
         # should we fall this frame?
         try_drop = False
@@ -243,14 +237,33 @@ class QuadBlox(Scene):
                 (pos[0] + bs * 11, pos[1] + 40 + y * 20)
             )
 
-
-
         # draw the opponents boards
         for opponent in self.opponents:
             self.draw_board(opponent)
 
         # draw our piece
         self.draw_piece()
+
+        # draw the next piece
+        self.draw_next_piece()
+
+    def draw_next_piece(self):
+        self.screen.blit(
+            self.standard_text("NEXT"),
+            (10, 10)
+        )
+        for x in range(4):
+            for y in range(4):
+                if self.next_piece.grid[y][x]:
+                    pygame.draw.rect(
+                        self.screen,
+                        colors[self.next_piece.color],
+                        (
+                            x * 12 ,
+                            y * 12 + 30,
+                            12 - 1,
+                            12 - 1)
+                    )   
 
     def draw_piece(self):
         for x in range(4):
