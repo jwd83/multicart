@@ -33,7 +33,7 @@ class QuadBlox(Scene):
 
         self.standard_font_size = 20
         self.standard_stroke = False
-        
+
 
 
     def setup_opponents(self):
@@ -68,19 +68,19 @@ class QuadBlox(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
             return
-        
-        
+
+
         # if we are dead stop the update logic here
         if self.died_at:
-            return 
-        
+            return
+
         # check if we are already colliding. If we are, place the piece
         if self.player_piece.collides(self.player_board):
             self.place()
             return
 
 
-        # LEFT / RIGHT MOVEMENT 
+        # LEFT / RIGHT MOVEMENT
         left_held_tick = False
         right_held_tick = False
 
@@ -90,7 +90,7 @@ class QuadBlox(Scene):
             self.held_right_for = 0
 
 
-        # check if left has been held for a while 
+        # check if left has been held for a while
         if not self.game.pressed[pygame.K_LEFT]:
             self.held_left_for = 0
         else:
@@ -102,8 +102,8 @@ class QuadBlox(Scene):
 
                 if numerator % denominator == 0:
                     left_held_tick = True
-            
-        
+
+
         if not self.game.pressed[pygame.K_RIGHT]:
             self.held_right_for = 0
         else:
@@ -115,7 +115,7 @@ class QuadBlox(Scene):
 
                 if numerator % denominator == 0:
                     right_held_tick = True
-            
+
 
         sim_left_right = copy.deepcopy(self.player_piece)
         if pygame.K_LEFT in self.game.just_pressed or left_held_tick:
@@ -157,10 +157,10 @@ class QuadBlox(Scene):
                             if not sim_rotate.collides(self.player_board):
                                 self.player_piece = sim_rotate
 
-        # DOWN MOVEMENT / GRAVITY 
+        # DOWN MOVEMENT / GRAVITY
         # should we fall this frame?
         try_drop = False
-    
+
         # check if down has been held for a while
         if self.game.pressed[pygame.K_DOWN]:
             self.held_down_for += 1
@@ -177,15 +177,15 @@ class QuadBlox(Scene):
         if pygame.K_DOWN in self.game.just_pressed:
             try_drop = True
 
-        
+
         # increment drop count and see if we need to drop the piece
         self.drop_count += 1
         if self.drop_count >= self.drop_at:
             try_drop = True
-    
-        # perform the drop if needed        
+
+        # perform the drop if needed
         if try_drop:
-            
+
             # if we are dropping the piece, reset the drop count
             self.drop_count = 0
             sim_drop = copy.deepcopy(self.player_piece)
@@ -210,6 +210,14 @@ class QuadBlox(Scene):
         self.player_board.place(self.player_piece)
         self.player_piece = self.next_piece
         self.next_piece = Piece()
+        # restart the delay for down being held to slow up the next place pieced
+        # from dropping right away when just placed
+        self.held_down_for = 0
+
+        if random.choice([True, False]):
+            self.play_sound("jsfxr-drop2.wav")
+        else:
+            self.play_sound("jsfxr-drop1.wav")
 
     def draw(self):
 
@@ -263,7 +271,7 @@ class QuadBlox(Scene):
                             y * 12 + 30,
                             12 - 1,
                             12 - 1)
-                    )   
+                    )
 
     def draw_piece(self):
         for x in range(4):
