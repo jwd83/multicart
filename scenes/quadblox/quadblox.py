@@ -22,7 +22,7 @@ class QuadBlox(Scene):
         self.drop_count = 0
 
         self.held_down_for = 0
-        self.held_toggles_at = 12
+        self.held_toggles_at = 10
         self.held_frame_interval = 4
         self.held_left_for = 0
         self.held_right_for = 0
@@ -80,9 +80,14 @@ class QuadBlox(Scene):
             return
 
 
-        # LEFT / RIGHT MOVEMENT AND ROTATION
+        # LEFT / RIGHT MOVEMENT 
         left_held_tick = False
         right_held_tick = False
+
+        # if they are holding both reset it
+        if self.game.pressed[pygame.K_LEFT] and self.game.pressed[pygame.K_RIGHT]:
+            self.held_left_for = 0
+            self.held_right_for = 0
 
 
         # check if left has been held for a while 
@@ -112,28 +117,55 @@ class QuadBlox(Scene):
                     right_held_tick = True
             
 
-        sim_piece = copy.deepcopy(self.player_piece)
+        sim_left_right = copy.deepcopy(self.player_piece)
         if pygame.K_LEFT in self.game.just_pressed or left_held_tick:
-            sim_piece.x -= 1
+            sim_left_right.x -= 1
 
         if pygame.K_RIGHT in self.game.just_pressed or right_held_tick:
-            sim_piece.x += 1
-
-        if pygame.K_UP in self.game.just_pressed:
-            sim_piece.rotate_and_size()
-
-
-
+            sim_left_right.x += 1
 
         # if the sim piece does not collide update our piece to it
-        if not sim_piece.collides(self.player_board):
-            self.player_piece = sim_piece
+        if not sim_left_right.collides(self.player_board):
+            self.player_piece = sim_left_right
+
+
+        # ROTATION
+        sim_rotate = copy.deepcopy(self.player_piece)
+
+        if pygame.K_UP in self.game.just_pressed:
+            sim_rotate.rotate()
+            if not sim_rotate.collides(self.player_board):
+                self.player_piece = sim_rotate
+            else:
+                # try right one first
+                sim_rotate.x = self.player_piece.x + 1
+
+                if not sim_rotate.collides(self.player_board):
+                    self.player_piece = sim_rotate
+                else:
+                    # try left one if that didn't work
+                    sim_rotate.x = self.player_piece.x - 1
+
+                    if not sim_rotate.collides(self.player_board):
+                        self.player_piece = sim_rotate
+                    else:
+                        # for an i piece try 2 left
+                        if sim_rotate.shape == Shapes.I:
+
+                            # try left two (from the original piece)
+                            sim_rotate.x = self.player_piece.x - 2
+                            if not sim_rotate.collides(self.player_board):
+                                self.player_piece = sim_rotate
+
+
+        
+
 
 
 
         # DOWN MOVEMENT / GRAVITY 
         # should we fall this frame?
-        sim_drop = False
+        try_drop = False
     
         # check if down has been held for a while
         if self.game.pressed[pygame.K_DOWN]:
@@ -143,29 +175,29 @@ class QuadBlox(Scene):
                 denominator = self.held_frame_interval
 
                 if numerator % denominator == 0:
-                    sim_drop = True
+                    try_drop = True
         else:
             self.held_down_for = 0
 
         # check for key press down
         if pygame.K_DOWN in self.game.just_pressed:
-            sim_drop = True
+            try_drop = True
 
-        # check for gravity fall
+        
+        # increment drop count and see if we need to drop the piece
         self.drop_count += 1
         if self.drop_count >= self.drop_at:
-            sim_drop = True
+            try_drop = True
     
-                
-        # increment drop count and see if we need to drop the piece
-        if sim_drop:
+        # perform the drop if needed        
+        if try_drop:
             
             # if we are dropping the piece, reset the drop count
             self.drop_count = 0
-            drop_sim = copy.deepcopy(self.player_piece)
-            drop_sim.y += 1
-            if not drop_sim.collides(self.player_board):
-                self.player_piece = drop_sim
+            sim_drop = copy.deepcopy(self.player_piece)
+            sim_drop.y += 1
+            if not sim_drop.collides(self.player_board):
+                self.player_piece = sim_drop
             else:
                 self.place()
 
@@ -179,6 +211,7 @@ class QuadBlox(Scene):
 
 
     def place(self):
+        self.game.log(f"Placing piece: {self.player_piece.shape}")
         # place the current piece and get a new piece
         self.player_board.place(self.player_piece)
         self.player_piece = self.next_piece
