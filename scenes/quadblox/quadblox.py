@@ -4,6 +4,7 @@ from utils import *
 from .scripts.qb import Board, colors, Piece, Shapes
 import copy
 
+
 class QuadBlox(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -219,6 +220,7 @@ class QuadBlox(Scene):
                 if self.player_board.grid[y][x]:
                     self.died_at = self.elapsed
                     self.player_board.kill()
+                    self.projected_piece = None
                     return
                 
         
@@ -228,6 +230,8 @@ class QuadBlox(Scene):
         self.game.log(f"Placing piece: {self.player_piece.shape}")
         # place the current piece and get a new piece
         self.player_board.place(self.player_piece)
+        self.level = self.player_board.lines_cleared // 10
+        self.drop_at = max(4, 60 - self.level * 5)
         self.player_piece = self.next_piece
         self.next_piece = Piece()
         # restart the delay for down being held to slow up the next place pieced
@@ -246,10 +250,10 @@ class QuadBlox(Scene):
                     if self.projected_piece.grid[y][x]:
                         pygame.draw.rect(
                             self.screen,
-                            (255,255,255,100),
+                            (140,140,140),
                             (
                                 (self.projected_piece.x + x) * 12 + 100,
-                                (self.projected_piece.y + y) * 12 + 10,
+                                (self.projected_piece.y + y) * 12 + 10 + math.sin(self.elapsed() * 12) * 2,
                                 12 - 1,
                                 12 - 1)
                         )
@@ -280,6 +284,29 @@ class QuadBlox(Scene):
                 self.standard_text(f"{y + 1}x " + str(self.player_board.clears[y])),
                 (pos[0] + bs * 11, pos[1] + 40 + y * 20)
             )
+
+        self.screen.blit(
+            self.standard_text("LINES"),
+            (pos[0] + bs * 11, pos[1] + 40 + 6 * 20)
+        )
+
+        self.screen.blit(
+            self.standard_text(str(self.player_board.lines_cleared)),
+            (pos[0] + bs * 11, pos[1] + 40 + 7 * 20)
+        )
+
+        self.screen.blit(
+            self.standard_text("LEVEL"),
+            (pos[0] + bs * 11, pos[1] + 40 + 8 * 20)
+        )
+
+        self.screen.blit(
+            self.standard_text(str(self.level)),
+            (pos[0] + bs * 11, pos[1] + 40 + 9 * 20)
+        )
+
+
+
 
         # draw the opponents boards
         for opponent in self.opponents:
