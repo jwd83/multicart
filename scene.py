@@ -30,7 +30,7 @@ class Scene:
         text: str,
         font_size: int | None = None,
     ):
-        
+
         if font_size is None:
             font_size = self.standard_font_size
 
@@ -51,9 +51,13 @@ class Scene:
         return max(min(n_max, n), n_min)
 
     def update(self):
+        """This method should be implemented by the child class to update the scene.
+        """
         print("Scene's update method has not been implemented")
 
     def draw(self):
+        """This method should be implemented by the child class to draw the scene.
+        """
         # the values of sin range from -1 to 1
         r = math.sin(time.time() * 1.33 + 1.5) * 127 + 128
         g = math.sin(time.time()) * 127 + 128
@@ -314,3 +318,16 @@ class Scene:
             print(f"Cannot load image: {fullname}")
             raise SystemExit
         return image, image.get_rect()
+
+
+    def log(self, message: str):
+        """Calls the game objects log method with the message to make it easier to log messages from scenes.
+
+        Args:
+            message (str): The message to be logged
+        """
+        self.game.log(message)
+
+
+
+
