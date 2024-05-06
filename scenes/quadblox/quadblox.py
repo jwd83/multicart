@@ -17,8 +17,15 @@ class QuadBlox(Scene):
         self.opponents = [Board() for _ in range(8)]
         self.setup_opponents()
 
-        self.player_piece = Piece()
-        self.next_piece = Piece()
+        self.piece_queue = []
+
+        # start populating the queue
+        self.open_bag()
+        self.open_bag()
+
+
+        self.player_piece = self.next_piece_in_queue()
+        self.next_piece = self.next_piece_in_queue()
         self.stored_piece = None
 
         self.drop_at = 60 # frames per line fall
@@ -39,6 +46,32 @@ class QuadBlox(Scene):
 
         self.projected_piece = None
 
+    def open_bag(self, num_bags = 1):
+
+        for j in range(num_bags):
+
+            bag = [
+                Shapes.I,
+                Shapes.J,
+                Shapes.L,
+                Shapes.O,
+                Shapes.S,
+                Shapes.T,
+                Shapes.Z,
+            ]
+
+            random.shuffle(bag)
+
+            for shape in bag:
+                self.piece_queue.append(Piece(shape))
+
+    def next_piece_in_queue(self):
+        # restock the queue if we are running low
+        while len(self.piece_queue) < 10:
+            self.open_bag()
+
+        # return the next piece
+        return self.piece_queue.pop(0)
 
 
     def setup_opponents(self):
@@ -83,7 +116,7 @@ class QuadBlox(Scene):
         if self.player_piece.collides(self.player_board):
             self.place()
             return
-        
+
         # developer mode
         if settings.DEBUG:
             if pygame.K_i in self.game.just_pressed:
@@ -96,7 +129,7 @@ class QuadBlox(Scene):
                 self.log("Storing first piece")
                 self.stored_piece = self.player_piece
                 self.player_piece = self.next_piece
-                self.next_piece = Piece()
+                self.next_piece = self.next_piece_in_queue()
             else:
                 self.log("Swapping stored piece")
                 self.player_piece, self.stored_piece = self.stored_piece, self.player_piece
@@ -251,9 +284,6 @@ class QuadBlox(Scene):
                     self.player_board.kill()
                     self.projected_piece = None
                     return
-                
-        
-
 
     def place(self):
         self.game.log(f"Placing piece: {self.player_piece.shape}")
@@ -262,7 +292,7 @@ class QuadBlox(Scene):
         self.level = self.player_board.lines_cleared // 10
         self.drop_at = max(4, 60 - self.level * 5)
         self.player_piece = self.next_piece
-        self.next_piece = Piece()
+        self.next_piece = self.next_piece_in_queue()
         # restart the delay for down being held to slow up the next place pieced
         # from dropping right away when just placed
         self.held_down_for = 0
@@ -271,7 +301,7 @@ class QuadBlox(Scene):
             self.play_sound("jsfxr-drop2")
         else:
             self.play_sound("jsfxr-drop2")
-    
+
     def draw_projected_piece(self):
         if self.projected_piece is not None:
             for x in range(4):
@@ -334,9 +364,6 @@ class QuadBlox(Scene):
             (pos[0] + bs * 11, pos[1] + 40 + 9 * 20)
         )
 
-
-
-
         # draw the opponents boards
         for opponent in self.opponents:
             self.draw_board(opponent)
@@ -350,42 +377,46 @@ class QuadBlox(Scene):
         # draw stored piece
         self.draw_stored_piece()
 
+        # draw the piece queue
+        self.draw_piece_queue()
+
+
+    def draw_arbitrary_piece(self, piece : Piece, pos = (0,0), size: int = 12):
+        for x in range(4):
+            for y in range(4):
+                if piece.grid[y][x]:
+                    pygame.draw.rect(
+                        self.screen,
+                        colors[piece.color],
+                        (
+                            pos[0] + size * x,
+                            pos[1] + size * y,
+                            size - 1,
+                            size - 1)
+                    )
+
+    def draw_piece_queue(self):
+        y = 160
+
+        for i, piece in enumerate(self.piece_queue):
+            self.draw_arbitrary_piece(piece, (10, y, 10 - i), 10 - i)
+            y += 5 * (10 - i)
+
     def draw_stored_piece(self):
         self.screen.blit(
             self.standard_text("STORED"),
-            (10, 150)
+            (10, 10)
         )
         if self.stored_piece is not None:
-            for x in range(4):
-                for y in range(4):
-                    if self.stored_piece.grid[y][x]:
-                        pygame.draw.rect(
-                            self.screen,
-                            colors[self.stored_piece.color],
-                            (
-                                x * 12,
-                                y * 12 + 180,
-                                12 - 1,
-                                12 - 1)
-                        )
+            self.draw_arbitrary_piece(self.stored_piece, (10, 30))
+
 
     def draw_next_piece(self):
         self.screen.blit(
             self.standard_text("NEXT"),
-            (10, 10)
+            (10, 90)
         )
-        for x in range(4):
-            for y in range(4):
-                if self.next_piece.grid[y][x]:
-                    pygame.draw.rect(
-                        self.screen,
-                        colors[self.next_piece.color],
-                        (
-                            x * 12 ,
-                            y * 12 + 30,
-                            12 - 1,
-                            12 - 1)
-                    )
+        self.draw_arbitrary_piece(self.next_piece, (10, 110))
 
     def draw_piece(self):
         for x in range(4):

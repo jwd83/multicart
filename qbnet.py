@@ -58,6 +58,8 @@ class QBServer(QBNet):
         # maintain a list of clients
         self.clients = []
         self.aliases = []
+        self.lobbies = []
+        
 
 
     def handle_client(self, client):
