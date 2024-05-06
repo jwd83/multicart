@@ -18,6 +18,7 @@ class QuadBlox(Scene):
 
         self.player_piece = Piece()
         self.next_piece = Piece()
+        self.stored_piece = None
 
         self.drop_at = 60 # frames per line fall
         self.drop_count = 0
@@ -81,6 +82,25 @@ class QuadBlox(Scene):
         if self.player_piece.collides(self.player_board):
             self.place()
             return
+
+        # check to swap piece
+        if pygame.K_TAB in self.game.just_pressed:
+            # store the current location
+            cur_x = self.player_piece.x
+            cur_y = self.player_piece.y
+            
+            # swap the piece
+            if self.stored_piece is None:
+                self.stored_piece = self.player_piece
+                self.player_piece = self.next_piece
+                self.next_piece = Piece()
+            else:
+                self.player_piece, self.stored_piece = self.stored_piece, self.player_piece
+
+            # set the new piece to the stored location
+            self.player_piece.x = cur_x
+            self.player_piece.y = cur_y
+
 
 
         # LEFT / RIGHT MOVEMENT
@@ -317,6 +337,28 @@ class QuadBlox(Scene):
 
         # draw the next piece
         self.draw_next_piece()
+
+        # draw stored piece
+        self.draw_stored_piece()
+
+    def draw_stored_piece(self):
+        self.screen.blit(
+            self.standard_text("STORED"),
+            (10, 150)
+        )
+        if self.stored_piece is not None:
+            for x in range(4):
+                for y in range(4):
+                    if self.stored_piece.grid[y][x]:
+                        pygame.draw.rect(
+                            self.screen,
+                            colors[self.stored_piece.color],
+                            (
+                                x * 12,
+                                y * 12 + 180,
+                                12 - 1,
+                                12 - 1)
+                        )
 
     def draw_next_piece(self):
         self.screen.blit(
