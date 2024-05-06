@@ -3,6 +3,7 @@ from scene import Scene
 from utils import *
 from .scripts.qb import Board, colors, Piece, Shapes
 import copy
+import settings
 
 
 class QuadBlox(Scene):
@@ -82,24 +83,32 @@ class QuadBlox(Scene):
         if self.player_piece.collides(self.player_board):
             self.place()
             return
+        
+        # developer mode
+        if settings.DEBUG:
+            if pygame.K_i in self.game.just_pressed:
+                self.player_piece = Piece(Shapes.I)
 
         # check to swap piece
         if pygame.K_TAB in self.game.just_pressed:
-            # store the current location
-            cur_x = self.player_piece.x
-            cur_y = self.player_piece.y
-            
             # swap the piece
             if self.stored_piece is None:
+                self.log("Storing first piece")
                 self.stored_piece = self.player_piece
                 self.player_piece = self.next_piece
                 self.next_piece = Piece()
             else:
+                self.log("Swapping stored piece")
                 self.player_piece, self.stored_piece = self.stored_piece, self.player_piece
 
+            # TODO: if there is a collision swap back (needs fixes with bounds checking/collision checking)
+            # if self.player_piece.collides(self.player_board):
+            #     print("The piece collided with the board, swapping back")
+            #     self.player_piece, self.stored_piece = self.stored_piece, self.player_piece
+
             # set the new piece to the stored location
-            self.player_piece.x = cur_x
-            self.player_piece.y = cur_y
+            self.player_piece.x = 3
+            self.player_piece.y = 0
 
 
 
