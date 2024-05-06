@@ -7,8 +7,10 @@ class QuadBloxTitle(Scene):
         super().__init__(game)
 
         # self.play_music("sounds/korobeiniki-arranged-for-piano-186249.mp3")
-        self.play_music("sounds/korobeiniki-rearranged-arr-for-strings-185592.mp3")
+        # self.play_music("sounds/korobeiniki-rearranged-arr-for-strings-185592.mp3")
+        self.play_music("sounds/korobeiniki-rearranged-arr-for-music-box-184978.mp3")
 
+        # 
         self.background = load_tpng("quadblox/title.png")
 
     def update(self):
