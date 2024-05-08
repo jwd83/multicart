@@ -18,6 +18,25 @@
                 "showReuseMessage": true,
                 "clear": true
             }
-        }
+        },
+        {
+            "label": "Run QuadBlox Server",
+            "type": "shell",
+            "command": "uvicorn",
+            "args": [
+                "--reload",
+                "qbfastapi:app"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
     ]
 }
