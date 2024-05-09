@@ -328,13 +328,24 @@ class Game:
     def valid_scene_name(self, scene: str):
         return scene in dir(scenes)
 
+    def __quit_all_scenes(self):
+        # call all active scene's quit methods
+        for scene in self.scene:
+            try:
+                scene.quit()
+                print(f"ran scene's quit method: {scene}")
+            except:
+                print(f"failed to run scene's quit method: {scene}")
+
     def __change_scenes(self):
         # check for scene changes
 
         # start off by looking for a replacement scene to rebuild the stack
         if self.scene_replace is not None:
-            print("scene_replace: " + self.scene_replace)
+            self.log("scene_replace: " + self.scene_replace)
             if self.valid_scene_name(self.scene_replace):
+                self.__quit_all_scenes()
+
                 self.scene = []
                 self.scene.append(self.load_scene(self.scene_replace))
             self.scene_replace = None
@@ -345,27 +356,35 @@ class Game:
                 # if scene pop was given an integer, pop that many scenes
                 # otherwise, pop only one scene
                 if isinstance(self.scene_pop, int):
-                    print("scene_pop: " + str(self.scene_pop))
+                    self.log("scene_pop: " + str(self.scene_pop))
                     if self.scene_pop >= len(self.scene):
-                        print("WARNING: Cannot pop more scenes than exist! Exiting!")
+                        self.log("WARNING: Cannot pop more scenes than exist! Exiting!")
+                        self.__quit_all_scenes()
                         self.quit = True
                     else:
                         for _ in range(self.scene_pop):
+                            # call the quit method of the scene being popped
+                            try:
+                                self.scene[-1].quit()
+                                self.log(f"ran scene's quit method: {self.scene[-1]}")
+                            except:
+                                self.log(f"failed to run scene's quit method: {self.scene[-1]}")
                             self.scene.pop()
                 else:
-                    print("scene_pop: 1")
+                    self.log("scene_pop: 1")
                     self.scene.pop()
             else:
-                print("WARNING: Cannot pop last scene! Exiting!")
+                self.log("WARNING: Cannot pop last scene! Exiting!")
+                self.__quit_all_scenes()
                 self.quit = True
             self.scene_pop = None
 
         if self.scene_push is not None:
             if self.valid_scene_name(self.scene_push):
-                print("scene_push: " + self.scene_push)
+                self.log("scene_push: " + self.scene_push)
                 self.scene.append(self.load_scene(self.scene_push))
             else:
-                print(
+                self.log(
                     "scene_push: " + self.scene_push + ", WARNING: Invalid scene name!"
                 )
             self.scene_push = None
