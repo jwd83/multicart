@@ -59,6 +59,7 @@ class QuadBlox(Scene):
         self.client_thread.join()
 
     def client_thread(self):
+        self.log("client thread: starting")
         while self.client_run:
             try:
                 # sleep for 1 second
@@ -70,6 +71,7 @@ class QuadBlox(Scene):
                 self.log("something went wrong")
                 pass
 
+        self.log("client thread: shutting down")
 
     def open_bag(self, num_bags = 1):
 
@@ -499,5 +501,8 @@ class QuadBlox(Scene):
         )
 
     def quit(self):
+        self.log("shutting down client thread...")
         self.shutdown_client()
+        self.log("client thread terminated.")
+
 

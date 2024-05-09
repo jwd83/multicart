@@ -496,3 +496,4 @@ class Game:
 
     def log(self, message: str):
         self.console.history.append(message)
+        print(f">> {message}")
