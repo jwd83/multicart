@@ -315,7 +315,7 @@ class Scene:
             else:
                 image = image.convert_alpha()
         except FileNotFoundError:
-            print(f"Cannot load image: {fullname}")
+            self.log(f"Cannot load image: {fullname}")
             raise SystemExit
         return image, image.get_rect()
 
@@ -329,7 +329,10 @@ class Scene:
         self.game.log(message)
 
     def quit(self):
-        print("Scene's draw method has not been implemented")
+        """Scenes can override this method to gracefully exit. This was added so QuadBlox
+        could gracefully exit it's client thread.
+        """
+        self.log("Scene's quit method has not been implemented")
 
 
 
