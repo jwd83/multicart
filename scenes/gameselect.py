@@ -15,14 +15,14 @@ class GameSelect(Scene):
         self.text_choose = self.standard_text("make a selection")
         self.standard_font_size = 20
         self.options = [
-            self.standard_text("4 Jacks"),
+            self.standard_text("QuadBlox"),
             self.standard_text("Jack Ninjas"),
             self.standard_text("Jack Ninjas Editor"),
             self.standard_text("Via Galactica"),
             self.standard_text("Jack Wizards"),
             self.standard_text("Superball"),
             # self.standard_text("Font Test"),
-            self.standard_text("Quad Blox"),
+            self.standard_text("4 Jacks"),
             self.standard_text("Options"),
             self.standard_text("Quit to Desktop"),
         ]
@@ -48,7 +48,7 @@ class GameSelect(Scene):
                 self.play_sound("jsxfr-select")
 
             if self.selected == 0:
-                self.game.scene_replace = "FourJacksTitle"
+                self.game.scene_replace = "QuadBloxTitle"
             elif self.selected == 1:
                 self.game.scene_replace = "JackNinjasTitle"
             elif self.selected == 2:
@@ -61,7 +61,7 @@ class GameSelect(Scene):
                 self.game.scene_replace = "SuperBallTitle"
             elif self.selected == 6:
                 # self.game.scene_replace = "FontTest"
-                self.game.scene_replace = "QuadBloxTitle"
+                self.game.scene_replace = "FourJacksTitle"
             elif self.selected == 7:
                 self.game.scene_push = "Menu"
             elif self.selected == 8 and not settings.WASM:

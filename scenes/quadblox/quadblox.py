@@ -4,11 +4,15 @@ from utils import *
 from .scripts.qb import Board, colors, Piece, Shapes
 import copy
 import settings
-
+import threading
+import requests
+import time
 
 class QuadBlox(Scene):
     def __init__(self, game):
         super().__init__(game)
+
+        self.client_run = True
 
 
         self.player_board = Board((100, 10))
@@ -46,9 +50,30 @@ class QuadBlox(Scene):
 
         self.projected_piece = None
 
+        # kick off the client comms thread
+        self.client_thread = threading.Thread(target=self.client_thread)
+        self.client_thread.start()
+
+    def shutdown_client(self):
+        self.client_run = False
+        self.client_thread.join()
+
+    def client_thread(self):
+        while self.client_run:
+            try:
+                # sleep for 1 second
+                time.sleep(0.5)
+                r = requests.get("http://127.0.0.1:8000")
+                self.log(r.text)
+
+            except:
+                self.log("something went wrong")
+                pass
+
+
     def open_bag(self, num_bags = 1):
 
-        for j in range(num_bags):
+        for _ in range(num_bags):
 
             bag = [
                 Shapes.I,
@@ -99,6 +124,7 @@ class QuadBlox(Scene):
                 else:
                     y = y1
                     x += x_step
+
 
 
     def update(self):
