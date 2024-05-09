@@ -332,7 +332,7 @@ class Scene:
         """Scenes can override this method to gracefully exit. This was added so QuadBlox
         could gracefully exit it's client thread.
         """
-        self.log("Scene's quit method has not been implemented")
+        self.log(f"Scene's quit method has not been implemented: {self.__class__.__name__}")
 
 
 

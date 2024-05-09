@@ -34,7 +34,7 @@ class Console(Scene):
             "scene len     show the number of scenes in the scene stack",
             "scene list    list the scenes in the scene stack",
             "scene init    call the __init__ method of scene beneath the console",
-        ]   
+        ]
 
     def update(self):
 
@@ -110,11 +110,11 @@ class Console(Scene):
                     self.history.append(f">>Scene stack length: {len(self.game.scene)}")
                 elif command_lower == "scene list":
                     for i, s in enumerate(self.game.scene):
-                        self.history.append(f">>Scene {i}: {s}")
+                        self.history.append(f">>Scene {i}: {s.__class__.__name__}")
                 elif command_lower == "scene init":
                     if len(self.game.scene) > 1:
                         self.game.scene[-2].__init__(self.game)
-                
+
                 # CUSTOM PYTHON EXECUTION : POTENTIAL DANGER
                 else:
                     # we didn't match a command, so we'll try to execute the python
