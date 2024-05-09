@@ -328,6 +328,8 @@ class Scene:
         """
         self.game.log(message)
 
+    def quit(self):
+        print("Scene's draw method has not been implemented")
 
 
 

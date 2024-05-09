@@ -130,7 +130,7 @@ class Game:
             if pygame.K_BACKQUOTE in self.just_pressed:
                 self.__toggle_console()
 
-            
+
             # set all scenes to inactive except the top scene in the stack
             for scene in self.scene:
                 scene.active = False
@@ -297,7 +297,7 @@ class Game:
                 # check ctrl or alt are being held down
                 if ctrl or alt:
                     reject_unicode = True
-                
+
                 if not reject_unicode:
                     try:
                         self.unicode += event.unicode
@@ -440,7 +440,7 @@ class Game:
 
     def frame_count(self):
         return self.__frame_count
-    
+
     def __toggle_console(self):
         # toggle the console
         self.console.active = not self.console.active
@@ -461,6 +461,15 @@ class Game:
 
         # save settings
         self.__save_settings()
+
+        for scene in self.scene:
+            try:
+                scene.quit()
+                print("ran scene's quit method")
+            except:
+                print("scene had no quit method")
+
+
 
         print("shutting down...")
         pygame.quit()

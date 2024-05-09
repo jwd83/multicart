@@ -498,4 +498,6 @@ class QuadBlox(Scene):
             width=border_width
         )
 
+    def quit(self):
+        self.shutdown_client()
 
