@@ -9,7 +9,7 @@ class JackWizardsMap(Scene):
 
         self.map_image = load_tpng("jackwizards/dall-e-map.png")
 
-        print("Rendering map: ", self.game.jw.level)
+        self.log("Rendering map: ", self.game.jw.level)
 
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.
@@ -20,8 +20,8 @@ class JackWizardsMap(Scene):
             self.game.scene_pop = True
 
     def draw(self):
-        print("Drawing map:")
-        print(self.game.jw.level)
+        self.log("Drawing map:")
+        self.log(self.game.jw.level)
         # self.screen.fill((0, 0, 0))
 
         # draw the map image at the center of the screen
@@ -39,13 +39,12 @@ class JackWizardsMap(Scene):
 
         for x in range(16):
             for y in range(16):
-                # print(self.game.jw.level)
                 room_flags = self.game.jw.level[x, y]
 
                 dx = left_start + (x * box_space)
                 dy = top_start + (y * box_space)
 
-                print(x, y, dx, dy, box_size, box_size, ": ", room_flags)
+                self.log(f"{x}, {y}, {dx}, {dy}, {box_size}, {box_size}: {room_flags}")
 
                 self.screen.fill((180, 180, 180), (dx, dy, box_size, box_size))
 

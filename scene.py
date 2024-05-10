@@ -53,7 +53,7 @@ class Scene:
     def update(self):
         """This method should be implemented by the child class to update the scene.
         """
-        print("Scene's update method has not been implemented")
+        self.log("Scene's update method has not been implemented")
 
     def draw(self):
         """This method should be implemented by the child class to draw the scene.
@@ -63,7 +63,7 @@ class Scene:
         g = math.sin(time.time()) * 127 + 128
         b = math.sin(time.time() * 0.25 - 0.6666) * 127 + 128
         self.screen.fill((r, g, b))
-        print("Scene's draw method has not been implemented")
+        self.log("Scene's draw method has not been implemented")
 
     def draw_box(self, position: tuple, size: tuple):
         if self.elapsed() < self.box_delay:
@@ -266,11 +266,11 @@ class Scene:
         target.blit(source, source_position)
 
     def play_sound(self, sound):
-        print("play_sound: " + sound)
+        self.log("play_sound: " + sound)
 
         # verify the sound is loaded
         if sound not in self.game.sfx:
-            print("play_sound: Sound not found: " + sound)
+            self.log("play_sound: Sound not found: " + sound)
             return
 
 
@@ -280,13 +280,13 @@ class Scene:
         pygame.mixer.Sound.play(self.game.sfx[sound])
 
     def play_music(self, path_in_assets): # play a sound in an endless loop
-        print("play_music: " + path_in_assets)
+        self.log("play_music: " + path_in_assets)
         # stop any music that is currently playing
         pygame.mixer.music.stop()
 
         # check if path_in_assets exists in ./assets/
         if not os.path.exists("assets/" + path_in_assets):
-            print("play_music: Music not found: " + path_in_assets)
+            self.log("play_music: Music not found: " + path_in_assets)
             return
 
         # load the music

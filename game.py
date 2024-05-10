@@ -16,6 +16,9 @@ class Game:
         pygame.mixer.init()
         pygame.joystick.init()
 
+        self.debug_scene = None
+        self.console = None
+
         # hardcode some default values
 
         self.__DEFAULT_VOLUME = 50
@@ -61,7 +64,7 @@ class Game:
         self.joysticks = [
             pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())
         ]
-        print("self.joysticks=", self.joysticks)
+        self.log("self.joysticks=" + str(self.joysticks))
 
         # load all sounds in assets/sounds as sound effects
         for sound in os.listdir("assets/sounds"):
@@ -112,8 +115,10 @@ class Game:
         # create the surface for our performance counter
         self.__perf_surface = pygame.Surface((640,360), pygame.SRCALPHA, 32).convert_alpha()
 
+
     # pygbag requires this be async to run the game
     async def run(self):
+        # create our debug and console scenes now so we can start logging
         self.debug_scene = scenes.Debug(self)
         self.console = scenes.Console(self)
 
@@ -158,7 +163,7 @@ class Game:
 
             self.__perf_results[self.__perf_index] = self.frame_load
 
-            # print performance data
+            # show performance data
             if settings.DEBUG:
 
                 # use the debug scene's make_text method for us to render the performance data to a surfrace we can blit to the screen
@@ -212,17 +217,17 @@ class Game:
         for j in range(200):
             self.__perf_start = time.perf_counter_ns()
             self.__perf_stop = time.perf_counter_ns()
-            # print("perf_test: " + str(j) + " " + str(self.__perf_stop - self.__perf_start) + " ns")
+            # self.log("perf_test: " + str(j) + " " + str(self.__perf_stop - self.__perf_start) + " ns")
             result = self.__perf_stop - self.__perf_start
             results.append(result)
             best_test = min(best_test, result)
             worst_test = max(worst_test, result)
 
 
-        print("best result: " + str(best_test) + " ns")
-        print("worst result: " + str(worst_test) + " ns")
-        print("average result: " + str(sum(results) / len(results)) + " ns")
-        print("raw results: " + str(results) + " ns")
+        self.log("best result: " + str(best_test) + " ns")
+        self.log("worst result: " + str(worst_test) + " ns")
+        self.log("average result: " + str(sum(results) / len(results)) + " ns")
+        self.log("raw results: " + str(results) + " ns")
 
     def get_events_and_input(self):
         # get input
@@ -333,9 +338,9 @@ class Game:
         for scene in self.scene:
             try:
                 scene.quit()
-                print(f"ran scene's quit method: {scene}")
+                self.log(f"ran scene's quit method: {scene.__class__.__name__}")
             except:
-                print(f"failed to run scene's quit method: {scene}")
+                self.log(f"failed to run scene's quit method: {scene.__class__.__name__}")
 
     def __change_scenes(self):
         # check for scene changes
@@ -365,10 +370,10 @@ class Game:
                         for _ in range(self.scene_pop):
                             # call the quit method of the scene being popped
                             try:
+                                self.log(f"Running scene's quit method: {self.scene[-1].__class__.__name__}")
                                 self.scene[-1].quit()
-                                self.log(f"ran scene's quit method: {self.scene[-1]}")
                             except:
-                                self.log(f"failed to run scene's quit method: {self.scene[-1]}")
+                                self.log(f"Failed to run scene's quit method: {self.scene[-1].__class__.__name__}")
                             self.scene.pop()
                 else:
                     self.log("scene_pop: 1")
@@ -400,11 +405,11 @@ class Game:
         # check if self.jw exists in the stack
         if self.jw is not None:
             if self.jw not in self.scene:
-                print("purging old jw reference")
+                self.log("purging old jw reference")
                 self.jw = None
 
 
-        print("load_scene: " + scene)
+        self.log("load_scene: " + scene)
 
         # check if the string passed in matches the name of a class in the scenes module
         if scene in dir(scenes):
@@ -413,7 +418,7 @@ class Game:
                 self.jw = new_scene
             return new_scene
         else:
-            print("WARNING: Invalid scene name! Loading start scene!")
+            self.log("WARNING: Invalid scene name! Loading start scene!")
             return eval("scenes." + settings.SCENE_START + "(self)")
 
     def __load_settings(self):
@@ -441,7 +446,7 @@ class Game:
 
 
     def __save_settings(self):
-        print("__save_settings")
+        self.log("__save_settings called")
 
         # check if the main section exists
         if "main" not in self.config:
@@ -476,24 +481,20 @@ class Game:
     def __quit(self):
 
         # quit the game
-        print("__quit")
+        self.log("__quit")
 
         # save settings
         self.__save_settings()
 
-        for scene in self.scene:
-            try:
-                scene.quit()
-                print("ran scene's quit method")
-            except:
-                print("scene had no quit method")
+        self.__quit_all_scenes()
 
 
 
-        print("shutting down...")
+        self.log("shutting down...")
         pygame.quit()
         sys.exit()
 
     def log(self, message: str):
-        self.console.history.append(message)
+        if self.console is not None:
+            self.console.history.append(message)
         print(f">> {message}")

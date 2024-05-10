@@ -147,7 +147,7 @@ class Console(Scene):
         # draw the last 5 history elements
         drawn_cache = ""
         for dci in self.history[-self.terminal_rows:]:
-            drawn_cache += dci + "\n"
+            drawn_cache += str(dci) + "\n"
 
         if drawn_cache != self.last_render:
             self.last_render = drawn_cache
@@ -155,6 +155,6 @@ class Console(Scene):
             # create a fresh surface to draw the terminal output
             self.terminal_output = self.make_transparent_surface(self.screen.get_size())
             for i, h in enumerate(self.history[-self.terminal_rows:]):
-                self.terminal_output.blit(self.standard_text(h), (10, 30 + 10 * i))
+                self.terminal_output.blit(self.standard_text(str(h)), (10, 30 + 10 * i))
 
         self.screen.blit(self.terminal_output, (0, 0))

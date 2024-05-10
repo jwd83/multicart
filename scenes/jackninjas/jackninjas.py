@@ -45,7 +45,7 @@ class JackNinjas(Scene):
             ),
         }
         # print our loaded assets
-        print(self.assets)
+        self.log(self.assets)
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
         self.player = Player(self, (75, 75), (8, 15))
@@ -116,42 +116,6 @@ class JackNinjas(Scene):
 
         # TODO - rewrite the joystick/gamepad input logic.
 
-        return
-
-        # get our events so windows thinks we are responding
-        for event in pygame.event.get():
-
-            # handle controller mappings
-            # dpad up is 11
-            # left is 13
-            # right is 14
-
-            # handle controller button down
-            if event.type == pygame.JOYBUTTONDOWN:
-                print(event)
-
-                # jump
-                if event.button == 1:
-                    self.player.jump()
-
-                # left
-                if event.button == 13:
-                    self.movement[0] = True
-
-                # right
-                if event.button == 14:
-                    self.movement[1] = True
-
-            # handle controller button up
-            if event.type == pygame.JOYBUTTONUP:
-                print(event)
-                # left
-                if event.button == 13:
-                    self.movement[0] = False
-
-                # right
-                if event.button == 14:
-                    self.movement[1] = False
 
     def draw_background(self):
         # let's go for a sky blue

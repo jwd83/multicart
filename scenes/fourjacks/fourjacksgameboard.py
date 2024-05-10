@@ -134,14 +134,14 @@ class FourJacksGameBoard(Scene):
         best_move = None
         best_score = None
 
-        print("Current Turn: " + str(self.current_turn))
-        print("Move list: " + str(move_list))
+        self.log("Current Turn: " + str(self.current_turn))
+        self.log("Move list: " + str(move_list))
 
         for move in move_list:
             new_board = deepcopy(self.board_map)
             self.apply_move_to_board(move, new_board, self.colors[self.current_turn])
             score = self.minimax(new_board, 4, self.current_turn == 1)
-            print("Move: " + move + " Score: " + str(score))
+            self.log("Move: " + move + " Score: " + str(score))
 
             if best_move is None:
                 best_move = move
@@ -221,7 +221,7 @@ class FourJacksGameBoard(Scene):
         if self.elapsed() - self.ai_delay_start < self.ai_delay_total:
             return
 
-        print(
+        self.log(
             "AI Turn:"
             + str(self.current_turn)
             + " AI Easy: "

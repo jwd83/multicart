@@ -23,11 +23,12 @@ def read_board(game_id: int):
         board_states.append(board.export_board())
     return board_states
 
-@app.post("/boards/update/{game_id}")
-def update_board(game_id: int, board_state: str):
+@app.post("/boards/update/{game_id}/{board_number}")
+def update_board(game_id: int, board_number: int, board_state: str):
     # pick a random board to update
-    board = random.choice(boards[game_id])
-    board.import_board(board_state)
+    # board = random.choice(boards[game_id])
+    boards[game_id][board_number].import_board(board_state)
+    
 
     return boards[game_id]
 

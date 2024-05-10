@@ -14,6 +14,8 @@ class QuadBlox(Scene):
 
         self.client_run = True
 
+        self.board_number = 0
+
 
         self.player_board = Board((100, 10))
         self.player_board.clear()
@@ -74,7 +76,7 @@ class QuadBlox(Scene):
                         self.opponents[i].import_board(board_state)
 
                 r = requests.post(
-                    f"http://127.0.0.1:8000/boards/update/0?board_state={self.player_board.export_board()}"
+                    f"http://127.0.0.1:8000/boards/update/0/{self.board_number}?board_state={self.player_board.export_board()}"
                 )
 
             except:

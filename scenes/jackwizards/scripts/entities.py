@@ -114,11 +114,11 @@ class Player(Entity):
             # if m, l and i are pressed add a compass and map to inventory
             if self.game.pressed[pygame.K_m] and self.game.pressed[pygame.K_l] and self.game.pressed[pygame.K_i]:
                 if 'compass' not in self.inventory:
-                    print("Adding compass to inventory")
+                    self.log("Adding compass to inventory")
                     self.inventory.append('compass')
 
                 if 'map' not in self.inventory:
-                    print("Adding map to inventory")
+                    self.log("Adding map to inventory")
                     self.inventory.append('map')
 
 
@@ -211,7 +211,7 @@ class Monster(Entity):
         if self.player:
             if self.center.distance_to(self.player.center) < self.radius_attack:
                 self.action = 'attack'
-                print("attacking")
+                self.log("attacking")
             elif self.center.distance_to(self.player.center) < self.radius_engage:
                 self.action = 'walk'
 
@@ -226,10 +226,10 @@ class Monster(Entity):
 
 
 
-                print("engaging")
+                self.log("engaging")
             else:
                 self.action = 'idle'
-                print("idle")
+                self.log("idle")
 
 class Bat(Entity):
     def __init__(self, center=(0, 0), hitbox=(0, 0), scene: Scene = None, player: Player = None):

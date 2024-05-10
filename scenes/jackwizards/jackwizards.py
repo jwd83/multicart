@@ -47,7 +47,7 @@ class JackWizards(Scene):
 
         # start making our level and rooms
         self.level = make_floor(minimum_rooms=16)
-        print(self.level)
+        self.log(self.level)
 
         self.level_x: int = 8
         self.level_y: int= 8
@@ -96,7 +96,7 @@ class JackWizards(Scene):
         if not safe_room:
             # generate 0-4 monsters based on the room
             monster_count = self.r.int(f"{self.level_x}-{self.level_y}-monster-count", 0, 6)
-            print(f"Generating {monster_count} monsters for room {self.level_x}-{self.level_y}")
+            self.log(f"Generating {monster_count} monsters for room {self.level_x}-{self.level_y}")
 
             for j in range(monster_count):
                 # generate a random position for each monster
@@ -262,12 +262,6 @@ class JackWizards(Scene):
 
         # check if the player is leaving the room
         self.change_rooms()
-
-        # periodically print the player's position
-        #
-        # if self.game.frame_count() % 60 == 0:
-        #     print(self.player.center)
-
 
     def change_rooms(self):
 
