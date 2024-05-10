@@ -70,12 +70,15 @@ class QuadBlox(Scene):
         r = requests.get(f"http://{host}:{port}/boards/0/sit").json()
         self.board_number = r["seat"]
 
+        self.log(f"client thread: sitting at seat {self.board_number}")
+
         while self.client_run:
             try:
                 # SLEEP
                 time.sleep(0.5)
 
                 # UPDATE OPPONENTS
+                self.log("client thread: updating opponents")
                 r = requests.get(f"http://{host}:{port}/boards/{self.game_number}")
                 # self.log(r.text)
 
@@ -93,21 +96,24 @@ class QuadBlox(Scene):
                     board_to_update += 1
 
                 # UPDATE OUR BOARD
+                self.log(f"client thread: updating our board {self.board_number}")
                 r = requests.post(
                     f"http://{host}:{port}/boards/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
                 )
 
                 # SEND ATTACKS
-                if self.player_board.self.outgoing_attack_queue > 0:
+                if self.player_board.outgoing_attack_queue > 0:
                     # sample this incase there is a thread/race sync issue
                     attacks = self.player_board.self.outgoing_attack_queue
                     # deduct the pending attacks from our board
                     self.player_board.self.outgoing_attack_queue -= attacks
-                    self.log(f"sending {attacks} attacks")
+
                     # write the attack to the server
                     r = requests.post(
                         f"http://{host}:{port}/boards/line-clear-attack/{self.game_number}/{self.board_number}/{attacks}"
                     )
+
+                    self.log(r.json)
 
 
                 # GET ATTACKS

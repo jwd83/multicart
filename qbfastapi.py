@@ -50,6 +50,13 @@ def attack_board(game_id: int, board_number: int, lines: int):
         if n != board_number:
             boards[game_id][board].attacks_waiting += lines
 
+    attacks_waiting = []
+
+    for board in boards[game_id]:
+        attacks_waiting.append(board.attacks_waiting)
+
+    return attacks_waiting
+
 @app.get("/boards/get-attacks/{game_id}/{board_number}")
 def get_attacks(game_id: int, board_number: int):
     n = boards[game_id][board_number].attacks_waiting
