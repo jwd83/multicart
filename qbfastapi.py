@@ -44,6 +44,20 @@ def update_board(game_id: int, board_number: int, board_state: str):
 
     return boards[game_id]
 
+@app.post("/boards/line-clear-attack/{game_id}/{board_number}/{lines}")
+def attack_board(game_id: int, board_number: int, lines: int):
+    for board, n in enumerate(boards[game_id]):
+        if n != board_number:
+            boards[game_id][board].attacks_waiting += lines
+
+@app.get("/boards/get-attacks/{game_id}/{board_number}")
+def get_attacks(game_id: int, board_number: int):
+    n = boards[game_id][board_number].attacks_waiting
+    boards[game_id][board_number].attacks_waiting -= n
+    return {'lines': n}
+
+
+
 
 def create_new_board():
     new_game = []

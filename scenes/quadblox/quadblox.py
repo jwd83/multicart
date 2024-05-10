@@ -72,13 +72,10 @@ class QuadBlox(Scene):
 
         while self.client_run:
             try:
-                # self.log("client thread: sleeping")
+                # SLEEP
                 time.sleep(0.5)
-                # r = requests.get(f"http://{host}:{port}")
-                # self.log(r.text)
 
-                # self.log("client thread: updating boards")
-                # update boards
+                # UPDATE OPPONENTS
                 r = requests.get(f"http://{host}:{port}/boards/{self.game_number}")
                 # self.log(r.text)
 
@@ -95,11 +92,29 @@ class QuadBlox(Scene):
                     # increment the board to update
                     board_to_update += 1
 
-                # self.log("client thread: submitting our board")
-                # submit our board
+                # UPDATE OUR BOARD
                 r = requests.post(
                     f"http://{host}:{port}/boards/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
                 )
+
+                # SEND ATTACKS
+                if self.player_board.attacks_waiting > 0:
+                    # sample this incase there is a thread/race sync issue
+                    attacks = self.player_board.attacks_waiting
+
+                    # write the attack to the server
+                    r = requests.post(
+                        f"http://{host}:{port}/boards/line-clear-attack/{self.game_number}/{self.board_number}/{attacks}"
+                    )
+
+                    # deduct the pending attacks from our board
+                    self.player_board.attacks_waiting -= attacks
+
+                # GET ATTACKS
+                r = requests.get(f"http://{host}:{port}/boards/get-attacks/{self.game_number}/{self.board_number}").json()
+                if r["lines"] > 0:
+                    self.player_board.add_line_to_bottom(r["lines"])
+
 
             except:
                 self.log("something went wrong")

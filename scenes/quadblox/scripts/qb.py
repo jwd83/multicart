@@ -155,6 +155,8 @@ class Board:
         self.grid = [[random.randint(1,len(colors) - 1) for _ in range(self.cols)] for _ in range(self.rows)]
         self.block_size = block_size
         self.game_over = True
+        self.attacks_waiting = 0
+        self.outgoing_attack_queue = 0
 
         # scoring variables
         self.points = 0
@@ -170,7 +172,7 @@ class Board:
                 if piece.grid[row][col]:
                     self.grid[piece.y + row][piece.x + col] = piece.color
 
-        self.score()
+        return self.score()
 
     def score(self):
         lines_cleared = 0
@@ -184,6 +186,7 @@ class Board:
 
         if lines_cleared:
             self.clears[lines_cleared - 1] += 1
+            self.outgoing_attack_queue += lines_cleared - 1
 
         self.points = (
             (   10 * self.clears[0]) +
@@ -227,11 +230,14 @@ class Board:
         """
         self.grid = [[int(cell) for cell in row.split(":")] for row in board_state_string.split(";")]
 
-    def add_line_to_bottom(self):
-        self.grid.pop(0)
-        self.grid.append([random.randint(1,len(colors) - 1) for _ in range(self.cols)])
-        # empty 1 cell
-        self.grid[-1][random.randint(0, self.cols - 1)] = 0
+    def add_line_to_bottom(self, num_lines: int = 1):
+
+        while num_lines:
+            num_lines -= 1
+            self.grid.pop(0)
+            self.grid.append([random.randint(1,len(colors) - 1) for _ in range(self.cols)])
+            # empty 1 cell
+            self.grid[-1][random.randint(0, self.cols - 1)] = 0
 
     def __str__(self):
         return "\n".join("".join(str(cell) for cell in row) for row in self.grid)
