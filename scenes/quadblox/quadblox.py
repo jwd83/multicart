@@ -53,13 +53,20 @@ class QuadBlox(Scene):
 
         self.projected_piece = None
 
-        # kick off the client comms thread
-        self.client_thread = threading.Thread(target=self.client_thread)
-        self.client_thread.start()
+        # check if we have a prior client thread running from a re-init
+        if hasattr(self, "game_client"):
+            self.log("terminating prior client thread...")
+            self.shutdown_client()
+            self.log("client thread terminated.")
+    
+        # kick off the client thread
+        self.client_run = True
+        self.game_client = threading.Thread(target=self.client_thread)
+        self.game_client.start()
 
     def shutdown_client(self):
         self.client_run = False
-        self.client_thread.join()
+        self.game_client.join()
 
     def client_thread(self):
         self.log("client thread: starting")
@@ -95,10 +102,6 @@ class QuadBlox(Scene):
                     # increment the board to update
                     board_to_update += 1
 
-                # IF DEAD CAN STOP HERE
-                if self.died_at:
-                    continue
-
 
                 # UPDATE OUR BOARD
                 self.log(f"client thread: updating our board {self.board_number}")
@@ -119,6 +122,10 @@ class QuadBlox(Scene):
                     )
 
                     self.log(r.json)
+
+                # IF DEAD CAN STOP HERE
+                if self.died_at:
+                    continue
 
 
                 # GET ATTACKS
