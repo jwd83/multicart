@@ -204,6 +204,10 @@ class QuadBlox(Scene):
             return
 
 
+        # check for death
+        self.check_for_death()
+
+
         # if we are dead stop the update logic here
         if self.died_at:
             return
@@ -375,6 +379,13 @@ class QuadBlox(Scene):
             self.drop_count = 0
             self.player_piece = self.projected_piece
 
+        # check for death
+        self.check_for_death()
+
+    def check_for_death(self):
+        if self.died_at:
+            return 
+        
         # check for death
         for x in range(10):
             for y in range(4):
