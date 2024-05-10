@@ -14,6 +14,7 @@ class QuadBlox(Scene):
 
         self.client_run = True
 
+        self.game_number = 0
         self.board_number = 0
 
 
@@ -62,6 +63,11 @@ class QuadBlox(Scene):
 
     def client_thread(self):
         self.log("client thread: starting")
+
+        r = requests.get("http://127.0.0.1:8000/boards/0/sit")
+        seat_num = r.json()
+        self.board_number = seat_num["seat"]
+
         while self.client_run:
             try:
                 # sleep for 1 second
@@ -69,14 +75,14 @@ class QuadBlox(Scene):
                 r = requests.get("http://127.0.0.1:8000")
                 # self.log(r.text)
 
-                r = requests.get("http://127.0.0.1:8000/boards/0")
+                r = requests.get(f"http://127.0.0.1:8000/boards/{self.game_number}")
                 # self.log(r.text)
                 for i, board_state in enumerate(r.json()):
                     if i < len(self.opponents):
                         self.opponents[i].import_board(board_state)
 
                 r = requests.post(
-                    f"http://127.0.0.1:8000/boards/update/0/{self.board_number}?board_state={self.player_board.export_board()}"
+                    f"http://127.0.0.1:8000/boards/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
                 )
 
             except:
@@ -161,6 +167,9 @@ class QuadBlox(Scene):
         if settings.DEBUG:
             if pygame.K_i in self.game.just_pressed:
                 self.player_piece = Piece(Shapes.I)
+            if pygame.K_a in self.game.just_pressed:
+                self.player_board.add_line_to_bottom()
+
 
         # check to swap piece
         if pygame.K_TAB in self.game.just_pressed:

@@ -7,6 +7,18 @@ app = FastAPI()
 def read_root():
     return {"active_games": len(boards)}
 
+@app.get("/boards/{game_id}/sit")
+def seat(game_id: int):
+    # check for a valid game
+    if game_id >= len(boards):
+        return "Invalid game id"
+
+    # check for an open seat
+    for i in range(len(boards[game_id])):
+        if boards[game_id][i].dead():
+            boards[game_id][i].clear()
+            return {'seat': i}
+
 @app.get("/boards")
 def read_boards():
     return boards

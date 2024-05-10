@@ -154,12 +154,14 @@ class Board:
         self.pos = pos
         self.grid = [[random.randint(1,len(colors) - 1) for _ in range(self.cols)] for _ in range(self.rows)]
         self.block_size = block_size
+        self.game_over = True
 
         # scoring variables
         self.points = 0
         self.lines_cleared = 0
         self.clears = [0, 0, 0, 0]
         self.blocks_placed = 0
+        self.players = 0
 
     def place(self, piece: Piece):
         self.blocks_placed += 1
@@ -191,6 +193,8 @@ class Board:
             self.blocks_placed
         )
 
+    def dead(self):
+        return any(self.grid[0]) or any(self.grid[1]) or any(self.grid[2]) or any(self.grid[3])
 
     def clear(self):
         self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
@@ -220,6 +224,12 @@ class Board:
             board_state_string (str): The string to import
         """
         self.grid = [[int(cell) for cell in row.split(":")] for row in board_state_string.split(";")]
+
+    def add_line_to_bottom(self):
+        self.grid.pop(0)
+        self.grid.append([random.randint(1,len(colors) - 1) for _ in range(self.cols)])
+        # empty 1 cell
+        self.grid[-1][random.randint(0, self.cols - 1)] = 0
 
     def __str__(self):
         return "\n".join("".join(str(cell) for cell in row) for row in self.grid)
