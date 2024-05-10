@@ -33,8 +33,6 @@ class Piece:
         if shape is None:
             shape = random.choice(list(Shapes))
 
-        print(f"Creating shape: {shape}")
-
         # set our x and y start positions
         self.x = 4
         self.y = 0

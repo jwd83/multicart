@@ -26,7 +26,7 @@ class FourJacksGameBoard(Scene):
 
         self.selected_column = 0
 
-        print(self.board_map)
+        self.log(self.board_map)
 
     def update_player_turn(self):
 
