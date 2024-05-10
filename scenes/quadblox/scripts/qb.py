@@ -202,6 +202,7 @@ class Board:
         return any(self.grid[0]) or any(self.grid[1]) or any(self.grid[2]) or any(self.grid[3])
 
     def clear(self):
+        self.attacks_waiting = 0
         self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
     def kill(self):
