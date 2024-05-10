@@ -98,20 +98,21 @@ class QuadBlox(Scene):
                 )
 
                 # SEND ATTACKS
-                if self.player_board.attacks_waiting > 0:
+                if self.player_board.self.outgoing_attack_queue > 0:
                     # sample this incase there is a thread/race sync issue
-                    attacks = self.player_board.attacks_waiting
-
+                    attacks = self.player_board.self.outgoing_attack_queue
+                    # deduct the pending attacks from our board
+                    self.player_board.self.outgoing_attack_queue -= attacks
+                    self.log(f"sending {attacks} attacks")
                     # write the attack to the server
                     r = requests.post(
                         f"http://{host}:{port}/boards/line-clear-attack/{self.game_number}/{self.board_number}/{attacks}"
                     )
 
-                    # deduct the pending attacks from our board
-                    self.player_board.attacks_waiting -= attacks
 
                 # GET ATTACKS
                 r = requests.get(f"http://{host}:{port}/boards/get-attacks/{self.game_number}/{self.board_number}").json()
+                self.log(f"got {r['lines']} attacks")
                 if r["lines"] > 0:
                     self.player_board.add_line_to_bottom(r["lines"])
 
