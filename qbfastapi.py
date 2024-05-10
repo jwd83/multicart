@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 import scenes.quadblox.scripts.qb as qb
 
+TIMEOUT = 30 # seconds
+
 app = FastAPI()
 
 @app.get("/")
@@ -14,8 +16,10 @@ def read_boards():
 @app.get("/games/{game_id}/sit")
 def seat(game_id: int):
     # check for a valid game
-    if game_id >= len(games):
-        return "Invalid game id"
+    if game_id >= len(games) or game_id < 0:
+        return  {'status': 'error', 'message': 'Invalid game id'}
+
+    purge_dead_boards(game_id)
 
     # check for an open seat
     for i in range(len(games[game_id])):
@@ -23,7 +27,10 @@ def seat(game_id: int):
             # make a new board for the player
             games[game_id][i] = qb.Board()
             games[game_id][i].clear()
-            return {'seat': i}
+            return {'status': 'ok','seat': i}
+        
+    # if no open seats return an error
+    return {'status': 'error', 'message': 'No open seats'}
 
 @app.get("/games/new")
 def new_board():
@@ -33,6 +40,10 @@ def new_board():
 @app.get("/games/{game_id}")
 def read_board(game_id: int):
     board_states = []
+
+
+    purge_dead_boards(game_id)
+
     for board in games[game_id]:
         board_states.append(board.export_board())
     return board_states
@@ -70,5 +81,15 @@ def create_new_board():
 
     games.append(new_game)
 
+def purge_dead_boards(game_id):
+
+    # purge any disconnected boards / dead boards
+    for i in range(len(games[game_id])):
+        if not games[game_id][i].dead():
+            if games[game_id][i].timeout() > TIMEOUT:
+                games[game_id][i] = qb.Board()
+
+
+lobbies = []
 games = []
 create_new_board()

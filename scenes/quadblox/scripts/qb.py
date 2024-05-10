@@ -1,5 +1,6 @@
 from enum import Enum, auto
 import random
+import time
 
 # from https://colorkit.co/palette/ffadad-ffd6a5-fdffb6-caffbf-9bf6ff-a0c4ff-bdb2ff-ffc6ff/
 colors = [
@@ -165,6 +166,8 @@ class Board:
         self.blocks_placed = 0
         self.players = 0
 
+        self.last_update = time.time() # for server
+
     def place(self, piece: Piece):
         self.blocks_placed += 1
         for row in range(piece.box_size):
@@ -230,6 +233,10 @@ class Board:
             board_state_string (str): The string to import
         """
         self.grid = [[int(cell) for cell in row.split(":")] for row in board_state_string.split(";")]
+        self.last_update = time.time() # for server
+
+    def timeout(self):
+        return time.time() - self.last_update
 
     def add_line_to_bottom(self, num_lines: int = 1):
 
