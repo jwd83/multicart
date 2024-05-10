@@ -104,9 +104,9 @@ class QuadBlox(Scene):
                 # SEND ATTACKS
                 if self.player_board.outgoing_attack_queue > 0:
                     # sample this incase there is a thread/race sync issue
-                    attacks = self.player_board.self.outgoing_attack_queue
+                    attacks = self.player_board.outgoing_attack_queue
                     # deduct the pending attacks from our board
-                    self.player_board.self.outgoing_attack_queue -= attacks
+                    self.player_board.outgoing_attack_queue -= attacks
 
                     # write the attack to the server
                     r = requests.post(
