@@ -95,6 +95,11 @@ class QuadBlox(Scene):
                     # increment the board to update
                     board_to_update += 1
 
+                # IF DEAD CAN STOP HERE
+                if self.died_at:
+                    continue
+
+
                 # UPDATE OUR BOARD
                 self.log(f"client thread: updating our board {self.board_number}")
                 r = requests.post(
