@@ -71,5 +71,6 @@
     // hide pycache garbage
     "files.exclude": {
         "**/__pycache__": true
-    }
+    },
+    "cmake.configureOnOpen": false
 }

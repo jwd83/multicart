@@ -72,21 +72,30 @@ class QuadBlox(Scene):
 
         while self.client_run:
             try:
-                self.log("client thread: sleeping")
+                # self.log("client thread: sleeping")
                 time.sleep(0.5)
                 # r = requests.get(f"http://{host}:{port}")
                 # self.log(r.text)
 
-                self.log("client thread: updating boards")
+                # self.log("client thread: updating boards")
                 # update boards
                 r = requests.get(f"http://{host}:{port}/boards/{self.game_number}")
                 # self.log(r.text)
+
+                board_to_update = 0
                 for i, board_state in enumerate(r.json()):
-                    if i < len(self.opponents):
-                        self.opponents[i].import_board(board_state)
+                    # skip our board
+                    if i == self.board_number:
+                        continue
+                    
+                    # update the board
+                    if board_to_update < len(self.opponents):
+                        self.opponents[board_to_update].import_board(board_state)
+                    
+                    # increment the board to update
+                    board_to_update += 1
 
-
-                self.log("client thread: submitting our board")
+                # self.log("client thread: submitting our board")
                 # submit our board
                 r = requests.post(
                     f"http://{host}:{port}/boards/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
