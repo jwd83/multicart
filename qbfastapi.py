@@ -46,9 +46,9 @@ def update_board(game_id: int, board_number: int, board_state: str):
 
 @app.post("/boards/line-clear-attack/{game_id}/{board_number}/{lines}")
 def attack_board(game_id: int, board_number: int, lines: int):
-    for board, n in enumerate(boards[game_id]):
-        if n != board_number:
-            boards[game_id][board].attacks_waiting += lines
+    for i in range(9):
+        if i != board_number:
+            boards[game_id][i].attacks_waiting += lines
 
     attacks_waiting = []
 
