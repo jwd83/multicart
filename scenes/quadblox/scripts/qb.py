@@ -5,15 +5,15 @@ import random
 colors = [
     (0, 0, 0),
     '#ffadad',
-    '#ffd6a5', 
-    '#fdffb6', 
-    '#caffbf', 
-    '#9bf6ff', 
-    '#a0c4ff', 
-    '#bdb2ff', 
+    '#ffd6a5',
+    '#fdffb6',
+    '#caffbf',
+    '#9bf6ff',
+    '#a0c4ff',
+    '#bdb2ff',
     '#ffc6ff',
     (255, 255, 255),
- 
+
 ]
 
 class Shapes(Enum):
@@ -82,7 +82,7 @@ class Piece:
             self.grid[0] = [1, 1, 0, 0]
             self.grid[1] = [0, 1, 1, 0]
 
-    
+
     def reverse_rotate_and_size(self):
         self.rotate()
         self.rotate()
@@ -133,7 +133,7 @@ class Piece:
             for col in range(self.box_size):
                 x = self.x + col
                 y = self.y + row
-                
+
                 # check if we have a piece in the grid here
                 if self.grid[row][col]:
                     # check if we are out of bounds
@@ -169,7 +169,7 @@ class Board:
             for col in range(piece.box_size):
                 if piece.grid[row][col]:
                     self.grid[piece.y + row][piece.x + col] = piece.color
-        
+
         self.score()
 
     def score(self):
@@ -181,18 +181,18 @@ class Board:
                 self.grid.insert(0, [0 for _ in range(self.cols)])
 
         self.lines_cleared += lines_cleared
-    
-        if lines_cleared:    
+
+        if lines_cleared:
             self.clears[lines_cleared - 1] += 1
 
         self.points = (
-            (   10 * self.clears[0]) + 
-            (  100 * self.clears[1]) + 
-            ( 1000 * self.clears[2]) + 
-            (10000 * self.clears[3]) + 
+            (   10 * self.clears[0]) +
+            (  100 * self.clears[1]) +
+            ( 1000 * self.clears[2]) +
+            (10000 * self.clears[3]) +
             self.blocks_placed
         )
-        
+
 
     def clear(self):
         self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
@@ -206,6 +206,22 @@ class Board:
         self.clears = [0, 0, 0, 0]
         self.blocks_placed = 0
         self.clear()
+
+    def export_board(self) -> str:
+        """Export the board state as a string usable by the import function
+
+        Returns:
+            str: _description_
+        """
+        return ";".join(":".join(str(cell) for cell in row) for row in self.grid)
+
+    def import_board(self, board_state_string: str) -> None:
+        """Import a board state from a string
+
+        Args:
+            board_state_string (str): The string to import
+        """
+        self.grid = [[int(cell) for cell in row.split(":")] for row in board_state_string.split(";")]
 
     def __str__(self):
         return "\n".join("".join(str(cell) for cell in row) for row in self.grid)

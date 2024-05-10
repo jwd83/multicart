@@ -65,7 +65,17 @@ class QuadBlox(Scene):
                 # sleep for 1 second
                 time.sleep(0.5)
                 r = requests.get("http://127.0.0.1:8000")
-                self.log(r.text)
+                # self.log(r.text)
+
+                r = requests.get("http://127.0.0.1:8000/boards/0")
+                # self.log(r.text)
+                for i, board_state in enumerate(r.json()):
+                    if i < len(self.opponents):
+                        self.opponents[i].import_board(board_state)
+
+                r = requests.post(
+                    f"http://127.0.0.1:8000/boards/update/0?board_state={self.player_board.export_board()}"
+                )
 
             except:
                 self.log("something went wrong")
