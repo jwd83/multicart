@@ -25,7 +25,11 @@
             "command": "uvicorn",
             "args": [
                 "--reload",
-                "qbfastapi:app"
+                "qbfastapi:app",
+                "--port",
+                "64209",
+                "--host",
+                "0.0.0.0"
             ],
             "group": {
                 "kind": "build",

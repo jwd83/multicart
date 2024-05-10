@@ -193,6 +193,8 @@ class Board:
             self.blocks_placed
         )
 
+        return lines_cleared
+
     def dead(self):
         return any(self.grid[0]) or any(self.grid[1]) or any(self.grid[2]) or any(self.grid[3])
 

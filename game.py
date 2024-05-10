@@ -58,7 +58,7 @@ class Game:
 
         # load settings from config file
         self.config = configparser.ConfigParser()
-        self.__load_settings()
+        self.__load_config()
 
         # joystick support
         self.joysticks = [
@@ -421,7 +421,7 @@ class Game:
             self.log("WARNING: Invalid scene name! Loading start scene!")
             return eval("scenes." + settings.SCENE_START + "(self)")
 
-    def __load_settings(self):
+    def __load_config(self):
 
         # set default settings
         self.fullscreen = False
@@ -445,8 +445,8 @@ class Game:
 
 
 
-    def __save_settings(self):
-        self.log("__save_settings called")
+    def __save_config(self):
+        self.log("__save_config called")
 
         # check if the main section exists
         if "main" not in self.config:
@@ -484,7 +484,7 @@ class Game:
         self.log("__quit")
 
         # save settings
-        self.__save_settings()
+        self.__save_config()
 
         self.__quit_all_scenes()
 

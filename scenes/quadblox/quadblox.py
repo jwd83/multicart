@@ -64,25 +64,32 @@ class QuadBlox(Scene):
     def client_thread(self):
         self.log("client thread: starting")
 
-        r = requests.get("http://127.0.0.1:8000/boards/0/sit")
-        seat_num = r.json()
-        self.board_number = seat_num["seat"]
+        host = self.game.config['main']['host']
+        port = self.game.config['main']['port']
+
+        r = requests.get(f"http://{host}:{port}/boards/0/sit").json()
+        self.board_number = r["seat"]
 
         while self.client_run:
             try:
-                # sleep for 1 second
+                self.log("client thread: sleeping")
                 time.sleep(0.5)
-                r = requests.get("http://127.0.0.1:8000")
+                # r = requests.get(f"http://{host}:{port}")
                 # self.log(r.text)
 
-                r = requests.get(f"http://127.0.0.1:8000/boards/{self.game_number}")
+                self.log("client thread: updating boards")
+                # update boards
+                r = requests.get(f"http://{host}:{port}/boards/{self.game_number}")
                 # self.log(r.text)
                 for i, board_state in enumerate(r.json()):
                     if i < len(self.opponents):
                         self.opponents[i].import_board(board_state)
 
+
+                self.log("client thread: submitting our board")
+                # submit our board
                 r = requests.post(
-                    f"http://127.0.0.1:8000/boards/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
+                    f"http://{host}:{port}/boards/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
                 )
 
             except:
