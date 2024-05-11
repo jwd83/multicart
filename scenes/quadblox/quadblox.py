@@ -71,10 +71,12 @@ class QuadBlox(Scene):
     def client_thread(self):
         self.log("client thread: starting")
 
-        host = self.game.config['main']['host']
-        port = self.game.config['main']['port']
+        server = self.game.config['main']['server']
 
-        r = requests.get(f"http://{host}:{port}/games/0/sit").json()
+
+        self.log(f"client thread: server set to {server}")
+
+        r = requests.get(f"{server}/games/0/sit").json()
         self.board_number = r["seat"]
 
         self.log(f"client thread: sitting at seat {self.board_number}")
@@ -86,7 +88,7 @@ class QuadBlox(Scene):
 
                 # UPDATE OPPONENTS
                 self.log("client thread: updating opponents")
-                r = requests.get(f"http://{host}:{port}/games/{self.game_number}")
+                r = requests.get(f"{server}/games/{self.game_number}")
                 # self.log(r.text)
 
                 board_to_update = 0
@@ -106,7 +108,7 @@ class QuadBlox(Scene):
                 # UPDATE OUR BOARD
                 self.log(f"client thread: updating our board {self.board_number}")
                 r = requests.post(
-                    f"http://{host}:{port}/games/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
+                    f"{server}/games/update/{self.game_number}/{self.board_number}?board_state={self.player_board.export_board()}"
                 )
 
                 # SEND ATTACKS
@@ -118,7 +120,7 @@ class QuadBlox(Scene):
 
                     # write the attack to the server
                     r = requests.post(
-                        f"http://{host}:{port}/games/line-clear-attack/{self.game_number}/{self.board_number}/{attacks}"
+                        f"{server}/games/line-clear-attack/{self.game_number}/{self.board_number}/{attacks}"
                     )
 
                     self.log(r.json)
@@ -129,7 +131,7 @@ class QuadBlox(Scene):
 
 
                 # GET ATTACKS
-                r = requests.get(f"http://{host}:{port}/games/get-attacks/{self.game_number}/{self.board_number}").json()
+                r = requests.get(f"{server}/games/get-attacks/{self.game_number}/{self.board_number}").json()
                 self.log(f"got {r['lines']} attacks")
                 if r["lines"] > 0:
                     self.player_board.add_line_to_bottom(r["lines"])
