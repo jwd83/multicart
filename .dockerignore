@@ -1,13 +1,4 @@
 # flyctl launch added from .gitignore
 # ingore pycache
-**\__pycache__
-**\.DS_Store
-**\.pyc
-**\dist
-**\build
-**\JackGamesMulticart
-**\JackGamesMulticart*.zip
-**\JackGamesMulticart.spec
-**\web.zip
-**\web*.zip
+
 fly.toml
