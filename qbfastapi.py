@@ -3,6 +3,7 @@ import scenes.quadblox.scripts.qb as qb
 import namebuilder
 
 TIMEOUT = 30 # seconds
+STARTING_LOBBY_COUNT = 3
 
 app = FastAPI()
 
@@ -75,9 +76,15 @@ def get_attacks(game_id: int, board_number: int):
     return {'lines': n}
 
 def create_new_board():
+    # create our list to hold our new set of boards
     new_game = []
+
+
     for _ in range(9):
-        new_game.append(qb.Board())
+        # create each board and zero out it's timeout so it's not active
+        new_board = qb.Board()
+        new_board.zero_timeout()
+        new_game.append(new_board)
 
     games.append(new_game)
 
@@ -115,5 +122,7 @@ def get_active_games():
 nb = namebuilder.NameBuilder()
 lobbies = []
 games = []
-create_new_board()
+
+for _ in range(STARTING_LOBBY_COUNT):
+    create_new_board()
 

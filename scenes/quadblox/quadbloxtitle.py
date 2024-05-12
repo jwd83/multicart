@@ -18,7 +18,7 @@ class QuadBloxTitle(Scene):
             self.game.scene_push = "Menu"
 
         if pygame.K_RETURN in self.game.just_pressed:
-            self.game.scene_replace = "QuadBlox"
+            self.game.scene_replace = "QuadMenu"
 
     def draw(self):
         self.screen.blit(self.background, (0, 0))

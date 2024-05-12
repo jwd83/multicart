@@ -39,5 +39,6 @@ from .superball.superballfield import SuperBallField
 
 from .quadblox.quadbloxtitle import QuadBloxTitle
 from .quadblox.quadblox import QuadBlox
+from .quadblox.quadmenu import QuadMenu
 
 

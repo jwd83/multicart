@@ -331,7 +331,12 @@ class Game:
             settings.DEBUG = not settings.DEBUG
 
     def valid_scene_name(self, scene: str):
-        return scene in dir(scenes)
+        found: bool = scene in dir(scenes)
+        if found:
+            self.log(f"valid scene name: {scene}")
+        else:
+            self.log(f"Warning! valid scene name: {scene}")
+        return found
 
     def __quit_all_scenes(self):
         # call all active scene's quit methods
@@ -410,9 +415,10 @@ class Game:
 
 
         self.log("load_scene: " + scene)
-
+        self.log(dir(scenes))
         # check if the string passed in matches the name of a class in the scenes module
         if scene in dir(scenes):
+            self.log("scene found in dir(scenes): " + scene)
             new_scene = eval("scenes." + scene + "(self)")
             if scene == "JackWizards":
                 self.jw = new_scene

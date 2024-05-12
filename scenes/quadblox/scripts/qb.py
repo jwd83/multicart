@@ -1,6 +1,7 @@
 from enum import Enum, auto
 import random
 import time
+from tokenize import Single
 
 # from https://colorkit.co/palette/ffadad-ffd6a5-fdffb6-caffbf-9bf6ff-a0c4ff-bdb2ff-ffc6ff/
 colors = [
@@ -16,6 +17,11 @@ colors = [
     (255, 255, 255),
 
 ]
+
+class GameMode(Enum):
+    MultiPlayer = auto()
+    EndlessSolo = auto()
+    FortyLines = auto()
 
 class Shapes(Enum):
     I = auto()
@@ -167,6 +173,9 @@ class Board:
         self.players = 0
 
         self.last_update = time.time() # for server
+
+    def zero_timeout(self):
+        self.last_update = 0
 
     def place(self, piece: Piece):
         self.blocks_placed += 1
