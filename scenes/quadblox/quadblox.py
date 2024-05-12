@@ -54,13 +54,21 @@ class QuadBlox(Scene):
         self.projected_piece = None
 
         self.texts = {
-            'time': self.standard_text("time"),
+            'blocks': self.standard_text("blocks"),
+            'bpm': self.standard_text("blox/min"),
             'clears': self.standard_text("clears"),
-            'lines': self.standard_text("lines"),
+            'frames': self.standard_text("frames"),
             'level': self.standard_text("level"),
-            'stored': self.standard_text("stored"),
+            'lines': self.standard_text("lines"),
+            'lpm': self.standard_text("lines/min"),
             'next': self.standard_text("next"),
+            'stored': self.standard_text("stored"),
+            'time': self.standard_text("time"),
         }
+
+
+        # record our starting frame
+        self.start_frame = self.game.frame_count()
 
         # check if we have a prior client thread running from a re-init
         if hasattr(self, "game_client"):
@@ -462,20 +470,6 @@ class QuadBlox(Scene):
             # draw the single player stuff
             self.draw_solo_stats()
 
-    def draw_solo_stats(self):
-        x = settings.RESOLUTION[0] // 2
-        y = 10
-
-        self.screen.blit(
-            self.texts['time'],
-            (x, y)
-        )
-
-        y += 20
-        self.screen.blit(
-            self.standard_text(str(self.elapsed())),
-            (x, y)
-        )
 
     def draw_player_board(self):
         self.draw_board(self.player_board)
@@ -637,3 +631,42 @@ class QuadBlox(Scene):
         self.log("client thread terminated.")
 
 
+
+    def draw_solo_stats(self):
+
+        # format elapsed time to a string with 3 decimal places
+        # real_time = f"{self.elapsed():.3f}"
+        fr = self.game.frame_count() - self.start_frame
+        et = fr * 1.0 / 60.0
+        
+        lpm = 0
+        bpm = 0
+
+        if fr > 0:
+            bpm = self.player_board.blocks_placed / et * 60
+            lpm = self.player_board.lines_cleared / et * 60
+
+        
+        lines_to_draw = [
+            self.texts['time'],
+            self.standard_text(f"{et:.3f}"),
+            self.texts['frames'],
+            self.standard_text(f"{fr}"),
+            self.texts['blocks'],
+            self.standard_text(str(self.player_board.blocks_placed)),
+            self.texts['bpm'],
+            self.standard_text(f"{bpm:.2f}"),
+            self.texts['lpm'],
+            self.standard_text(f"{lpm:.2f}"),
+
+
+        ]
+
+        x = settings.RESOLUTION[0] // 2
+        y = 10
+        for line in lines_to_draw:
+            self.screen.blit(
+                line,
+                (x, y)
+            )
+            y += 20
