@@ -45,6 +45,7 @@ class QuadBlox(Scene):
         self.held_right_for = 0
 
         self.died_at = 0
+        self.died_frame = 0
 
         self.level = 0
 
@@ -405,6 +406,15 @@ class QuadBlox(Scene):
         # handle the main player input
         self.update_player()
 
+        # check for end of 40 line rush if we are still alive
+        if not self.died_frame:    
+            if self.game.qb_mode == QBMode.SoloForty and self.player_board.lines_cleared >= 40:
+                self.died_at = self.elapsed()
+                self.died_frame = self.game.frame_count()
+                self.player_board.kill()
+                self.projected_piece = None
+
+
 
 
     def check_for_death(self):
@@ -415,7 +425,8 @@ class QuadBlox(Scene):
         for x in range(10):
             for y in range(4):
                 if self.player_board.grid[y][x]:
-                    self.died_at = self.elapsed
+                    self.died_at = self.elapsed()
+                    self.died_frame = self.game.frame_count()
                     self.player_board.kill()
                     self.projected_piece = None
                     return
@@ -582,7 +593,8 @@ class QuadBlox(Scene):
                             (self.player_piece.x + x) * 12 + 100,
                             (self.player_piece.y + y) * 12 + 10,
                             12 - 1,
-                            12 - 1)
+                            12 - 1
+                        )
                     )
 
     def draw_board(self, board: Board):
@@ -635,8 +647,12 @@ class QuadBlox(Scene):
     def draw_solo_stats(self):
 
         # format elapsed time to a string with 3 decimal places
-        # real_time = f"{self.elapsed():.3f}"
-        fr = self.game.frame_count() - self.start_frame
+        # real_time = f"{self.elapsed():.3f}" 
+
+        if self.died_frame:
+            fr = self.died_frame - self.start_frame
+        else:
+            fr = self.game.frame_count() - self.start_frame
         et = fr * 1.0 / 60.0
         
         lpm = 0
