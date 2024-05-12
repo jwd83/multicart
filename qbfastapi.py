@@ -8,19 +8,11 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    lobby_list = []
-
-    for i, lobby in enumerate(lobbies):
-        lobby_list.append({'game_id': i, 'name': lobby})
-
-    return {
-        "active_games": len(games),
-        "lobbies": lobby_list
-    }
+    return get_active_games()
 
 @app.get("/games")
-def read_boards():
-    return games
+def active_games():
+    return get_active_games()
 
 @app.get("/games/{game_id}/sit")
 def seat(game_id: int):
@@ -49,7 +41,6 @@ def new_board():
 @app.get("/games/{game_id}")
 def read_board(game_id: int):
     board_states = []
-
 
     purge_dead_boards(game_id)
 
@@ -100,6 +91,25 @@ def purge_dead_boards(game_id):
             if games[game_id][i].timeout() > TIMEOUT:
                 games[game_id][i] = qb.Board()
 
+
+def get_active_games():
+    lobby_list = []
+
+    for i, lobby in enumerate(lobbies):
+        player_count = 0
+        for board in games[i]:
+            if board.timeout() < TIMEOUT:
+                player_count += 1
+        
+        
+        lobby_list.append({'game_id': i, 'name': lobby, 'players': player_count, 'seats_available': 9 - player_count})
+
+        
+
+    return {
+        "active_games": len(games),
+        "lobbies": lobby_list
+    }
 
 
 nb = namebuilder.NameBuilder()
