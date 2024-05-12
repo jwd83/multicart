@@ -409,13 +409,7 @@ class QuadBlox(Scene):
         # check for end of 40 line rush if we are still alive
         if not self.died_frame:    
             if self.game.qb_mode == QBMode.SoloForty and self.player_board.lines_cleared >= 40:
-                self.died_at = self.elapsed()
-                self.died_frame = self.game.frame_count()
-                self.player_board.kill()
-                self.projected_piece = None
-
-
-
+                self.kill_player()
 
     def check_for_death(self):
         if self.died_at:
@@ -425,11 +419,14 @@ class QuadBlox(Scene):
         for x in range(10):
             for y in range(4):
                 if self.player_board.grid[y][x]:
-                    self.died_at = self.elapsed()
-                    self.died_frame = self.game.frame_count()
-                    self.player_board.kill()
-                    self.projected_piece = None
-                    return
+                    self.kill_player()
+
+                    
+    def kill_player(self):
+        self.died_at = self.elapsed()
+        self.died_frame = self.game.frame_count()
+        self.player_board.kill()
+        self.projected_piece = None
 
     def place(self):
         self.game.log(f"Placing piece: {self.player_piece.shape}")
