@@ -54,7 +54,7 @@ adjectives = [
     "zealous",
 ]
 
-animals = [
+creatures = [
     "aardvark",
     "albatross",
     "anteater",
@@ -160,7 +160,7 @@ places = [
 ]
 
 nouns = [
-    *animals, *places
+    *creatures, *places
 ]
 
 def string_builder(fields: str):
@@ -175,7 +175,7 @@ def string_builder(fields: str):
     The characters are as follows:
 
     a: adjectives
-    i: animals
+    c: creatures
     n: nouns
     p: places
 
@@ -186,8 +186,8 @@ def string_builder(fields: str):
     for field in fields:
         if field == 'a':
             selections.append(random.choice(adjectives))
-        elif field == 'i':
-            selections.append(random.choice(animals))
+        elif field == 'c':
+            selections.append(random.choice(creatures))
         elif field == 'n':
             selections.append(random.choice(nouns))
         elif field == 'p':
@@ -201,11 +201,10 @@ def _test_string_builder(query: str):
     print(f"Query: {query}, Result: {string_builder(query)}")
 
 if __name__ == "__main__":
-    _test_string_builder('ai')
-    _test_string_builder('ai')
+    _test_string_builder('ac')
+    _test_string_builder('ac')
     _test_string_builder('an')
     _test_string_builder('an')
-    _test_string_builder('ani')
-    _test_string_builder('ani')
-    _test_string_builder('aninp')
-    
+    _test_string_builder('anc')
+    _test_string_builder('anc')
+    _test_string_builder('acnp')
