@@ -1,7 +1,6 @@
 from enum import Enum, auto
 import random
 import time
-from tokenize import Single
 
 # from https://colorkit.co/palette/ffadad-ffd6a5-fdffb6-caffbf-9bf6ff-a0c4ff-bdb2ff-ffc6ff/
 colors = [
@@ -18,10 +17,10 @@ colors = [
 
 ]
 
-class GameMode(Enum):
-    MultiPlayer = auto()
-    EndlessSolo = auto()
-    FortyLines = auto()
+class QBMode(Enum):
+    Multiplayer = auto()
+    SoloEndless = auto()
+    SoloForty = auto()
 
 class Shapes(Enum):
     I = auto()

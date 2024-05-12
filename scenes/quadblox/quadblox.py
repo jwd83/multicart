@@ -1,7 +1,7 @@
 import pygame
 from scene import Scene
 from utils import *
-from .scripts.qb import Board, colors, Piece, Shapes
+from .scripts.qb import Board, colors, Piece, Shapes, QBMode
 import copy
 import settings
 import threading
@@ -59,10 +59,11 @@ class QuadBlox(Scene):
             self.shutdown_client()
             self.log("client thread terminated.")
     
-        # kick off the client thread
-        self.client_run = True
-        self.game_client = threading.Thread(target=self.client_thread)
-        self.game_client.start()
+        if self.game.qb_mode == QBMode.Multiplayer:
+            # kick off the client thread
+            self.client_run = True
+            self.game_client = threading.Thread(target=self.client_thread)
+            self.game_client.start()
 
     def shutdown_client(self):
         self.client_run = False
@@ -198,13 +199,7 @@ class QuadBlox(Scene):
                     x += x_step
 
 
-
-    def update(self):
-        # if the user presses escape or F5 key, quit the event loop.
-        if pygame.K_ESCAPE in self.game.just_pressed:
-            self.game.scene_push = "Menu"
-            return
-
+    def update_player(self):
 
         # check for death
         self.check_for_death()
@@ -384,6 +379,17 @@ class QuadBlox(Scene):
         # check for death
         self.check_for_death()
 
+    def update(self):
+        # if the user presses escape or F5 key, quit the event loop.
+        if pygame.K_ESCAPE in self.game.just_pressed:
+            self.game.scene_push = "Menu"
+            return
+        
+        # handle the main player input
+        self.update_player()
+
+
+
     def check_for_death(self):
         if self.died_at:
             return 
@@ -433,6 +439,22 @@ class QuadBlox(Scene):
 
         # draw the player board
         self.screen.fill((0, 0, 0))
+
+        # draw the player board
+        self.draw_player_board()
+
+        # draw the opponents in multiplayer mode
+        if self.game.qb_mode == QBMode.Multiplayer:
+
+            # draw the multiplayer opponents
+            self.draw_opponents()
+
+        else:
+            # draw the single player stuff
+            pass
+
+
+    def draw_player_board(self):
         self.draw_board(self.player_board)
         self.draw_projected_piece()
 
@@ -476,9 +498,6 @@ class QuadBlox(Scene):
             (pos[0] + bs * 11, pos[1] + 40 + 9 * 20)
         )
 
-        # draw the opponents boards
-        for opponent in self.opponents:
-            self.draw_board(opponent)
 
         # draw our piece
         self.draw_piece()
@@ -492,6 +511,11 @@ class QuadBlox(Scene):
         # draw the piece queue
         self.draw_piece_queue()
 
+    def draw_opponents(self):
+
+        # draw the opponents boards
+        for opponent in self.opponents:
+            self.draw_board(opponent)
 
     def draw_arbitrary_piece(self, piece : Piece, pos = (0,0), size: int = 12):
         for x in range(4):

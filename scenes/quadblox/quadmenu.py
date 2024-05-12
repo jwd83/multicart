@@ -1,7 +1,7 @@
 import pygame
 from scene import Scene
 from utils import *
-from .scripts.qb import GameMode
+from .scripts.qb import QBMode
 import settings
 
 class QuadMenu(Scene):
@@ -9,7 +9,7 @@ class QuadMenu(Scene):
         super().__init__(game)
 
         # default to multiplayer
-        self.game.qb_mode = GameMode.MultiPlayer
+        self.game.qb_mode = QBMode.Multiplayer
 
         # menu setup
         self.background, _ = self.load_png("dall-e-chess-space.png")
@@ -42,11 +42,11 @@ class QuadMenu(Scene):
                 self.play_sound("jsxfr-select")
 
             if self.selected == 0:
-                self.game.qb_mode = GameMode.MultiPlayer
+                self.game.qb_mode = QBMode.Multiplayer
             elif self.selected == 1:
-                self.game.qb_mode = GameMode.FortyLineRush
+                self.game.qb_mode = QBMode.SoloForty
             elif self.selected == 2:
-                self.game.qb_mode = GameMode.SoloEndless
+                self.game.qb_mode = QBMode.SoloEndless
 
             self.game.scene_replace = "QuadBlox"
 

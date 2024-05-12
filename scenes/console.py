@@ -99,6 +99,7 @@ class Console(Scene):
                 # make the basic commands case insensitive
                 command_lower = self.command.lower()
                 if command_lower == "exit" or command_lower == "quit":
+                    self.log("Quitting the game.")
                     self.game.quit = True
                 elif command_lower == "clear":
                     self.history = []

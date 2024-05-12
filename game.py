@@ -31,6 +31,7 @@ class Game:
         # an instance of jack wizards to be removed.
         self.four_jacks_easy = True
         self.jw = None
+        self.qb_mode = None
 
         # set the quit flag to false at the start
         self.quit = False
@@ -402,6 +403,8 @@ class Game:
     # return type is Scene
     def load_scene(self, scene: str) -> Scene:
 
+        self.log("load_scene: " + scene)
+
         # while we are in here let's clean out the garbage
         # collect any old references to scenes that are no longer in the stack
         # this will help the garbage collector clean up any old scenes that are
@@ -414,18 +417,34 @@ class Game:
                 self.jw = None
 
 
-        self.log("load_scene: " + scene)
-        self.log(dir(scenes))
         # check if the string passed in matches the name of a class in the scenes module
-        if scene in dir(scenes):
-            self.log("scene found in dir(scenes): " + scene)
+        if self.valid_scene_name(scene):
+            # create our new scene
             new_scene = eval("scenes." + scene + "(self)")
+
+            # store a reference the jackwizards game scene for easy access
             if scene == "JackWizards":
                 self.jw = new_scene
+
             return new_scene
         else:
             self.log("WARNING: Invalid scene name! Loading start scene!")
             return eval("scenes." + settings.SCENE_START + "(self)")
+        
+    def get_scene_by_name(self, scene: str) -> Scene:
+
+        result = None
+        for s in self.scene:
+            if s.__class__.__name__ == scene:
+                result = s
+                break
+
+
+        if result is None:
+            self.log("WARNING: get_scene_by_name failed to find scene: " + scene)
+        else:
+            self.log("get_scene_by_name found scene: " + scene)
+        return result
 
     def __load_config(self):
 

@@ -70,7 +70,7 @@
         "wordlist"
     ],
     "python.analysis.typeCheckingMode": "off",
-    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoImportCompletions": false,
     // hide pycache garbage
     "files.exclude": {
         "**/__pycache__": true
