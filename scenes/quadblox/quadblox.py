@@ -53,6 +53,15 @@ class QuadBlox(Scene):
 
         self.projected_piece = None
 
+        self.texts = {
+            'time': self.standard_text("time"),
+            'clears': self.standard_text("clears"),
+            'lines': self.standard_text("lines"),
+            'level': self.standard_text("level"),
+            'stored': self.standard_text("stored"),
+            'next': self.standard_text("next"),
+        }
+
         # check if we have a prior client thread running from a re-init
         if hasattr(self, "game_client"):
             self.log("terminating prior client thread...")
@@ -451,8 +460,22 @@ class QuadBlox(Scene):
 
         else:
             # draw the single player stuff
-            pass
+            self.draw_solo_stats()
 
+    def draw_solo_stats(self):
+        x = settings.RESOLUTION[0] // 2
+        y = 10
+
+        self.screen.blit(
+            self.texts['time'],
+            (x, y)
+        )
+
+        y += 20
+        self.screen.blit(
+            self.standard_text(str(self.elapsed())),
+            (x, y)
+        )
 
     def draw_player_board(self):
         self.draw_board(self.player_board)
@@ -468,7 +491,7 @@ class QuadBlox(Scene):
         )
 
         self.screen.blit(
-            self.standard_text("CLEARS"),
+            self.texts['clears'],
             (pos[0] + bs * 11, pos[1] + 20)
         )
 
@@ -479,7 +502,7 @@ class QuadBlox(Scene):
             )
 
         self.screen.blit(
-            self.standard_text("LINES"),
+            self.texts['lines'],
             (pos[0] + bs * 11, pos[1] + 40 + 6 * 20)
         )
 
@@ -489,7 +512,7 @@ class QuadBlox(Scene):
         )
 
         self.screen.blit(
-            self.standard_text("LEVEL"),
+            self.texts['level'],
             (pos[0] + bs * 11, pos[1] + 40 + 8 * 20)
         )
 
@@ -540,7 +563,7 @@ class QuadBlox(Scene):
 
     def draw_stored_piece(self):
         self.screen.blit(
-            self.standard_text("STORED"),
+            self.texts['stored'],
             (10, 10)
         )
         if self.stored_piece is not None:
@@ -549,7 +572,7 @@ class QuadBlox(Scene):
 
     def draw_next_piece(self):
         self.screen.blit(
-            self.standard_text("NEXT"),
+            self.texts['next'],
             (10, 90)
         )
         self.draw_arbitrary_piece(self.next_piece, (10, 110))
