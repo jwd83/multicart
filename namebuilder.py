@@ -210,14 +210,9 @@ class NameBuilder:
         return " ".join(selections)
 
 def _test_string_builder(query: str):
-    print(f"Query: {query}, Result: {nb.build(query)}")
+    return(f"Query: {query}, Result: {nb.build(query)}")
 
 if __name__ == "__main__":
     nb = NameBuilder()
-    _test_string_builder('ac')
-    _test_string_builder('ac')
-    _test_string_builder('ap')
-    _test_string_builder('ap')
-    _test_string_builder('apc')
-    _test_string_builder('apc')
-    _test_string_builder('ac')
+    for i in range(20):
+        print(f"Test {i + 1}: {_test_string_builder('ac')}")
