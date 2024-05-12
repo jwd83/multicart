@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import scenes.quadblox.scripts.qb as qb
+import namebuilder
 
 TIMEOUT = 30 # seconds
 
@@ -7,7 +8,15 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"active_games": len(games)}
+    lobby_list = []
+
+    for i, lobby in enumerate(lobbies):
+        lobby_list.append({'game_id': i, 'name': lobby})
+
+    return {
+        "active_games": len(games),
+        "lobbies": lobby_list
+    }
 
 @app.get("/games")
 def read_boards():
@@ -17,7 +26,7 @@ def read_boards():
 def seat(game_id: int):
     # check for a valid game
     if game_id >= len(games) or game_id < 0:
-        return  {'status': 'error', 'message': 'Invalid game id'}
+        return  {'status': 'error', 'message': 'Invalid game_id'}
 
     purge_dead_boards(game_id)
 
@@ -28,14 +37,14 @@ def seat(game_id: int):
             games[game_id][i] = qb.Board()
             games[game_id][i].clear()
             return {'status': 'ok','seat': i}
-        
+
     # if no open seats return an error
     return {'status': 'error', 'message': 'No open seats'}
 
 @app.get("/games/new")
 def new_board():
     create_new_board()
-    return {'status': 'ok', 'game': len(games) - 1}
+    return {'status': 'ok', 'game_id': len(games) - 1, 'name': lobbies[-1]}
 
 @app.get("/games/{game_id}")
 def read_board(game_id: int):
@@ -81,6 +90,8 @@ def create_new_board():
 
     games.append(new_game)
 
+    lobbies.append(nb.build('ac'))
+
 def purge_dead_boards(game_id):
 
     # purge any disconnected boards / dead boards
@@ -90,6 +101,9 @@ def purge_dead_boards(game_id):
                 games[game_id][i] = qb.Board()
 
 
+
+nb = namebuilder.NameBuilder()
 lobbies = []
 games = []
 create_new_board()
+
