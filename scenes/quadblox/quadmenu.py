@@ -12,10 +12,9 @@ class QuadMenu(Scene):
         self.game.qb_mode = QBMode.Multiplayer
 
         # menu setup
-        self.background, _ = self.load_png("dall-e-chess-space.png")
+        self.background, _ = self.load_png("../quadblox/title.png")
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.standard_font_size = 40
-        self.text_multicart = self.standard_text("QuadBlox")
         self.text_choose = self.standard_text("Mode Selection")
         self.standard_font_size = 20
         self.options = [
@@ -56,18 +55,22 @@ class QuadMenu(Scene):
         self.screen.blit(self.background, (0, 0))
 
         y_spacing = 25
+        y_base = 200
 
-        self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
-        self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
+        self.blit_centered(self.text_choose, self.screen, (0.5, 0.5))
 
         for i, option in enumerate(self.options):
             if i == self.selected:
                 option.set_alpha(255)
             else:
                 option.set_alpha(150)
-            self.screen.blit(option, (100, 100 + i * y_spacing))
+            self.screen.blit(option, (100, y_base + i * y_spacing))
+
+
+
+
 
         self.screen.blit(
             self.img_cursor,
-            (50, 100 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 4),
+            (50, y_base + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 4),
         )

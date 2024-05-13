@@ -9,6 +9,7 @@ class GameSelect(Scene):
 
         # menu setup
         self.background, _ = self.load_png("dall-e-chess-space.png")
+        
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.standard_font_size = 40
         self.text_multicart = self.standard_text("Jack Games Multicart")
@@ -48,7 +49,7 @@ class GameSelect(Scene):
                 self.play_sound("jsxfr-select")
 
             if self.selected == 0:
-                self.game.scene_replace = "QuadBloxTitle"
+                self.game.scene_replace = "QuadMenu"
             elif self.selected == 1:
                 self.game.scene_replace = "JackNinjasTitle"
             elif self.selected == 2:

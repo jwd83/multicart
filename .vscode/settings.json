@@ -48,6 +48,7 @@
         "ndarray",
         "numhats",
         "offgrid",
+        "opengameart",
         "psycopg",
         "pygame",
         "pygbag",
