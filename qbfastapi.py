@@ -131,4 +131,12 @@ for _ in range(STARTING_LOBBY_COUNT):
     
 if __name__ == "__main__":
     # bind to 8000 or use the PORT environment variable
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", default=8000)))
+
+    port = int(os.getenv("PORT", default=8000))
+    print(f"Starting server on port http://localhost:{port}")
+    uvicorn.run(
+        app="qbfastapi:app", 
+        host="0.0.0.0", 
+        port=port,
+        reload=True
+    )
