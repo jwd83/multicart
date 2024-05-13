@@ -128,5 +128,7 @@ games = []
 for _ in range(STARTING_LOBBY_COUNT):
     create_new_board()
 
-# bind to 8000 or use the PORT environment variable
-uvicorn.run(app, host="0.0.0.0", port=os.getenv("PORT", default=8000))
+    
+if __name__ == "__main__":
+    # bind to 8000 or use the PORT environment variable
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", default=8000)))
