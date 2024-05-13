@@ -2,9 +2,9 @@ FROM python:latest
 
 WORKDIR /app
 
-RUN pip install -r requirements.txt
-
 COPY . /app
+
+RUN pip install -r app/requirements.txt
 
 EXPOSE 8000
 
