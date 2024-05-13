@@ -78,7 +78,7 @@ class QuadBlox(Scene):
             self.log("terminating prior client thread...")
             self.shutdown_client()
             self.log("client thread terminated.")
-    
+
         if self.game.qb_mode == QBMode.Multiplayer:
             # kick off the client thread
             self.client_run = True
@@ -93,14 +93,14 @@ class QuadBlox(Scene):
         self.log("high score thread: starting")
 
         try:
-                
+
 
             # check if we have a high score to send in and clear it back to None
             if self.high_score is not None:
-                
+
 
                 server = self.game.config['main']['server']
-        
+
                 hs_url = f"{server}/leaderboard?"
                 hs_url += f"player={self.high_score['player']}&"
                 hs_url += f"time={self.high_score['time']}&"
@@ -108,16 +108,16 @@ class QuadBlox(Scene):
                 hs_url += f"pieces={self.high_score['pieces']}&"
                 hs_url += f"score={self.high_score['score']}&"
                 hs_url += f"frames={self.high_score['frames']}"
-                
+
                 self.log(f"client thread: sending high score: {hs_url}")
-                
+
                 requests.post(hs_url)
 
                 self.high_score = None
         except:
             self.log("high score thread: something went wrong")
             pass
-        
+
 
     def client_thread(self):
         self.log("client thread: starting")
@@ -148,11 +148,11 @@ class QuadBlox(Scene):
                     # skip our board
                     if i == self.board_number:
                         continue
-                    
+
                     # update the board
                     if board_to_update < len(self.opponents):
                         self.opponents[board_to_update].import_board(board_state)
-                    
+
                     # increment the board to update
                     board_to_update += 1
 
@@ -435,13 +435,14 @@ class QuadBlox(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
             return
-        
+
         # handle the main player input
         self.update_player()
 
         # check for end of 40 line rush if we are still alive
-        if not self.died_frame:    
+        if not self.died_frame:
             if self.game.qb_mode == QBMode.SoloForty and self.player_board.lines_cleared >= 40:
+                self.kill_player()
 
                 self.high_score = {
                     'player': os.getlogin(),
@@ -455,19 +456,18 @@ class QuadBlox(Scene):
                 self.high_score_client = threading.Thread(target=self.high_score_thread)
                 self.high_score_client.start()
 
-                self.kill_player()
 
     def check_for_death(self):
         if self.died_at:
-            return 
-        
+            return
+
         # check for death
         for x in range(10):
             for y in range(4):
                 if self.player_board.grid[y][x]:
                     self.kill_player()
 
-                    
+
     def kill_player(self):
         self.died_at = self.elapsed()
         self.died_frame = self.game.frame_count()
@@ -690,14 +690,14 @@ class QuadBlox(Scene):
     def draw_solo_stats(self):
 
         # format elapsed time to a string with 3 decimal places
-        # real_time = f"{self.elapsed():.3f}" 
+        # real_time = f"{self.elapsed():.3f}"
 
         if self.died_frame:
             fr = self.died_frame - self.start_frame
         else:
             fr = self.game.frame_count() - self.start_frame
         et = fr * 1.0 / 60.0
-        
+
         lpm = 0
         bpm = 0
 
@@ -705,7 +705,7 @@ class QuadBlox(Scene):
             bpm = self.player_board.blocks_placed / et * 60
             lpm = self.player_board.lines_cleared / et * 60
 
-        
+
         lines_to_draw = [
             self.texts['time'],
             self.standard_text(f"{et:.3f}"),
