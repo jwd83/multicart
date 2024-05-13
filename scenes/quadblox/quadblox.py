@@ -7,6 +7,7 @@ import settings
 import threading
 import requests
 import time
+import os
 
 class QuadBlox(Scene):
     def __init__(self, game):
@@ -46,6 +47,7 @@ class QuadBlox(Scene):
 
         self.died_at = 0
         self.died_frame = 0
+        self.high_score = None
 
         self.level = 0
 
@@ -104,6 +106,22 @@ class QuadBlox(Scene):
             try:
                 # SLEEP
                 time.sleep(0.5)
+
+                # check if we have a high score to send in and clear it back to None
+                if self.high_score:
+
+                    hs_url = f"{server}/leaderboard?"
+                    hs_url += f"player={self.high_score['player']}&"
+                    hs_url += f"time={self.high_score['time']}&"
+                    hs_url += f"lines={self.high_score['lines']}&"
+                    hs_url += f"pieces={self.high_score['pieces']}&"
+                    hs_url += f"score={self.high_score['score']}&"
+                    hs_url += f"frames={self.high_score['frames']}"
+                    self.log(f"client thread: sending high score: {hs_url}")
+                    
+                    r = requests.post(hs_url)
+
+                    self.high_score = None
 
                 # UPDATE OPPONENTS
                 self.log("client thread: updating opponents")
@@ -409,6 +427,16 @@ class QuadBlox(Scene):
         # check for end of 40 line rush if we are still alive
         if not self.died_frame:    
             if self.game.qb_mode == QBMode.SoloForty and self.player_board.lines_cleared >= 40:
+
+                self.high_score = {
+                    'player': os.getlogin(),
+                    'time': (self.died_frame - self.start_frame) * 1.0 / 60.0,
+                    'lines': self.player_board.lines_cleared,
+                    'pieces': self.player_board.blocks_placed,
+                    'score': self.player_board.points,
+                    'frames': self.died_frame - self.start_frame
+                }
+
                 self.kill_player()
 
     def check_for_death(self):
