@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 import scenes.quadblox.scripts.qb as qb
 import namebuilder
+import uvicorn
+import os
 
 TIMEOUT = 30 # seconds
 STARTING_LOBBY_COUNT = 3
@@ -126,3 +128,5 @@ games = []
 for _ in range(STARTING_LOBBY_COUNT):
     create_new_board()
 
+# bind to 8000 or use the PORT environment variable
+uvicorn.run(app, host="0.0.0.0", port=os.getenv("PORT", default=8000))

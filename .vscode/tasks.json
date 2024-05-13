@@ -22,14 +22,9 @@
         {
             "label": "Run QuadBlox Server",
             "type": "shell",
-            "command": "uvicorn",
+            "command": "python",
             "args": [
-                "--reload",
-                "qbfastapi:app",
-                "--port",
-                "8000",
-                "--host",
-                "0.0.0.0"
+                "qbfastapi.py",
             ],
             "group": {
                 "kind": "build",
