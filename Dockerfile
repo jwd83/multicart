@@ -2,7 +2,7 @@ FROM python:latest
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir fastapi uvicorn pygame-ce numpy requests
+RUN pip install -r requirements.txt
 
 COPY . /app
 
