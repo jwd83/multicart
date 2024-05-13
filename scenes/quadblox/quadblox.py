@@ -89,6 +89,36 @@ class QuadBlox(Scene):
         self.client_run = False
         self.game_client.join()
 
+    def high_score_thread(self):
+        self.log("high score thread: starting")
+
+        try:
+                
+
+            # check if we have a high score to send in and clear it back to None
+            if self.high_score is not None:
+                
+
+                server = self.game.config['main']['server']
+        
+                hs_url = f"{server}/leaderboard?"
+                hs_url += f"player={self.high_score['player']}&"
+                hs_url += f"time={self.high_score['time']}&"
+                hs_url += f"lines={self.high_score['lines']}&"
+                hs_url += f"pieces={self.high_score['pieces']}&"
+                hs_url += f"score={self.high_score['score']}&"
+                hs_url += f"frames={self.high_score['frames']}"
+                
+                self.log(f"client thread: sending high score: {hs_url}")
+                
+                requests.post(hs_url)
+
+                self.high_score = None
+        except:
+            self.log("high score thread: something went wrong")
+            pass
+        
+
     def client_thread(self):
         self.log("client thread: starting")
 
@@ -107,21 +137,6 @@ class QuadBlox(Scene):
                 # SLEEP
                 time.sleep(0.5)
 
-                # check if we have a high score to send in and clear it back to None
-                if self.high_score:
-
-                    hs_url = f"{server}/leaderboard?"
-                    hs_url += f"player={self.high_score['player']}&"
-                    hs_url += f"time={self.high_score['time']}&"
-                    hs_url += f"lines={self.high_score['lines']}&"
-                    hs_url += f"pieces={self.high_score['pieces']}&"
-                    hs_url += f"score={self.high_score['score']}&"
-                    hs_url += f"frames={self.high_score['frames']}"
-                    self.log(f"client thread: sending high score: {hs_url}")
-                    
-                    r = requests.post(hs_url)
-
-                    self.high_score = None
 
                 # UPDATE OPPONENTS
                 self.log("client thread: updating opponents")
@@ -436,6 +451,9 @@ class QuadBlox(Scene):
                     'score': self.player_board.points,
                     'frames': self.died_frame - self.start_frame
                 }
+
+                self.high_score_client = threading.Thread(target=self.high_score_thread)
+                self.high_score_client.start()
 
                 self.kill_player()
 
