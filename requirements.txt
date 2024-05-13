@@ -3,3 +3,5 @@ fastapi
 uvicorn
 requests
 numpy
+psycopg[binary]
+python-dotenv
