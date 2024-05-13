@@ -3,6 +3,8 @@ import scenes.quadblox.scripts.qb as qb
 import namebuilder
 import uvicorn
 import os
+from dotenv import load_dotenv
+import psycopg
 
 TIMEOUT = 30 # seconds
 STARTING_LOBBY_COUNT = 3
@@ -12,6 +14,28 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return get_active_games()
+
+@app.get("/leaderboard")
+def read_leaderboard():
+    return high_scores
+
+@app.post("/leaderboard")
+def update_leaderboard(player: str, time: float, lines: int, pieces: int, score: int, frames: int):
+    with psycopg.connect(conninfo=os.getenv('DATABASE')) as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO
+                high_scores
+
+                (player, time, lines, pieces, score, frames)
+
+                VALUES
+
+                (%s, %s, %s, %s, %s, %s)
+
+                """, (player, time, lines, pieces, score, frames))
+    refresh_high_scores()
+    return high_scores
 
 @app.get("/games")
 def active_games():
@@ -120,10 +144,21 @@ def get_active_games():
         "lobbies": lobby_list
     }
 
+def refresh_high_scores():
+    global high_scores
+    with psycopg.connect(conninfo=os.getenv('DATABASE')) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM high_scores")
+            high_scores = cur.fetchall()
+
+load_dotenv()
 
 nb = namebuilder.NameBuilder()
 lobbies = []
 games = []
+high_scores = []
+
+refresh_high_scores()
 
 for _ in range(STARTING_LOBBY_COUNT):
     create_new_board()
