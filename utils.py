@@ -1,5 +1,4 @@
 import pygame
-import math
 import os
 from hashlib import md5
 import random
