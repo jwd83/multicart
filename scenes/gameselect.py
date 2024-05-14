@@ -3,13 +3,14 @@ import pygame
 import settings
 from scene import Scene
 
+
 class GameSelect(Scene):
     def __init__(self, game):
         super().__init__(game)
 
         # menu setup
         self.background, _ = self.load_png("dall-e-chess-space.png")
-        
+
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.standard_font_size = 40
         self.text_multicart = self.standard_text("Jack Games Multicart")

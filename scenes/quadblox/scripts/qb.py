@@ -5,22 +5,23 @@ import time
 # from https://colorkit.co/palette/ffadad-ffd6a5-fdffb6-caffbf-9bf6ff-a0c4ff-bdb2ff-ffc6ff/
 colors = [
     (0, 0, 0),
-    '#ffadad',
-    '#ffd6a5',
-    '#fdffb6',
-    '#caffbf',
-    '#9bf6ff',
-    '#a0c4ff',
-    '#bdb2ff',
-    '#ffc6ff',
+    "#ffadad",
+    "#ffd6a5",
+    "#fdffb6",
+    "#caffbf",
+    "#9bf6ff",
+    "#a0c4ff",
+    "#bdb2ff",
+    "#ffc6ff",
     (255, 255, 255),
-
 ]
+
 
 class QBMode(Enum):
     Multiplayer = auto()
     SoloEndless = auto()
     SoloForty = auto()
+
 
 class Shapes(Enum):
     I = auto()
@@ -86,12 +87,10 @@ class Piece:
             self.grid[0] = [1, 1, 0, 0]
             self.grid[1] = [0, 1, 1, 0]
 
-
     def reverse_rotate_and_size(self):
         self.rotate()
         self.rotate()
         self.rotate()
-
 
     def rotate(self):
         # make our box 4x4
@@ -110,11 +109,30 @@ class Piece:
                 new_grid[3] = [0, 1, 0, 0]
         else:
             # rotate our shape in the new box
-            new_grid[0] = [self.grid[3][0], self.grid[2][0], self.grid[1][0], self.grid[0][0]]
-            new_grid[1] = [self.grid[3][1], self.grid[2][1], self.grid[1][1], self.grid[0][1]]
-            new_grid[2] = [self.grid[3][2], self.grid[2][2], self.grid[1][2], self.grid[0][2]]
-            new_grid[3] = [self.grid[3][3], self.grid[2][3], self.grid[1][3], self.grid[0][3]]
-
+            new_grid[0] = [
+                self.grid[3][0],
+                self.grid[2][0],
+                self.grid[1][0],
+                self.grid[0][0],
+            ]
+            new_grid[1] = [
+                self.grid[3][1],
+                self.grid[2][1],
+                self.grid[1][1],
+                self.grid[0][1],
+            ]
+            new_grid[2] = [
+                self.grid[3][2],
+                self.grid[2][2],
+                self.grid[1][2],
+                self.grid[0][2],
+            ]
+            new_grid[3] = [
+                self.grid[3][3],
+                self.grid[2][3],
+                self.grid[1][3],
+                self.grid[0][3],
+            ]
 
             # shift the piece up so the top most row is not empty
             while not any(new_grid[0]):
@@ -127,11 +145,9 @@ class Piece:
                     row.pop(0)
                     row.append(0)
 
-
         self.grid = new_grid
 
     def collides(self, board):
-
 
         for row in range(self.box_size):
             for col in range(self.box_size):
@@ -150,7 +166,9 @@ class Piece:
         return False
 
     def __str__(self):
-        return "\n".join("".join(str(cell) for cell in row) for row in self.shape[self.rotation])
+        return "\n".join(
+            "".join(str(cell) for cell in row) for row in self.shape[self.rotation]
+        )
 
 
 class Board:
@@ -158,7 +176,10 @@ class Board:
         self.rows = 24
         self.cols = 10
         self.pos = pos
-        self.grid = [[random.randint(1,len(colors) - 1) for _ in range(self.cols)] for _ in range(self.rows)]
+        self.grid = [
+            [random.randint(1, len(colors) - 1) for _ in range(self.cols)]
+            for _ in range(self.rows)
+        ]
         self.block_size = block_size
         self.game_over = True
         self.attacks_waiting = 0
@@ -171,7 +192,7 @@ class Board:
         self.blocks_placed = 0
         self.players = 0
 
-        self.last_update = time.time() # for server
+        self.last_update = time.time()  # for server
 
     def zero_timeout(self):
         self.last_update = 0
@@ -200,24 +221,32 @@ class Board:
             self.outgoing_attack_queue += lines_cleared - 1
 
         self.points = (
-            (   10 * self.clears[0]) +
-            (  100 * self.clears[1]) +
-            ( 1000 * self.clears[2]) +
-            (10000 * self.clears[3]) +
-            self.blocks_placed
+            (10 * self.clears[0])
+            + (100 * self.clears[1])
+            + (1000 * self.clears[2])
+            + (10000 * self.clears[3])
+            + self.blocks_placed
         )
 
         return lines_cleared
 
     def dead(self):
-        return any(self.grid[0]) or any(self.grid[1]) or any(self.grid[2]) or any(self.grid[3])
+        return (
+            any(self.grid[0])
+            or any(self.grid[1])
+            or any(self.grid[2])
+            or any(self.grid[3])
+        )
 
     def clear(self):
         self.attacks_waiting = 0
         self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
     def kill(self):
-        self.grid = [[random.randint(1,len(colors) - 1) for _ in range(self.cols)] for _ in range(self.rows)]
+        self.grid = [
+            [random.randint(1, len(colors) - 1) for _ in range(self.cols)]
+            for _ in range(self.rows)
+        ]
 
     def reset(self):
         self.score = 0
@@ -240,8 +269,11 @@ class Board:
         Args:
             board_state_string (str): The string to import
         """
-        self.grid = [[int(cell) for cell in row.split(":")] for row in board_state_string.split(";")]
-        self.last_update = time.time() # for server
+        self.grid = [
+            [int(cell) for cell in row.split(":")]
+            for row in board_state_string.split(";")
+        ]
+        self.last_update = time.time()  # for server
 
     def timeout(self):
         return time.time() - self.last_update
@@ -251,7 +283,9 @@ class Board:
         while num_lines:
             num_lines -= 1
             self.grid.pop(0)
-            self.grid.append([random.randint(1,len(colors) - 1) for _ in range(self.cols)])
+            self.grid.append(
+                [random.randint(1, len(colors) - 1) for _ in range(self.cols)]
+            )
             # empty 1 cell
             self.grid[-1][random.randint(0, self.cols - 1)] = 0
 

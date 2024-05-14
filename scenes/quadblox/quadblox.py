@@ -9,6 +9,7 @@ import requests
 import time
 import os
 
+
 class QuadBlox(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -17,7 +18,6 @@ class QuadBlox(Scene):
 
         self.game_number = 0
         self.board_number = 0
-
 
         self.player_board = Board((100, 10))
         self.player_board.clear()
@@ -31,12 +31,11 @@ class QuadBlox(Scene):
         self.open_bag()
         self.open_bag()
 
-
         self.player_piece = self.next_piece_in_queue()
         self.next_piece = self.next_piece_in_queue()
         self.stored_piece = None
 
-        self.drop_at = 60 # frames per line fall
+        self.drop_at = 60  # frames per line fall
         self.drop_count = 0
 
         self.held_down_for = 0
@@ -57,18 +56,17 @@ class QuadBlox(Scene):
         self.projected_piece = None
 
         self.texts = {
-            'blocks': self.standard_text("blocks"),
-            'bpm': self.standard_text("blox/min"),
-            'clears': self.standard_text("clears"),
-            'frames': self.standard_text("frames"),
-            'level': self.standard_text("level"),
-            'lines': self.standard_text("lines"),
-            'lpm': self.standard_text("lines/min"),
-            'next': self.standard_text("next"),
-            'stored': self.standard_text("stored"),
-            'time': self.standard_text("time"),
+            "blocks": self.standard_text("blocks"),
+            "bpm": self.standard_text("blox/min"),
+            "clears": self.standard_text("clears"),
+            "frames": self.standard_text("frames"),
+            "level": self.standard_text("level"),
+            "lines": self.standard_text("lines"),
+            "lpm": self.standard_text("lines/min"),
+            "next": self.standard_text("next"),
+            "stored": self.standard_text("stored"),
+            "time": self.standard_text("time"),
         }
-
 
         # record our starting frame
         self.start_frame = self.game.frame_count()
@@ -94,12 +92,10 @@ class QuadBlox(Scene):
 
         try:
 
-
             # check if we have a high score to send in and clear it back to None
             if self.high_score is not None:
 
-
-                server = self.game.config['main']['server']
+                server = self.game.config["main"]["server"]
 
                 hs_url = f"{server}/leaderboard?"
                 hs_url += f"player={self.high_score['player']}&"
@@ -118,12 +114,10 @@ class QuadBlox(Scene):
             self.log("high score thread: something went wrong")
             pass
 
-
     def client_thread(self):
         self.log("client thread: starting")
 
-        server = self.game.config['main']['server']
-
+        server = self.game.config["main"]["server"]
 
         self.log(f"client thread: server set to {server}")
 
@@ -136,7 +130,6 @@ class QuadBlox(Scene):
             try:
                 # SLEEP
                 time.sleep(0.5)
-
 
                 # UPDATE OPPONENTS
                 self.log("client thread: updating opponents")
@@ -155,7 +148,6 @@ class QuadBlox(Scene):
 
                     # increment the board to update
                     board_to_update += 1
-
 
                 # UPDATE OUR BOARD
                 self.log(f"client thread: updating our board {self.board_number}")
@@ -181,13 +173,13 @@ class QuadBlox(Scene):
                 if self.died_at:
                     continue
 
-
                 # GET ATTACKS
-                r = requests.get(f"{server}/games/get-attacks/{self.game_number}/{self.board_number}").json()
+                r = requests.get(
+                    f"{server}/games/get-attacks/{self.game_number}/{self.board_number}"
+                ).json()
                 self.log(f"got {r['lines']} attacks")
                 if r["lines"] > 0:
                     self.player_board.add_line_to_bottom(r["lines"])
-
 
             except:
                 self.log("something went wrong")
@@ -195,7 +187,7 @@ class QuadBlox(Scene):
 
         self.log("client thread: shutting down")
 
-    def open_bag(self, num_bags = 1):
+    def open_bag(self, num_bags=1):
 
         for _ in range(num_bags):
 
@@ -221,7 +213,6 @@ class QuadBlox(Scene):
 
         # return the next piece
         return self.piece_queue.pop(0)
-
 
     def setup_opponents(self):
         for opponent in self.opponents:
@@ -249,12 +240,10 @@ class QuadBlox(Scene):
                     y = y1
                     x += x_step
 
-
     def update_player(self):
 
         # check for death
         self.check_for_death()
-
 
         # if we are dead stop the update logic here
         if self.died_at:
@@ -272,7 +261,6 @@ class QuadBlox(Scene):
             if pygame.K_a in self.game.just_pressed:
                 self.player_board.add_line_to_bottom()
 
-
         # check to swap piece
         if pygame.K_TAB in self.game.just_pressed:
             # swap the piece
@@ -283,7 +271,10 @@ class QuadBlox(Scene):
                 self.next_piece = self.next_piece_in_queue()
             else:
                 self.log("Swapping stored piece")
-                self.player_piece, self.stored_piece = self.stored_piece, self.player_piece
+                self.player_piece, self.stored_piece = (
+                    self.stored_piece,
+                    self.player_piece,
+                )
 
             # TODO: if there is a collision swap back (needs fixes with bounds checking/collision checking)
             # if self.player_piece.collides(self.player_board):
@@ -294,8 +285,6 @@ class QuadBlox(Scene):
             self.player_piece.x = 3
             self.player_piece.y = 0
 
-
-
         # LEFT / RIGHT MOVEMENT
         left_held_tick = False
         right_held_tick = False
@@ -304,7 +293,6 @@ class QuadBlox(Scene):
         if self.game.pressed[pygame.K_LEFT] and self.game.pressed[pygame.K_RIGHT]:
             self.held_left_for = 0
             self.held_right_for = 0
-
 
         # check if left has been held for a while
         if not self.game.pressed[pygame.K_LEFT]:
@@ -319,7 +307,6 @@ class QuadBlox(Scene):
                 if numerator % denominator == 0:
                     left_held_tick = True
 
-
         if not self.game.pressed[pygame.K_RIGHT]:
             self.held_right_for = 0
         else:
@@ -332,7 +319,6 @@ class QuadBlox(Scene):
                 if numerator % denominator == 0:
                     right_held_tick = True
 
-
         sim_left_right = copy.deepcopy(self.player_piece)
         if pygame.K_LEFT in self.game.just_pressed or left_held_tick:
             sim_left_right.x -= 1
@@ -343,7 +329,6 @@ class QuadBlox(Scene):
         # if the sim piece does not collide update our piece to it
         if not sim_left_right.collides(self.player_board):
             self.player_piece = sim_left_right
-
 
         # ROTATION
         sim_rotate = copy.deepcopy(self.player_piece)
@@ -393,7 +378,6 @@ class QuadBlox(Scene):
         if pygame.K_DOWN in self.game.just_pressed:
             try_drop = True
 
-
         # increment drop count and see if we need to drop the piece
         self.drop_count += 1
         if self.drop_count >= self.drop_at:
@@ -423,7 +407,10 @@ class QuadBlox(Scene):
         else:
             self.projected_piece = None
 
-        if pygame.K_SPACE in self.game.just_pressed and self.projected_piece is not None:
+        if (
+            pygame.K_SPACE in self.game.just_pressed
+            and self.projected_piece is not None
+        ):
             self.drop_count = 0
             self.player_piece = self.projected_piece
 
@@ -441,21 +428,23 @@ class QuadBlox(Scene):
 
         # check for end of 40 line rush if we are still alive
         if not self.died_frame:
-            if self.game.qb_mode == QBMode.SoloForty and self.player_board.lines_cleared >= 40:
+            if (
+                self.game.qb_mode == QBMode.SoloForty
+                and self.player_board.lines_cleared >= 40
+            ):
                 self.kill_player()
 
                 self.high_score = {
-                    'player': os.getlogin(),
-                    'time': (self.died_frame - self.start_frame) * 1.0 / 60.0,
-                    'lines': self.player_board.lines_cleared,
-                    'pieces': self.player_board.blocks_placed,
-                    'score': self.player_board.points,
-                    'frames': self.died_frame - self.start_frame
+                    "player": os.getlogin(),
+                    "time": (self.died_frame - self.start_frame) * 1.0 / 60.0,
+                    "lines": self.player_board.lines_cleared,
+                    "pieces": self.player_board.blocks_placed,
+                    "score": self.player_board.points,
+                    "frames": self.died_frame - self.start_frame,
                 }
 
                 self.high_score_client = threading.Thread(target=self.high_score_thread)
                 self.high_score_client.start()
-
 
     def check_for_death(self):
         if self.died_at:
@@ -466,7 +455,6 @@ class QuadBlox(Scene):
             for y in range(4):
                 if self.player_board.grid[y][x]:
                     self.kill_player()
-
 
     def kill_player(self):
         self.died_at = self.elapsed()
@@ -498,12 +486,15 @@ class QuadBlox(Scene):
                     if self.projected_piece.grid[y][x]:
                         pygame.draw.rect(
                             self.screen,
-                            (140,140,140),
+                            (140, 140, 140),
                             (
                                 (self.projected_piece.x + x) * 12 + 100,
-                                (self.projected_piece.y + y) * 12 + 10 + math.sin(self.elapsed() * 12) * 2,
+                                (self.projected_piece.y + y) * 12
+                                + 10
+                                + math.sin(self.elapsed() * 12) * 2,
                                 12 - 1,
-                                12 - 1)
+                                12 - 1,
+                            ),
                         )
 
     def draw(self):
@@ -524,7 +515,6 @@ class QuadBlox(Scene):
             # draw the single player stuff
             self.draw_solo_stats()
 
-
     def draw_player_board(self):
         self.draw_board(self.player_board)
         self.draw_projected_piece()
@@ -534,41 +524,31 @@ class QuadBlox(Scene):
         bs = self.player_board.block_size
 
         self.screen.blit(
-            self.standard_text( str(self.player_board.points)),
-            (pos[0] + bs * 11, pos[1])
+            self.standard_text(str(self.player_board.points)),
+            (pos[0] + bs * 11, pos[1]),
         )
 
-        self.screen.blit(
-            self.texts['clears'],
-            (pos[0] + bs * 11, pos[1] + 20)
-        )
+        self.screen.blit(self.texts["clears"], (pos[0] + bs * 11, pos[1] + 20))
 
         for y in range(4):
             self.screen.blit(
                 self.standard_text(f"{y + 1}x " + str(self.player_board.clears[y])),
-                (pos[0] + bs * 11, pos[1] + 40 + y * 20)
+                (pos[0] + bs * 11, pos[1] + 40 + y * 20),
             )
 
-        self.screen.blit(
-            self.texts['lines'],
-            (pos[0] + bs * 11, pos[1] + 40 + 6 * 20)
-        )
+        self.screen.blit(self.texts["lines"], (pos[0] + bs * 11, pos[1] + 40 + 6 * 20))
 
         self.screen.blit(
             self.standard_text(str(self.player_board.lines_cleared)),
-            (pos[0] + bs * 11, pos[1] + 40 + 7 * 20)
+            (pos[0] + bs * 11, pos[1] + 40 + 7 * 20),
         )
 
-        self.screen.blit(
-            self.texts['level'],
-            (pos[0] + bs * 11, pos[1] + 40 + 8 * 20)
-        )
+        self.screen.blit(self.texts["level"], (pos[0] + bs * 11, pos[1] + 40 + 8 * 20))
 
         self.screen.blit(
             self.standard_text(str(self.level)),
-            (pos[0] + bs * 11, pos[1] + 40 + 9 * 20)
+            (pos[0] + bs * 11, pos[1] + 40 + 9 * 20),
         )
-
 
         # draw our piece
         self.draw_piece()
@@ -588,18 +568,14 @@ class QuadBlox(Scene):
         for opponent in self.opponents:
             self.draw_board(opponent)
 
-    def draw_arbitrary_piece(self, piece : Piece, pos = (0,0), size: int = 12):
+    def draw_arbitrary_piece(self, piece: Piece, pos=(0, 0), size: int = 12):
         for x in range(4):
             for y in range(4):
                 if piece.grid[y][x]:
                     pygame.draw.rect(
                         self.screen,
                         colors[piece.color],
-                        (
-                            pos[0] + size * x,
-                            pos[1] + size * y,
-                            size - 1,
-                            size - 1)
+                        (pos[0] + size * x, pos[1] + size * y, size - 1, size - 1),
                     )
 
     def draw_piece_queue(self):
@@ -610,19 +586,12 @@ class QuadBlox(Scene):
             y += 5 * (10 - i)
 
     def draw_stored_piece(self):
-        self.screen.blit(
-            self.texts['stored'],
-            (10, 10)
-        )
+        self.screen.blit(self.texts["stored"], (10, 10))
         if self.stored_piece is not None:
             self.draw_arbitrary_piece(self.stored_piece, (10, 30))
 
-
     def draw_next_piece(self):
-        self.screen.blit(
-            self.texts['next'],
-            (10, 90)
-        )
+        self.screen.blit(self.texts["next"], (10, 90))
         self.draw_arbitrary_piece(self.next_piece, (10, 110))
 
     def draw_piece(self):
@@ -636,8 +605,8 @@ class QuadBlox(Scene):
                             (self.player_piece.x + x) * 12 + 100,
                             (self.player_piece.y + y) * 12 + 10,
                             12 - 1,
-                            12 - 1
-                        )
+                            12 - 1,
+                        ),
                     )
 
     def draw_board(self, board: Board):
@@ -648,8 +617,8 @@ class QuadBlox(Scene):
         pygame.draw.line(
             self.screen,
             (255, 0, 0),
-            (pos[0], pos[1] + 4 * bs-1),
-            (pos[0] + 10 * bs -1, pos[1] + 4 * bs -1)
+            (pos[0], pos[1] + 4 * bs - 1),
+            (pos[0] + 10 * bs - 1, pos[1] + 4 * bs - 1),
         )
 
         # draw the board
@@ -659,11 +628,7 @@ class QuadBlox(Scene):
                     pygame.draw.rect(
                         self.screen,
                         colors[cell],
-                        (
-                            pos[0] + x * bs,
-                            pos[1] + y * bs,
-                            bs - 1,
-                            bs - 1)
+                        (pos[0] + x * bs, pos[1] + y * bs, bs - 1, bs - 1),
                     )
 
         # draw a grey border around the board
@@ -675,17 +640,15 @@ class QuadBlox(Scene):
                 pos[0] - border_width - 1,
                 pos[1] - border_width - 1,
                 10 * bs + 2 * border_width + 1,
-                24 * bs + 2 * border_width + 1
+                24 * bs + 2 * border_width + 1,
             ),
-            width=border_width
+            width=border_width,
         )
 
     def quit(self):
         self.log("shutting down client thread...")
         self.shutdown_client()
         self.log("client thread terminated.")
-
-
 
     def draw_solo_stats(self):
 
@@ -705,27 +668,21 @@ class QuadBlox(Scene):
             bpm = self.player_board.blocks_placed / et * 60
             lpm = self.player_board.lines_cleared / et * 60
 
-
         lines_to_draw = [
-            self.texts['time'],
+            self.texts["time"],
             self.standard_text(f"{et:.3f}"),
-            self.texts['frames'],
+            self.texts["frames"],
             self.standard_text(f"{fr}"),
-            self.texts['blocks'],
+            self.texts["blocks"],
             self.standard_text(str(self.player_board.blocks_placed)),
-            self.texts['bpm'],
+            self.texts["bpm"],
             self.standard_text(f"{bpm:.2f}"),
-            self.texts['lpm'],
+            self.texts["lpm"],
             self.standard_text(f"{lpm:.2f}"),
-
-
         ]
 
         x = settings.RESOLUTION[0] // 2
         y = 10
         for line in lines_to_draw:
-            self.screen.blit(
-                line,
-                (x, y)
-            )
+            self.screen.blit(line, (x, y))
             y += 20

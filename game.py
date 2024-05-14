@@ -45,7 +45,7 @@ class Game:
         self.volume_effects = self.__DEFAULT_VOLUME
         self.winner = None
         self.fullscreen = False
-        self.unicode = "" # text input this frame
+        self.unicode = ""  # text input this frame
 
         self.__frame_count = 0
         self.__perf_start = time.perf_counter_ns()
@@ -85,9 +85,7 @@ class Game:
         # check if browser or desktop
         if settings.WASM:
             # browser
-            self.screen: pygame.Surface = pygame.display.set_mode(
-                settings.RESOLUTION
-            )
+            self.screen: pygame.Surface = pygame.display.set_mode(settings.RESOLUTION)
         else:
             # desktop
             if self.fullscreen:
@@ -114,8 +112,9 @@ class Game:
         self.scene_pop = None
 
         # create the surface for our performance counter
-        self.__perf_surface = pygame.Surface((640,360), pygame.SRCALPHA, 32).convert_alpha()
-
+        self.__perf_surface = pygame.Surface(
+            (640, 360), pygame.SRCALPHA, 32
+        ).convert_alpha()
 
     # pygbag requires this be async to run the game
     async def run(self):
@@ -124,7 +123,6 @@ class Game:
         self.console = scenes.Console(self)
 
         while not self.quit:
-
 
             # process scene change requests (if any)
             self.__change_scenes()
@@ -135,7 +133,6 @@ class Game:
             # check if tilde was pressed to open the console
             if pygame.K_BACKQUOTE in self.just_pressed:
                 self.__toggle_console()
-
 
             # set all scenes to inactive except the top scene in the stack
             for scene in self.scene:
@@ -157,7 +154,7 @@ class Game:
             # update the display
             self.__perf_stop = time.perf_counter_ns()
 
-            self.frame_time_ns = (self.__perf_stop - self.__perf_start)
+            self.frame_time_ns = self.__perf_stop - self.__perf_start
             self.frame_time_ms = self.frame_time_ns / 1000000
 
             self.frame_load = self.frame_time_ms / (1000 / settings.FPS) * 100
@@ -169,30 +166,45 @@ class Game:
 
                 # use the debug scene's make_text method for us to render the performance data to a surfrace we can blit to the screen
                 self.frame_report = self.debug_scene.make_text(
-                    text="Frame Time: " + str(round(self.frame_time_ms, 1)) + "    Frame Load: " + str(round(self.frame_load, 1)) + " %",
-                    color=(255,255,255),
-                    font="assets/fonts/"+settings.FONT_SMALL,
+                    text="Frame Time: "
+                    + str(round(self.frame_time_ms, 1))
+                    + "    Frame Load: "
+                    + str(round(self.frame_load, 1))
+                    + " %",
+                    color=(255, 255, 255),
+                    font="assets/fonts/" + settings.FONT_SMALL,
                     fontSize=5,
                     stroke=True,
-                    strokeColor=(0,0,0),
-                    strokeThickness=1
+                    strokeColor=(0, 0, 0),
+                    strokeThickness=1,
                 )
 
                 # blit the performance data to the screen
                 self.screen.blit(self.frame_report, (0, 0))
 
                 # draw a clear vertical line on the performance surface to clear any prior result
-                pygame.draw.line(self.__perf_surface, (0,0,0,0), (self.__perf_index, 0), (self.__perf_index, 360), 1)
+                pygame.draw.line(
+                    self.__perf_surface,
+                    (0, 0, 0, 0),
+                    (self.__perf_index, 0),
+                    (self.__perf_index, 360),
+                    1,
+                )
 
                 # draw a translucent red vertical line on the performance surface to represent 1% of frame load per pixel
-                pygame.draw.line(self.__perf_surface, (255,0,0,50), (self.__perf_index, 360), (self.__perf_index, 360-self.__perf_results[self.__perf_index]), 1)
+                pygame.draw.line(
+                    self.__perf_surface,
+                    (255, 0, 0, 50),
+                    (self.__perf_index, 360),
+                    (self.__perf_index, 360 - self.__perf_results[self.__perf_index]),
+                    1,
+                )
 
                 # blit the performance surface to the screen
                 self.screen.blit(self.__perf_surface, (0, 0))
 
             # increment the performance index
             self.__perf_index = (self.__perf_index + 1) % len(self.__perf_results)
-
 
             pygame.display.flip()
             self.__frame_count += 1
@@ -224,7 +236,6 @@ class Game:
             best_test = min(best_test, result)
             worst_test = max(worst_test, result)
 
-
         self.log("best result: " + str(best_test) + " ns")
         self.log("worst result: " + str(worst_test) + " ns")
         self.log("average result: " + str(sum(results) / len(results)) + " ns")
@@ -251,7 +262,6 @@ class Game:
                 self.just_pressed.append(event.key)
 
                 reject_unicode = False
-
 
                 # attempt to append the unicode character to the unicode string
                 # if it's not in the list of keys to reject or a modifier key
@@ -318,7 +328,9 @@ class Game:
                 self.just_mouse_up.append(event.button)
 
         # check if ctrl and backquote was pressed to instantly quit the game
-        if pygame.K_BACKQUOTE in self.just_pressed and (self.pressed[pygame.K_LCTRL] or self.pressed[pygame.K_RCTRL]):
+        if pygame.K_BACKQUOTE in self.just_pressed and (
+            self.pressed[pygame.K_LCTRL] or self.pressed[pygame.K_RCTRL]
+        ):
             self.quit = True
 
         # check for escape key to quit
@@ -346,7 +358,9 @@ class Game:
                 scene.quit()
                 self.log(f"ran scene's quit method: {scene.__class__.__name__}")
             except:
-                self.log(f"failed to run scene's quit method: {scene.__class__.__name__}")
+                self.log(
+                    f"failed to run scene's quit method: {scene.__class__.__name__}"
+                )
 
     def __change_scenes(self):
         # check for scene changes
@@ -376,10 +390,14 @@ class Game:
                         for _ in range(self.scene_pop):
                             # call the quit method of the scene being popped
                             try:
-                                self.log(f"Running scene's quit method: {self.scene[-1].__class__.__name__}")
+                                self.log(
+                                    f"Running scene's quit method: {self.scene[-1].__class__.__name__}"
+                                )
                                 self.scene[-1].quit()
                             except:
-                                self.log(f"Failed to run scene's quit method: {self.scene[-1].__class__.__name__}")
+                                self.log(
+                                    f"Failed to run scene's quit method: {self.scene[-1].__class__.__name__}"
+                                )
                             self.scene.pop()
                 else:
                     self.log("scene_pop: 1")
@@ -416,7 +434,6 @@ class Game:
                 self.log("purging old jw reference")
                 self.jw = None
 
-
         # check if the string passed in matches the name of a class in the scenes module
         if self.valid_scene_name(scene):
             # create our new scene
@@ -430,7 +447,7 @@ class Game:
         else:
             self.log("WARNING: Invalid scene name! Loading start scene!")
             return eval("scenes." + settings.SCENE_START + "(self)")
-        
+
     def get_scene_by_name(self, scene: str) -> Scene:
 
         result = None
@@ -438,7 +455,6 @@ class Game:
             if s.__class__.__name__ == scene:
                 result = s
                 break
-
 
         if result is None:
             self.log("WARNING: get_scene_by_name failed to find scene: " + scene)
@@ -468,8 +484,6 @@ class Game:
             if "volume_effects" in self.config["main"]:
                 self.volume_effects = int(self.config["main"]["volume_effects"])
 
-
-
     def __save_config(self):
         self.log("__save_config called")
 
@@ -477,12 +491,10 @@ class Game:
         if "main" not in self.config:
             self.config["main"] = {}
 
-
         # save settings to config file
         self.config["main"]["volume_music"] = str(self.volume_music)
         self.config["main"]["volume_effects"] = str(self.volume_effects)
         self.config["main"]["fullscreen"] = str(self.fullscreen)
-
 
         with open("assets/config.ini", "w") as config_file:
             self.config.write(config_file)
@@ -512,8 +524,6 @@ class Game:
         self.__save_config()
 
         self.__quit_all_scenes()
-
-
 
         self.log("shutting down...")
         pygame.quit()

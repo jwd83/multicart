@@ -2,6 +2,7 @@ import pygame
 from scene import Scene
 from utils import *
 
+
 class Blank(Scene):
     def __init__(self, game):
         super().__init__(game)

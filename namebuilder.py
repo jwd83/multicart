@@ -2,6 +2,7 @@
 
 import random
 
+
 class NameBuilder:
     def __init__(self):
 
@@ -200,17 +201,19 @@ class NameBuilder:
         selections = []
 
         for field in fields:
-            if field == 'a':
+            if field == "a":
                 selections.append(self.__next_item(self.adjectives))
-            elif field == 'c':
+            elif field == "c":
                 selections.append(self.__next_item(self.creatures))
-            elif field == 'p':
+            elif field == "p":
                 selections.append(self.__next_item(self.places))
 
         return " ".join(selections)
 
+
 def _test_string_builder(query: str):
-    return(f"Query: {query}, Result: {nb.build(query)}")
+    return f"Query: {query}, Result: {nb.build(query)}"
+
 
 if __name__ == "__main__":
     nb = NameBuilder()

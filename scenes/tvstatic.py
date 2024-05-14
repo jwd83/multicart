@@ -4,6 +4,7 @@ import pygame
 from scene import Scene
 import settings
 
+
 class TVStatic(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -30,4 +31,6 @@ class TVStatic(Scene):
             for x in range(0, settings.RESOLUTION[0], box_size):
                 for y in range(0, settings.RESOLUTION[1], box_size):
                     if random.randint(0, 1) == 0:
-                        pygame.draw.rect(self.screen, (255, 255, 255), (x, y, box_size, box_size))
+                        pygame.draw.rect(
+                            self.screen, (255, 255, 255), (x, y, box_size, box_size)
+                        )

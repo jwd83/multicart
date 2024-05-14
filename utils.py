@@ -31,7 +31,7 @@ def load_tpng_folder(assets_path):
 
 
 class SpriteSheet:
-    def __init__ (self, asset_path: str, colorkey: tuple = None):
+    def __init__(self, asset_path: str, colorkey: tuple = None):
         self.asset_path = "assets/" + asset_path
         self.sheet = pygame.image.load(self.asset_path).convert_alpha()
         if colorkey is not None:
@@ -62,7 +62,11 @@ class SpriteSheet:
         for y in range(0, self.sheet.get_height(), height):
             for x in range(0, self.sheet.get_width(), width):
                 count += 1
-                pygame.image.save(self.sheet.subsurface(x, y, width, height), folder + "/%d-%d_%d.png" % (count-1, x, y))
+                pygame.image.save(
+                    self.sheet.subsurface(x, y, width, height),
+                    folder + "/%d-%d_%d.png" % (count - 1, x, y),
+                )
+
 
 # animation class (DaFluffyPotato)
 class Animation:
@@ -91,6 +95,7 @@ class Animation:
     def img(self):
         return self.images[int(self.frame / self.img_duration)]
 
+
 class Seed:
     """
     This class represents a Seed object.
@@ -104,7 +109,7 @@ class Seed:
         set_seed(seed: str): Sets a new seed value.
     """
 
-    def __init__(self, seed: str|None= None):
+    def __init__(self, seed: str | None = None):
         """
         The constructor for Seed class.
 
@@ -155,7 +160,6 @@ class Seed:
         # convert the hash to a float value between 0 and 1
         return int(result, 16) / 16**32
 
-
     def bool(self, name: str = "default") -> bool:
         """
         The function to return a boolean value based on the seed and the name.
@@ -182,7 +186,6 @@ class Seed:
         if len(choices) == 0:
             return None
 
-
         result = self.__hashed(name)
         return choices[int(result, 16) % len(choices)]
 
@@ -194,7 +197,6 @@ def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
     mask = mask.to_surface()
     mask.set_colorkey((255, 255, 255))
 
-
     x = dest[0]
     y = dest[1]
 
@@ -202,6 +204,7 @@ def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
     target.blit(mask, (x + 1, y))
     target.blit(mask, (x, y - 1))
     target.blit(mask, (x, y + 1))
+
 
 # test our utilities if ran directly
 if __name__ == "__main__":

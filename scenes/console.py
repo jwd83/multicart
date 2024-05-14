@@ -3,6 +3,7 @@ from scene import Scene
 from utils import *
 import settings
 
+
 class Console(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -19,7 +20,7 @@ class Console(Scene):
         self.standard_stroke = 0
         self.standard_font = "system-ui"
         self.standard_color = (255, 255, 255)
-        self.console_title = self.standard_text( "PyGame Console")
+        self.console_title = self.standard_text("PyGame Console")
         self.help_docs = [
             ">>HELP:",
             "This is a simple console. It will execute the given",
@@ -29,7 +30,7 @@ class Console(Scene):
             "debug         toggle debug mode",
             "exit | quit   quit the game",
             "help | ?      show this help",
-            "scene         use \"scene\" to commands",
+            'scene         use "scene" to commands',
             ">>HELP>>SCENE COMMANDS:",
             "scene len     show the number of scenes in the scene stack",
             "scene list    list the scenes in the scene stack",
@@ -45,7 +46,6 @@ class Console(Scene):
             # delete the last character in the command
             if k == pygame.K_BACKSPACE:
                 # check if a modifier is being held
-
 
                 # capture the list of modifiers being held down
                 ctrl = pygame.key.get_mods() & pygame.KMOD_CTRL
@@ -80,7 +80,6 @@ class Console(Scene):
                     self.history_pointer = len(self.command_history) - 1
                 else:
                     self.history_pointer -= 1
-
 
                 if self.history_pointer < 0:
                     self.history_pointer = 0
@@ -130,10 +129,9 @@ class Console(Scene):
     def execute_command(self, command):
         pass
 
-
     def draw(self):
 
-        prompt_text = f'$ {self.command}'
+        prompt_text = f"$ {self.command}"
         prompt_texture = self.standard_text(prompt_text)
 
         self.screen.blit(self.background, (0, 0))
@@ -147,7 +145,7 @@ class Console(Scene):
 
         # draw the last 5 history elements
         drawn_cache = ""
-        for dci in self.history[-self.terminal_rows:]:
+        for dci in self.history[-self.terminal_rows :]:
             drawn_cache += str(dci) + "\n"
 
         if drawn_cache != self.last_render:
@@ -155,7 +153,7 @@ class Console(Scene):
 
             # create a fresh surface to draw the terminal output
             self.terminal_output = self.make_transparent_surface(self.screen.get_size())
-            for i, h in enumerate(self.history[-self.terminal_rows:]):
+            for i, h in enumerate(self.history[-self.terminal_rows :]):
                 self.terminal_output.blit(self.standard_text(str(h)), (10, 30 + 10 * i))
 
         self.screen.blit(self.terminal_output, (0, 0))
