@@ -615,19 +615,19 @@ class QuadBlox(Scene):
         pos = board.pos
         bs = board.block_size
 
+        # draw a black background for the board
+        pygame.draw.rect(
+            self.screen,
+            (0, 0, 0),
+            (pos[0], pos[1], 10 * bs, 24 * bs),
+        )
+
         # draw a red horizontal line after the first 4 rows
         pygame.draw.line(
             self.screen,
             (255, 0, 0),
             (pos[0], pos[1] + 4 * bs - 1),
             (pos[0] + 10 * bs - 1, pos[1] + 4 * bs - 1),
-        )
-
-        # draw a black background for the board
-        pygame.draw.rect(
-            self.screen,
-            (0, 0, 0),
-            (pos[0], pos[1], 10 * bs, 24 * bs),
         )
 
         # draw the board
