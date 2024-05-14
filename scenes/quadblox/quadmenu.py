@@ -28,7 +28,7 @@ class QuadMenu(Scene):
 
     def update(self):
         if pygame.K_ESCAPE in self.game.just_pressed and not settings.WASM:
-            self.game.quit = True
+            self.game.scene_replace = "GameSelect"
 
         if pygame.K_DOWN in self.game.just_pressed:
             self.selected = (self.selected + 1) % len(self.options)
