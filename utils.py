@@ -215,19 +215,6 @@ if __name__ == "__main__":
         print(seed.bool("testing the seed trial #" + str(i)))
         print(seed.float("testing the seed trial #" + str(i)))
 
-    # test the Vector2 class
-    a = Vector2(1, 2)
-    print(a.pos())
-
-    b = Vector2((1, 2))
-    print(b.pos())
-
-    c = a + b
-    print(c.pos())
-
-    d = Vector2(1)
-    print(d.pos())
-
     for i in range(10):
         r = Seed()
         sum = 0
