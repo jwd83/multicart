@@ -3,6 +3,7 @@ from scene import Scene
 from utils import *
 from .scripts.qb import QBMode
 import settings
+import math
 
 
 class QuadMenu(Scene):

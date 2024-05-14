@@ -2,6 +2,7 @@ import pygame
 import os
 from hashlib import md5
 import random
+import math
 
 
 # load a single image
