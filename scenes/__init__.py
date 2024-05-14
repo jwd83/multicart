@@ -4,6 +4,7 @@ from scenes.menu import Menu
 from .jackgames import JackGames
 from .gameselect import GameSelect
 from .tvstatic import TVStatic
+from .plasma import Plasma
 
 # console
 from .console import Console
@@ -39,5 +40,3 @@ from .superball.superballfield import SuperBallField
 
 from .quadblox.quadblox import QuadBlox
 from .quadblox.quadmenu import QuadMenu
-
-
