@@ -151,60 +151,7 @@ class Game:
                 self.debug_scene.update()
                 self.debug_scene.draw()
 
-            # update the display
-            self.__perf_stop = time.perf_counter_ns()
-
-            self.frame_time_ns = self.__perf_stop - self.__perf_start
-            self.frame_time_ms = self.frame_time_ns / 1000000
-
-            self.frame_load = self.frame_time_ms / (1000 / settings.FPS) * 100
-
-            self.__perf_results[self.__perf_index] = self.frame_load
-
-            # show performance data
-            if settings.DEBUG:
-
-                # use the debug scene's make_text method for us to render the performance data to a surfrace we can blit to the screen
-                self.frame_report = self.debug_scene.make_text(
-                    text="Frame Time: "
-                    + str(round(self.frame_time_ms, 1))
-                    + "    Frame Load: "
-                    + str(round(self.frame_load, 1))
-                    + " %",
-                    color=(255, 255, 255),
-                    font="assets/fonts/" + settings.FONT_SMALL,
-                    fontSize=5,
-                    stroke=True,
-                    strokeColor=(0, 0, 0),
-                    strokeThickness=1,
-                )
-
-                # blit the performance data to the screen
-                self.screen.blit(self.frame_report, (0, 0))
-
-                # draw a clear vertical line on the performance surface to clear any prior result
-                pygame.draw.line(
-                    self.__perf_surface,
-                    (0, 0, 0, 0),
-                    (self.__perf_index, 0),
-                    (self.__perf_index, 360),
-                    1,
-                )
-
-                # draw a translucent red vertical line on the performance surface to represent 1% of frame load per pixel
-                pygame.draw.line(
-                    self.__perf_surface,
-                    (255, 0, 0, 50),
-                    (self.__perf_index, 360),
-                    (self.__perf_index, 360 - self.__perf_results[self.__perf_index]),
-                    1,
-                )
-
-                # blit the performance surface to the screen
-                self.screen.blit(self.__perf_surface, (0, 0))
-
-            # increment the performance index
-            self.__perf_index = (self.__perf_index + 1) % len(self.__perf_results)
+            self.__update_performance_finish()
 
             pygame.display.flip()
             self.__frame_count += 1
@@ -215,11 +162,73 @@ class Game:
             # limit the game to 60 fps
             self.clock.tick(settings.FPS)
 
-            # update the performance timer
-            self.__perf_start = time.perf_counter_ns()
+            # start the performance update
+            self.__update_performance_start()
 
         # quit the game
         self.__quit()
+
+    def __update_performance_start(self):
+
+        # update the performance timer
+        self.__perf_start = time.perf_counter_ns()
+
+    def __update_performance_finish(self):
+
+        # update the display
+        self.__perf_stop = time.perf_counter_ns()
+
+        self.frame_time_ns = self.__perf_stop - self.__perf_start
+        self.frame_time_ms = self.frame_time_ns / 1000000
+
+        self.frame_load = self.frame_time_ms / (1000 / settings.FPS) * 100
+
+        self.__perf_results[self.__perf_index] = self.frame_load
+
+        # show performance data
+        if settings.DEBUG:
+
+            # use the debug scene's make_text method for us to render the performance data to a surfrace we can blit to the screen
+            self.frame_report = self.debug_scene.make_text(
+                text="Frame Time: "
+                + str(round(self.frame_time_ms, 1))
+                + "    Frame Load: "
+                + str(round(self.frame_load, 1))
+                + " %",
+                color=(255, 255, 255),
+                font="assets/fonts/" + settings.FONT_SMALL,
+                fontSize=5,
+                stroke=True,
+                strokeColor=(0, 0, 0),
+                strokeThickness=1,
+            )
+
+            # blit the performance data to the screen
+            self.screen.blit(self.frame_report, (0, 0))
+
+            # draw a clear vertical line on the performance surface to clear any prior result
+            pygame.draw.line(
+                self.__perf_surface,
+                (0, 0, 0, 0),
+                (self.__perf_index, 0),
+                (self.__perf_index, 360),
+                1,
+            )
+
+            # draw a translucent red vertical line on the performance surface to represent 1% of frame load per pixel
+            pygame.draw.line(
+                self.__perf_surface,
+                (255, 0, 0, 50),
+                (self.__perf_index, 360),
+                (self.__perf_index, 360 - self.__perf_results[self.__perf_index]),
+                1,
+            )
+
+            # blit the performance surface to the screen
+            self.screen.blit(self.__perf_surface, (0, 0))
+
+        # increment the performance index
+        self.__perf_index = (self.__perf_index + 1) % len(self.__perf_results)
 
     def __test_performance(self):
         results = []
