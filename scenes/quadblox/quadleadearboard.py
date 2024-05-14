@@ -25,8 +25,11 @@ class QuadLeaderboard(Scene):
 
     def thread_get_leaderboard(self):
         self.log("thread_get_leaderboard starting")
+
+        server = self.game.config["main"]["server"]
+
         try:
-            j = requests.get("http://localhost:8000/leaderboard").json()
+            j = requests.get(f"{server}/leaderboard").json()
             self.log(j)
             new_texts = [self.standard_text("Leaderboard", 40)]
             for i, score in enumerate(j):
