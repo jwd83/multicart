@@ -5,6 +5,7 @@ from .jackgames import JackGames
 from .gameselect import GameSelect
 from .tvstatic import TVStatic
 from .plasma import Plasma
+from .lavalamp import LavaLamp
 
 # console
 from .console import Console
