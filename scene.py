@@ -4,6 +4,7 @@ import pygame
 import settings
 import os
 
+
 class Scene:
     def __init__(self, game):
         # prevent circular import by importing game here for type hinting
@@ -23,7 +24,7 @@ class Scene:
         self.standard_stroke_thickness = 1
         self.standard_font_size = 40
         self.standard_color = (240, 240, 240)
-        self.standard_font = None # use the default font
+        self.standard_font = None  # use the default font
 
     def standard_text(
         self,
@@ -51,13 +52,11 @@ class Scene:
         return max(min(n_max, n), n_min)
 
     def update(self):
-        """This method should be implemented by the child class to update the scene.
-        """
+        """This method should be implemented by the child class to update the scene."""
         self.log("Scene's update method has not been implemented")
 
     def draw(self):
-        """This method should be implemented by the child class to draw the scene.
-        """
+        """This method should be implemented by the child class to draw the scene."""
         # the values of sin range from -1 to 1
         r = math.sin(time.time() * 1.33 + 1.5) * 127 + 128
         g = math.sin(time.time()) * 127 + 128
@@ -191,7 +190,7 @@ class Scene:
         pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
         surface.blit(shape_surf, rect)
 
-    def make_surface(self, size): # an alias for make_transparent_surface
+    def make_surface(self, size):  # an alias for make_transparent_surface
         return self.make_transparent_surface(size)
 
     def make_transparent_surface(self, size):
@@ -273,13 +272,12 @@ class Scene:
             self.log("play_sound: Sound not found: " + sound)
             return
 
-
         # set the volume of the sound based on the settings
         self.game.sfx[sound].set_volume(self.game.volume_effects / 100)
 
         pygame.mixer.Sound.play(self.game.sfx[sound])
 
-    def play_music(self, path_in_assets): # play a sound in an endless loop
+    def play_music(self, path_in_assets):  # play a sound in an endless loop
         self.log("play_music: " + path_in_assets)
         # stop any music that is currently playing
         pygame.mixer.music.stop()
@@ -298,11 +296,6 @@ class Scene:
         # play the music in an endless loop
         pygame.mixer.music.play(-1)
 
-
-
-
-
-
     # from the pygame tutorial:
     # https://www.pygame.org/docs/tut/tom_games3.html
     def load_png(self, name):
@@ -319,7 +312,6 @@ class Scene:
             raise SystemExit
         return image, image.get_rect()
 
-
     def log(self, message: str):
         """Calls the game objects log method with the message to make it easier to log messages from scenes.
 
@@ -332,7 +324,6 @@ class Scene:
         """Scenes can override this method to gracefully exit. This was added so QuadBlox
         could gracefully exit it's client thread.
         """
-        self.log(f"Scene's quit method has not been implemented: {self.__class__.__name__}")
-
-
-
+        self.log(
+            f"Scene's quit method has not been implemented: {self.__class__.__name__}"
+        )
