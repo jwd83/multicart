@@ -51,7 +51,10 @@ class QuadBlox(Scene):
         self.level = 0
 
         self.standard_font_size = 20
-        self.standard_stroke = False
+        # self.standard_stroke = False
+        self.standard_stroke = True
+        self.standard_stroke_color = (0, 0, 0)
+        self.standard_stroke_thickness = 1
 
         self.projected_piece = None
 
