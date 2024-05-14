@@ -49,7 +49,7 @@ class QuadMenu(Scene):
             elif self.selected == 2:
                 self.game.qb_mode = QBMode.SoloEndless
 
-            self.game.scene_replace = "QuadBlox"
+            self.game.scene_replace = ["Plasma", "QuadBlox"]
 
     def draw(self):
         # choose a soothing sky blue
