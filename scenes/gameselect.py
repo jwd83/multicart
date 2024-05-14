@@ -8,6 +8,8 @@ class GameSelect(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        self.game.scene_push_under = "Plasma"
+
         # menu setup
         self.background, _ = self.load_png("dall-e-chess-space.png")
 
@@ -72,7 +74,7 @@ class GameSelect(Scene):
     def draw(self):
         # choose a soothing sky blue
         # self.screen.fill((18, 27, 180))
-        self.screen.blit(self.background, (0, 0))
+        # self.screen.blit(self.background, (0, 0))
 
         y_spacing = 25
 

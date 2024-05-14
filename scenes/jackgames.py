@@ -25,11 +25,9 @@ class JackGames(Scene):
             pygame.K_RETURN in self.game.just_pressed
             or pygame.K_SPACE in self.game.just_pressed
             or pygame.K_ESCAPE in self.game.just_pressed
+            or self.elapsed() > self.timeout
         ):
-            self.game.scene_replace = "Logo"
-
-        if self.elapsed() > self.timeout:
-            self.game.scene_replace = "Logo"
+            self.game.scene_replace = "GameSelect"
 
     def draw(self):
         self.screen.fill((0, 0, 0))

@@ -110,6 +110,7 @@ class Game:
         self.scene_replace = None
         self.scene_push = None
         self.scene_pop = None
+        self.scene_push_under = None
 
         # create the surface for our performance counter
         self.__perf_surface = pygame.Surface(
@@ -460,6 +461,37 @@ class Game:
                             "scene_push: " + scene + ", WARNING: Invalid scene name!"
                         )
             self.scene_push = None
+
+        if self.scene_push_under is not None:
+            # if scene push is a string, push that scene onto the stack under the current scene
+            if type(self.scene_push_under) == str:
+
+                if self.valid_scene_name(self.scene_push_under):
+                    self.log("scene_push_under: " + self.scene_push_under)
+                    self.scene.insert(-1, self.load_scene(self.scene_push_under))
+                else:
+                    self.log(
+                        "scene_push_under: "
+                        + self.scene_push_under
+                        + ", WARNING: Invalid scene name!"
+                    )
+
+            if type(self.scene_push_under) == list:
+                self.log(
+                    "scene_push_under received a list of scenes to push onto the stack"
+                )
+                # if scene push is a list, push each scene onto the stack under the current scene
+                for scene in self.scene_push_under:
+                    if self.valid_scene_name(scene):
+                        self.log("scene_push_under: " + scene)
+                        self.scene.insert(-1, self.load_scene(scene))
+                    else:
+                        self.log(
+                            "scene_push_under: "
+                            + scene
+                            + ", WARNING: Invalid scene name!"
+                        )
+            self.scene_push_under = None
 
     # return type is Scene
     def load_scene(self, scene: str) -> Scene:
