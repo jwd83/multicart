@@ -499,8 +499,7 @@ class QuadBlox(Scene):
 
     def draw(self):
 
-        # draw the player board
-        self.screen.fill((0, 0, 0))
+        # plasma scene will handle filling the background back up
 
         # draw the player board
         self.draw_player_board()
@@ -619,6 +618,13 @@ class QuadBlox(Scene):
             (255, 0, 0),
             (pos[0], pos[1] + 4 * bs - 1),
             (pos[0] + 10 * bs - 1, pos[1] + 4 * bs - 1),
+        )
+
+        # draw a black background for the board
+        pygame.draw.rect(
+            self.screen,
+            (0, 0, 0),
+            (pos[0], pos[1], 10 * bs, 24 * bs),
         )
 
         # draw the board
