@@ -30,7 +30,7 @@ class Plasma(Scene):
     def draw(self):
         if not self.drawing:
             self.drawing = True
-            threading.Thread(target=self.draw_v2).start()
+            threading.Thread(target=self.draw_v1).start()
 
         if self.draw_a:
             self.screen.blit(self.frame_a, (0, 0))
@@ -63,7 +63,8 @@ class Plasma(Scene):
         pixels = np.zeros((self.w, self.h, 3), dtype=np.uint8)
 
         # Set the red and blue components of the colors
-        pixels[..., 0] = noise  #
+        # pixels[..., 0] = noise  # Red
+        pixels[..., 1] = noise  # Green
         pixels[..., 2] = 255 - noise  # Blue
 
         # Convert the pixel array to a Pygame surface and blit it to the screen
