@@ -4,6 +4,7 @@ from utils import *
 from .scripts.qb import QBMode
 import settings
 
+
 class QuadMenu(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -65,10 +66,6 @@ class QuadMenu(Scene):
             else:
                 option.set_alpha(150)
             self.screen.blit(option, (100, y_base + i * y_spacing))
-
-
-
-
 
         self.screen.blit(
             self.img_cursor,
