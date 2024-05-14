@@ -22,15 +22,16 @@ class Plasma(Scene):
         self.frame_b = pygame.Surface((self.w, self.h))
 
     def update(self):
-        if not self.drawing:
-            self.drawing = True
-            threading.Thread(target=self.draw_v1).start()
 
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
     def draw(self):
+        if not self.drawing:
+            self.drawing = True
+            threading.Thread(target=self.draw_v2).start()
+
         if self.draw_a:
             self.screen.blit(self.frame_a, (0, 0))
         else:
@@ -118,4 +119,12 @@ class Plasma(Scene):
 
         # Convert the pixel array to a Pygame surface and blit it to the screen
         image = pygame.surfarray.make_surface(pixels)
-        self.game.screen.blit(image, (0, 0))
+
+        # update the frame we are not currently drawing
+        if self.draw_a:
+            self.frame_b.blit(image, (0, 0))
+        else:
+            self.frame_a.blit(image, (0, 0))
+
+        self.draw_a = not self.draw_a
+        self.drawing = False
