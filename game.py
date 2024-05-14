@@ -367,12 +367,29 @@ class Game:
 
         # start off by looking for a replacement scene to rebuild the stack
         if self.scene_replace is not None:
-            self.log("scene_replace: " + self.scene_replace)
-            if self.valid_scene_name(self.scene_replace):
+
+            if type(self.scene_replace) == str:
+                self.log("scene_replace: " + self.scene_replace)
+                if self.valid_scene_name(self.scene_replace):
+                    self.__quit_all_scenes()
+
+                    self.scene = []
+                    self.scene.append(self.load_scene(self.scene_replace))
+
+            if type(self.scene_replace) == list:
+                self.log("scene_replace received a list of scenes to replace the stack")
                 self.__quit_all_scenes()
 
                 self.scene = []
-                self.scene.append(self.load_scene(self.scene_replace))
+                for scene in self.scene_replace:
+                    self.log("scene_replace: " + scene)
+
+                    if self.valid_scene_name(scene):
+                        self.scene.append(self.load_scene(scene))
+                    else:
+                        self.log(
+                            "scene_replace: " + scene + ", WARNING: Invalid scene name!"
+                        )
             self.scene_replace = None
 
         # next, look for a pop request to clear the stack
@@ -409,13 +426,30 @@ class Game:
             self.scene_pop = None
 
         if self.scene_push is not None:
-            if self.valid_scene_name(self.scene_push):
-                self.log("scene_push: " + self.scene_push)
-                self.scene.append(self.load_scene(self.scene_push))
-            else:
-                self.log(
-                    "scene_push: " + self.scene_push + ", WARNING: Invalid scene name!"
-                )
+            # if scene push is a string, push that scene onto the stack
+            if type(self.scene_push) == str:
+
+                if self.valid_scene_name(self.scene_push):
+                    self.log("scene_push: " + self.scene_push)
+                    self.scene.append(self.load_scene(self.scene_push))
+                else:
+                    self.log(
+                        "scene_push: "
+                        + self.scene_push
+                        + ", WARNING: Invalid scene name!"
+                    )
+
+            if type(self.scene_push) == list:
+                self.log("scene_push received a list of scenes to push onto the stack")
+                # if scene push is a list, push each scene onto the stack
+                for scene in self.scene_push:
+                    if self.valid_scene_name(scene):
+                        self.log("scene_push: " + scene)
+                        self.scene.append(self.load_scene(scene))
+                    else:
+                        self.log(
+                            "scene_push: " + scene + ", WARNING: Invalid scene name!"
+                        )
             self.scene_push = None
 
     # return type is Scene
