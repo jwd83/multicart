@@ -23,6 +23,8 @@ class QuadMenu(Scene):
             self.standard_text("Multiplayer"),
             self.standard_text("40 Line Rush"),
             self.standard_text("Solo Endless"),
+            self.standard_text("Leaderboard"),
+            self.standard_text("Quit"),
         ]
         self.selected = 0
 
@@ -44,12 +46,18 @@ class QuadMenu(Scene):
 
             if self.selected == 0:
                 self.game.qb_mode = QBMode.Multiplayer
+                self.game.scene_replace = ["Plasma", "QuadBlox"]
+
             elif self.selected == 1:
                 self.game.qb_mode = QBMode.SoloForty
+                self.game.scene_replace = ["Plasma", "QuadBlox"]
+
             elif self.selected == 2:
                 self.game.qb_mode = QBMode.SoloEndless
+                self.game.scene_replace = ["Plasma", "QuadBlox"]
 
-            self.game.scene_replace = ["Plasma", "QuadBlox"]
+            elif self.selected == 3:
+                self.game.scene_replace = "QuadLeaderboard"
 
     def draw(self):
         # choose a soothing sky blue

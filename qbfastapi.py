@@ -1,10 +1,20 @@
+import os
+
+# .env support
+from dotenv import load_dotenv
+
+# fastapi
+import uvicorn
 from fastapi import FastAPI
 import scenes.quadblox.scripts.qb as qb
-import namebuilder
-import uvicorn
-import os
-from dotenv import load_dotenv
+
+
+# Postgres
 import psycopg
+from psycopg.rows import dict_row
+
+# my custom namebuilder
+import namebuilder
 
 TIMEOUT = 30  # seconds
 STARTING_LOBBY_COUNT = 3
@@ -164,9 +174,9 @@ def get_active_games():
 
 def refresh_high_scores():
     global high_scores
-    with psycopg.connect(conninfo=os.getenv("DATABASE")) as conn:
+    with psycopg.connect(conninfo=os.getenv("DATABASE"), row_factory=dict_row) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM high_scores")
+            cur.execute("SELECT * FROM high_scores ORDER BY time ASC LIMIT 10")
             high_scores = cur.fetchall()
 
 

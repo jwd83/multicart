@@ -38,6 +38,6 @@ from .superball.superballtitle import SuperBallTitle
 from .superball.superballfield import SuperBallField
 
 # quadblox
-
+from .quadblox.quadleadearboard import QuadLeaderboard
 from .quadblox.quadblox import QuadBlox
 from .quadblox.quadmenu import QuadMenu
