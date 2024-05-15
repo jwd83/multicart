@@ -73,7 +73,7 @@ class QuadBlox(Scene):
 
         self.held_down_for = 0
         self.held_toggles_at = 10
-        self.held_frame_interval = 4
+        self.held_frame_interval = 6
         self.held_left_for = 0
         self.held_right_for = 0
 
@@ -94,6 +94,7 @@ class QuadBlox(Scene):
         self.texts = {
             "blocks": self.standard_text("blocks"),
             "bpm": self.standard_text("blox/min"),
+            "das [l:d:r]": self.standard_text("blox/min"),
             "clears": self.standard_text("clears"),
             "frames": self.standard_text("frames"),
             "level": self.standard_text("level"),
@@ -343,35 +344,26 @@ class QuadBlox(Scene):
         left_held_tick = False
         right_held_tick = False
 
-        # if they are holding both reset it
+        # if player is holding both left and right reset the held counters
         if self.game.pressed[pygame.K_LEFT] and self.game.pressed[pygame.K_RIGHT]:
             self.held_left_for = 0
             self.held_right_for = 0
-
-        # check if left has been held for a while
-        if not self.game.pressed[pygame.K_LEFT]:
-            self.held_left_for = 0
         else:
-            self.held_left_for += 1
-
-            if self.held_left_for >= self.held_toggles_at:
-                numerator = self.held_left_for - self.held_toggles_at
-                denominator = self.held_frame_interval
-
-                if numerator % denominator == 0:
+            # left hold
+            if self.game.pressed[pygame.K_LEFT]:
+                self.held_left_for += 1
+                if self.held_left_for % self.held_frame_interval == 0:
                     left_held_tick = True
+            else:
+                self.held_left_for = 0
 
-        if not self.game.pressed[pygame.K_RIGHT]:
-            self.held_right_for = 0
-        else:
-            self.held_right_for += 1
-
-            if self.held_right_for >= self.held_toggles_at:
-                numerator = self.held_right_for - self.held_toggles_at
-                denominator = self.held_frame_interval
-
-                if numerator % denominator == 0:
+            # right hold
+            if self.game.pressed[pygame.K_RIGHT]:
+                self.held_right_for += 1
+                if self.held_right_for % self.held_frame_interval == 0:
                     right_held_tick = True
+            else:
+                self.held_right_for = 0
 
         sim_left_right = copy.deepcopy(self.player_piece)
         if pygame.K_LEFT in self.game.just_pressed or left_held_tick:
@@ -741,7 +733,10 @@ class QuadBlox(Scene):
             self.standard_text(f"{lpm:.2f}"),
             self.texts["speed"],
             self.standard_text(f"{self.drop_at} : {self.drop_count}"),
-            
+            self.texts["das [l:d:r]"],
+            self.standard_text(
+                f"{self.held_left_for % self.held_frame_interval} : {self.held_down_for % self.held_frame_interval} : {self.held_right_for % self.held_frame_interval}"
+            ),
         ]
 
         x = settings.RESOLUTION[0] // 2
