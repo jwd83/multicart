@@ -72,7 +72,6 @@ class QuadBlox(Scene):
         self.drop_count = 0
 
         self.held_down_for = 0
-        self.held_toggles_at = 10
         self.held_frame_interval = 6
         self.held_left_for = 0
         self.held_right_for = 0
@@ -411,12 +410,9 @@ class QuadBlox(Scene):
         # check if down has been held for a while
         if self.game.pressed[pygame.K_DOWN]:
             self.held_down_for += 1
-            if self.held_down_for >= self.held_toggles_at:
-                numerator = self.held_down_for - self.held_toggles_at
-                denominator = self.held_frame_interval
+            if self.held_down_for % self.held_frame_interval == 0:
+                try_drop = True
 
-                if numerator % denominator == 0:
-                    try_drop = True
         else:
             self.held_down_for = 0
 
