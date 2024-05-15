@@ -35,7 +35,7 @@ class QuadLeaderboard(Scene):
             for i, score in enumerate(j):
                 new_texts.append(
                     self.standard_text(
-                        f"{i+1}. {score['player']} - {score['time']}", 20
+                        f"{i+1}. {score['player']} - {score['time']:.3f}", 20
                     )
                 )
             self.texts = new_texts
