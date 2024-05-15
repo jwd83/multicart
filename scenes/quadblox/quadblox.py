@@ -93,14 +93,14 @@ class QuadBlox(Scene):
         self.texts = {
             "blocks": self.standard_text("blocks"),
             "bpm": self.standard_text("blox/min"),
-            "das [l:d:r]": self.standard_text("blox/min"),
             "clears": self.standard_text("clears"),
+            "das": self.standard_text("das [l:d:r]"),
             "frames": self.standard_text("frames"),
             "level": self.standard_text("level"),
             "lines": self.standard_text("lines"),
             "lpm": self.standard_text("lines/min"),
             "next": self.standard_text("next"),
-            "speed": self.standard_text("speed"),
+            "speed": self.standard_text("drop speed"),
             "stored": self.standard_text("stored"),
             "time": self.standard_text("time"),
         }
@@ -729,7 +729,7 @@ class QuadBlox(Scene):
             self.standard_text(f"{lpm:.2f}"),
             self.texts["speed"],
             self.standard_text(f"{self.drop_at} : {self.drop_count}"),
-            self.texts["das [l:d:r]"],
+            self.texts["das"],
             self.standard_text(
                 f"{self.held_left_for % self.held_frame_interval} : {self.held_down_for % self.held_frame_interval} : {self.held_right_for % self.held_frame_interval}"
             ),
