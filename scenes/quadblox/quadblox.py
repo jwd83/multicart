@@ -19,6 +19,39 @@ class QuadBlox(Scene):
         self.game_number = 0
         self.board_number = 0
 
+        # a lookup table where level vs drop rate
+
+        self.__level_speed_lookup_table = [
+            48,  # 0
+            43,  # 1
+            38,  # 2
+            33,  # 3
+            28,  # 4
+            23,  # 5
+            18,  # 6
+            13,  # 7
+            8,  # 8
+            6,  # 9
+            5,  # 10
+            5,  # 11
+            5,  # 12
+            4,  # 13
+            4,  # 14
+            4,  # 15
+            3,  # 16
+            3,  # 17
+            3,  # 18
+            2,  # 19
+            2,  # 20
+            2,  # 21
+            2,  # 22
+            2,  # 23
+            2,  # 24
+            2,  # 25
+            2,  # 26
+            2,  # 27
+            2,  # 28
+        ]
         self.player_board = Board((100, 10))
         self.player_board.clear()
 
@@ -35,7 +68,7 @@ class QuadBlox(Scene):
         self.next_piece = self.next_piece_in_queue()
         self.stored_piece = None
 
-        self.drop_at = 60  # frames per line fall
+        self.drop_at = self.level_speed(0)  # frames per line fall
         self.drop_count = 0
 
         self.held_down_for = 0
@@ -67,6 +100,7 @@ class QuadBlox(Scene):
             "lines": self.standard_text("lines"),
             "lpm": self.standard_text("lines/min"),
             "next": self.standard_text("next"),
+            "speed": self.standard_text("speed"),
             "stored": self.standard_text("stored"),
             "time": self.standard_text("time"),
         }
@@ -85,6 +119,23 @@ class QuadBlox(Scene):
             self.client_run = True
             self.game_client = threading.Thread(target=self.client_thread)
             self.game_client.start()
+
+    def level_speed(self, level: int) -> int:
+        """Returns the number of frames to wait before dropping a piece at a given level
+
+        Args:
+            level (int): The level to get the speed for
+
+        Returns:
+            int: The number of frames to wait before dropping a piece at the given level
+        """
+        if level < 0:
+            return 48
+
+        if level > 28:
+            return 1
+
+        return self.__level_speed_lookup_table[level]
 
     def shutdown_client(self):
         self.client_run = False
@@ -470,7 +521,7 @@ class QuadBlox(Scene):
         # place the current piece and get a new piece
         self.player_board.place(self.player_piece)
         self.level = self.player_board.lines_cleared // 10
-        self.drop_at = max(4, 60 - self.level * 5)
+        self.drop_at = self.level_speed(self.level)
         self.player_piece = self.next_piece
         self.next_piece = self.next_piece_in_queue()
         # restart the delay for down being held to slow up the next place pieced
@@ -688,6 +739,9 @@ class QuadBlox(Scene):
             self.standard_text(f"{bpm:.2f}"),
             self.texts["lpm"],
             self.standard_text(f"{lpm:.2f}"),
+            self.texts["speed"],
+            self.standard_text(f"{self.drop_at} : {self.drop_count}"),
+            
         ]
 
         x = settings.RESOLUTION[0] // 2
