@@ -172,7 +172,7 @@ class Piece:
 
 
 class Board:
-    def __init__(self, pos=(0, 0), block_size=12):
+    def __init__(self, pos=(0, 0), block_size=12, start_level=0):
         self.rows = 24
         self.cols = 10
         self.pos = pos
@@ -190,9 +190,64 @@ class Board:
         self.lines_cleared = 0
         self.clears = [0, 0, 0, 0]
         self.blocks_placed = 0
-        self.players = 0
+        self.level = start_level
+        self.start_level = start_level
 
         self.last_update = time.time()  # for server
+
+    def level_speed(self, level: int | None = None) -> int:
+        """Returns the number of frames to wait before dropping a piece at a given level
+
+        Args:
+            level (int) | : The level to get the speed for. If none, the current level is used
+
+        Returns:
+            int: The number of frames to wait before dropping a piece at the given level
+        """
+
+        if level is None:
+            level = self.level
+
+        # a lookup table where level vs drop rate
+        __level_frame_drop_rates = [
+            48,  # 0
+            43,  # 1
+            38,  # 2
+            33,  # 3
+            28,  # 4
+            23,  # 5
+            18,  # 6
+            13,  # 7
+            8,  # 8
+            6,  # 9
+            5,  # 10
+            5,  # 11
+            5,  # 12
+            4,  # 13
+            4,  # 14
+            4,  # 15
+            3,  # 16
+            3,  # 17
+            3,  # 18
+            2,  # 19
+            2,  # 20
+            2,  # 21
+            2,  # 22
+            2,  # 23
+            2,  # 24
+            2,  # 25
+            2,  # 26
+            2,  # 27
+            2,  # 28
+        ]
+
+        if level < 0:
+            return 48
+
+        if level > 28:
+            return 1
+
+        return __level_frame_drop_rates[level]
 
     def zero_timeout(self):
         self.last_update = 0
@@ -220,13 +275,8 @@ class Board:
             self.clears[lines_cleared - 1] += 1
             self.outgoing_attack_queue += lines_cleared - 1
 
-        self.points = (
-            (10 * self.clears[0])
-            + (100 * self.clears[1])
-            + (1000 * self.clears[2])
-            + (10000 * self.clears[3])
-            + self.blocks_placed
-        )
+        clear_points = [0, 40, 100, 300, 1200]
+        self.points += clear_points[lines_cleared] * (self.level + 1)
 
         return lines_cleared
 

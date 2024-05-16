@@ -19,39 +19,6 @@ class QuadBlox(Scene):
         self.game_number = 0
         self.board_number = 0
 
-        # a lookup table where level vs drop rate
-
-        self.__level_speed_lookup_table = [
-            48,  # 0
-            43,  # 1
-            38,  # 2
-            33,  # 3
-            28,  # 4
-            23,  # 5
-            18,  # 6
-            13,  # 7
-            8,  # 8
-            6,  # 9
-            5,  # 10
-            5,  # 11
-            5,  # 12
-            4,  # 13
-            4,  # 14
-            4,  # 15
-            3,  # 16
-            3,  # 17
-            3,  # 18
-            2,  # 19
-            2,  # 20
-            2,  # 21
-            2,  # 22
-            2,  # 23
-            2,  # 24
-            2,  # 25
-            2,  # 26
-            2,  # 27
-            2,  # 28
-        ]
         self.player_board = Board((100, 10))
         self.player_board.clear()
 
@@ -68,7 +35,7 @@ class QuadBlox(Scene):
         self.next_piece = self.next_piece_in_queue()
         self.stored_piece = None
 
-        self.drop_at = self.level_speed(0)  # frames per line fall
+        self.drop_at = self.player_board.level_speed()
         self.drop_count = 0
 
         self.das_startup_frames = 16
@@ -80,8 +47,6 @@ class QuadBlox(Scene):
         self.died_at = 0
         self.died_frame = 0
         self.high_score = None
-
-        self.level = 0
 
         self.standard_font_size = 20
         # self.standard_stroke = False
@@ -122,23 +87,6 @@ class QuadBlox(Scene):
             self.client_run = True
             self.game_client = threading.Thread(target=self.client_thread)
             self.game_client.start()
-
-    def level_speed(self, level: int) -> int:
-        """Returns the number of frames to wait before dropping a piece at a given level
-
-        Args:
-            level (int): The level to get the speed for
-
-        Returns:
-            int: The number of frames to wait before dropping a piece at the given level
-        """
-        if level < 0:
-            return 48
-
-        if level > 28:
-            return 1
-
-        return self.__level_speed_lookup_table[level]
 
     def shutdown_client(self):
         self.client_run = False
@@ -415,6 +363,7 @@ class QuadBlox(Scene):
         # DOWN MOVEMENT / GRAVITY
         # should we fall this frame?
         try_drop = False
+        user_drop = False
 
         # check if down has been held for a while
         if self.game.pressed[pygame.K_DOWN]:
@@ -424,6 +373,7 @@ class QuadBlox(Scene):
                     self.held_down_for - self.das_startup_frames
                 ) % self.das_interval_frames == 0:
                     try_drop = True
+                    user_drop = True
 
         else:
             self.held_down_for = 0
@@ -431,6 +381,11 @@ class QuadBlox(Scene):
         # check for key press down
         if pygame.K_DOWN in self.game.just_pressed:
             try_drop = True
+            user_drop = True
+
+        # if the user commands a down, increment the points by 1
+        if user_drop:
+            self.player_board.points += 1
 
         # increment drop count and see if we need to drop the piece
         self.drop_count += 1
@@ -458,15 +413,12 @@ class QuadBlox(Scene):
 
         if projected.y > self.player_piece.y:
             self.projected_piece = projected
+            if pygame.K_SPACE in self.game.just_pressed:
+                self.drop_count = 0
+                self.player_board.points += self.projected_piece.y - self.player_piece.y
+                self.player_piece = self.projected_piece
         else:
             self.projected_piece = None
-
-        if (
-            pygame.K_SPACE in self.game.just_pressed
-            and self.projected_piece is not None
-        ):
-            self.drop_count = 0
-            self.player_piece = self.projected_piece
 
         # check for death
         self.check_for_death()
@@ -517,19 +469,18 @@ class QuadBlox(Scene):
         self.projected_piece = None
 
     def place(self):
-        self.game.log(f"Placing piece: {self.player_piece.shape}")
+        self.log(f"Placing piece: {self.player_piece.shape}")
         # place the current piece and get a new piece
-        self.player_board.place(self.player_piece)
-        self.level = self.player_board.lines_cleared // 10
-        self.drop_at = self.level_speed(self.level)
+        lines_cleared = self.player_board.place(self.player_piece)
+        self.drop_at = self.player_board.level_speed()
         self.player_piece = self.next_piece
         self.next_piece = self.next_piece_in_queue()
         # restart the delay for down being held to slow up the next place pieced
         # from dropping right away when just placed
         self.held_down_for = 0
 
-        if random.choice([True, False]):
-            self.play_sound("jsfxr-drop2")
+        if lines_cleared:
+            self.play_sound("jsfxr-qb-lines-explode")
         else:
             self.play_sound("jsfxr-drop2")
 
@@ -599,7 +550,7 @@ class QuadBlox(Scene):
         self.screen.blit(self.texts["level"], (pos[0] + bs * 11, pos[1] + 40 + 8 * 20))
 
         self.screen.blit(
-            self.standard_text(str(self.level)),
+            self.standard_text(str(self.player_board.level)),
             (pos[0] + bs * 11, pos[1] + 40 + 9 * 20),
         )
 
