@@ -95,7 +95,9 @@ class QuadBlox(Scene):
             "blocks": self.standard_text("blocks"),
             "bpm": self.standard_text("blox/min"),
             "clears": self.standard_text("clears"),
-            "das": self.standard_text("das [l:d:r]"),
+            "das": self.standard_text(
+                f"das [l:d:r] {self.das_startup_frames}>>{self.das_interval_frames}]"
+            ),
             "frames": self.standard_text("frames"),
             "level": self.standard_text("level"),
             "lines": self.standard_text("lines"),
@@ -726,6 +728,31 @@ class QuadBlox(Scene):
             bpm = self.player_board.blocks_placed / et * 60
             lpm = self.player_board.lines_cleared / et * 60
 
+        dl = 0
+        dd = 0
+        dr = 0
+
+        if self.held_left_for >= self.das_startup_frames:
+            dl = (
+                self.held_left_for - self.das_startup_frames
+            ) % self.das_interval_frames
+        else:
+            dl = self.held_left_for
+
+        if self.held_down_for >= self.das_startup_frames:
+            dd = (
+                self.held_down_for - self.das_startup_frames
+            ) % self.das_interval_frames
+        else:
+            dd = self.held_down_for
+
+        if self.held_right_for >= self.das_startup_frames:
+            dr = (
+                self.held_right_for - self.das_startup_frames
+            ) % self.das_interval_frames
+        else:
+            dr = self.held_right_for
+
         lines_to_draw = [
             self.texts["time"],
             self.standard_text(f"{et:.3f}"),
@@ -740,9 +767,7 @@ class QuadBlox(Scene):
             self.texts["speed"],
             self.standard_text(f"{self.drop_at} : {self.drop_count}"),
             self.texts["das"],
-            self.standard_text(
-                f"{self.held_left_for % self.das_interval_frames} : {self.held_down_for % self.das_interval_frames} : {self.held_right_for % self.das_interval_frames}"
-            ),
+            self.standard_text(f"{dl} : {dd} : {dr}"),
         ]
 
         x = settings.RESOLUTION[0] // 2
