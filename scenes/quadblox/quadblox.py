@@ -71,8 +71,9 @@ class QuadBlox(Scene):
         self.drop_at = self.level_speed(0)  # frames per line fall
         self.drop_count = 0
 
+        self.das_startup_frames = 16
+        self.das_interval_frames = 6
         self.held_down_for = 0
-        self.held_frame_interval = 6
         self.held_left_for = 0
         self.held_right_for = 0
 
@@ -351,16 +352,22 @@ class QuadBlox(Scene):
             # left hold
             if self.game.pressed[pygame.K_LEFT]:
                 self.held_left_for += 1
-                if self.held_left_for % self.held_frame_interval == 0:
-                    left_held_tick = True
+                if self.held_left_for >= self.das_startup_frames:
+                    if (
+                        self.held_left_for - self.das_startup_frames
+                    ) % self.das_interval_frames == 0:
+                        left_held_tick = True
             else:
                 self.held_left_for = 0
 
             # right hold
             if self.game.pressed[pygame.K_RIGHT]:
                 self.held_right_for += 1
-                if self.held_right_for % self.held_frame_interval == 0:
-                    right_held_tick = True
+                if self.held_right_for >= self.das_startup_frames:
+                    if (
+                        self.held_right_for - self.das_startup_frames
+                    ) % self.das_interval_frames == 0:
+                        right_held_tick = True
             else:
                 self.held_right_for = 0
 
@@ -410,8 +417,11 @@ class QuadBlox(Scene):
         # check if down has been held for a while
         if self.game.pressed[pygame.K_DOWN]:
             self.held_down_for += 1
-            if self.held_down_for % self.held_frame_interval == 0:
-                try_drop = True
+            if self.held_down_for >= self.das_startup_frames:
+                if (
+                    self.held_down_for - self.das_startup_frames
+                ) % self.das_interval_frames == 0:
+                    try_drop = True
 
         else:
             self.held_down_for = 0
@@ -731,7 +741,7 @@ class QuadBlox(Scene):
             self.standard_text(f"{self.drop_at} : {self.drop_count}"),
             self.texts["das"],
             self.standard_text(
-                f"{self.held_left_for % self.held_frame_interval} : {self.held_down_for % self.held_frame_interval} : {self.held_right_for % self.held_frame_interval}"
+                f"{self.held_left_for % self.das_interval_frames} : {self.held_down_for % self.das_interval_frames} : {self.held_right_for % self.das_interval_frames}"
             ),
         ]
 
