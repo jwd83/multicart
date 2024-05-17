@@ -31,7 +31,7 @@ class BoxParticle(pygame.sprite.Sprite):
     def __init__(self, row, col, color, board: Board):
         super().__init__()
 
-        self.alpha = random.randint(64, 128)
+        self.alpha = random.randint(64, 64 * 3)
 
         self.image = pygame.Surface(
             (board.block_size, board.block_size)
@@ -45,7 +45,7 @@ class BoxParticle(pygame.sprite.Sprite):
         self.rect.topleft = (tlx, tly)
 
     def update(self):
-        self.alpha -= 2
+        self.alpha -= 3
         if self.alpha <= 0:
             self.kill()
             return
@@ -97,8 +97,8 @@ class QuadBlox(Scene):
         self.high_score = None
 
         self.standard_font_size = 20
-        self.standard_stroke = False
-        # self.standard_stroke = True
+        # self.standard_stroke = False
+        self.standard_stroke = True
         self.standard_stroke_color = (0, 0, 0)
         self.standard_stroke_thickness = 1
 
@@ -614,11 +614,12 @@ class QuadBlox(Scene):
             # generate particles for the cleared lines
             for row in results:
                 for col in range(10):
-                    self.particle_group.add(
-                        BoxParticle(
-                            row["row"], col, row["blocks"][col], self.player_board
+                    for _ in range(len(results)):
+                        self.particle_group.add(
+                            BoxParticle(
+                                row["row"], col, row["blocks"][col], self.player_board
+                            )
                         )
-                    )
 
             # self.play_sound("jsfxr-qb-lines-explode")
             self.play_sound(clear_sound)
@@ -852,18 +853,43 @@ class QuadBlox(Scene):
         else:
             dr = self.held_right_for
 
-        lines_to_draw = [
-            self.standard_text(f"{et:.3f}"),
-            self.standard_text(f"{fr}"),
-            self.standard_text(str(self.player_board.blocks_placed)),
-            self.standard_text(f"{bpm:.2f}"),
-            self.standard_text(f"{lpm:.2f}"),
-            self.standard_text(f"{self.drop_at} : {self.drop_count}"),
-            self.standard_text(f"{dl} : {dd} : {dr}"),
-        ]
-
         x = settings.RESOLUTION[0] // 2
         y = 30
-        for line in lines_to_draw:
-            self.screen.blit(line, (x, y))
+
+        # build the fast texts if they don't exist
+        if "solo_time" not in self.fast_texts:
+            self.fast_texts["solo_time"] = FastText(self, f"{et:.3f}", (x, y))
             y += 40
+
+            self.fast_texts["solo_frames"] = FastText(self, f"{fr}", (x, y))
+            y += 40
+
+            self.fast_texts["solo_blocks_placed"] = FastText(
+                self, str(self.player_board.blocks_placed), (x, y)
+            )
+            y += 40
+
+            self.fast_texts["solo_bpm"] = FastText(self, f"{bpm:.1f}", (x, y))
+            y += 40
+
+            self.fast_texts["solo_lpm"] = FastText(self, f"{lpm:.1f}", (x, y))
+            y += 40
+
+            self.fast_texts["solo_drop"] = FastText(
+                self, f"{self.drop_at} : {self.drop_count}", (x, y)
+            )
+            y += 40
+
+            self.fast_texts["solo_das"] = FastText(self, f"{dl} : {dd} : {dr}", (x, y))
+
+        else:
+            # update the fast texts
+            self.fast_texts["solo_time"].text = f"{et:.3f}"
+            self.fast_texts["solo_frames"].text = f"{fr}"
+            self.fast_texts["solo_blocks_placed"].text = str(
+                self.player_board.blocks_placed
+            )
+            self.fast_texts["solo_bpm"].text = f"{bpm:.1f}"
+            self.fast_texts["solo_lpm"].text = f"{lpm:.1f}"
+            self.fast_texts["solo_drop"].text = f"{self.drop_at} : {self.drop_count}"
+            self.fast_texts["solo_das"].text = f"{dl} : {dd} : {dr}"
