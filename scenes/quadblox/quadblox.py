@@ -559,8 +559,15 @@ class QuadBlox(Scene):
         self.screen.blit(self.texts["level"], (pos[0] + bs * 11, pos[1] + 40 + 8 * 20))
 
         self.screen.blit(
-            self.standard_text(str(self.player_board.level)),
+            self.standard_text(f"{self.player_board.level}"),
             (pos[0] + bs * 11, pos[1] + 40 + 9 * 20),
+        )
+
+        self.screen.blit(self.texts["next"], (pos[0] + bs * 11, pos[1] + 40 + 10 * 20))
+
+        self.screen.blit(
+            self.standard_text(f"{self.player_board.next_level}"),
+            (pos[0] + bs * 11, pos[1] + 40 + 11 * 20),
         )
 
         # draw our piece
