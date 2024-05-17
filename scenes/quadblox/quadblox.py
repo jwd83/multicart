@@ -640,6 +640,21 @@ class QuadBlox(Scene):
             (pos[0] - 1, pos[1] - 1, 10 * bs + 1, 24 * bs + 1),
         )
 
+        # check if we are in a 40 line rush mode
+        if self.game.qb_mode == QBMode.SoloForty:
+
+            # draw this in the top center of the board
+
+            self.blit_centered(
+                self.make_text(
+                    text=f"{40 - self.player_board.lines_cleared}",
+                    color=(90, 90, 90),
+                    fontSize=80,
+                ),
+                self.screen,
+                (0.25, 0.09),
+            )
+
         # draw a red horizontal line after the first 4 rows
         pygame.draw.line(
             self.screen,
