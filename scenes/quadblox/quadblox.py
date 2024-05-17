@@ -480,7 +480,16 @@ class QuadBlox(Scene):
         self.held_down_for = 0
 
         if lines_cleared:
-            self.play_sound("jsfxr-qb-lines-explode")
+            clear_sound = ""
+            if lines_cleared >= 3:
+                clear_sound = "level-up-bonus-sequence-3-186892"
+            elif lines_cleared == 2:
+                clear_sound = "level-up-bonus-sequence-2-186891"
+            else:
+                clear_sound = "level-up-bonus-sequence-1-186890"
+
+            # self.play_sound("jsfxr-qb-lines-explode")
+            self.play_sound(clear_sound)
         else:
             self.play_sound("jsfxr-drop2")
 
