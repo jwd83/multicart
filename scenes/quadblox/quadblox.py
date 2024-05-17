@@ -10,6 +10,23 @@ import time
 import os
 
 
+class FastText:
+    def __init__(self, scene: Scene, text: str, pos: tuple):
+        self.text = text
+        self.pos = pos
+        self.scene = scene
+        self.__render()
+
+    def __render(self):
+        self.image = self.scene.standard_text(self.text)
+        self.__last_rendered_text = self.text
+
+    def draw(self):
+        if self.text != self.__last_rendered_text:
+            self.__render()
+        self.scene.screen.blit(self.image, self.pos)
+
+
 class BoxParticle(pygame.sprite.Sprite):
     def __init__(self, row, col, color, board: Board):
         super().__init__()
@@ -38,10 +55,12 @@ class BoxParticle(pygame.sprite.Sprite):
 
 
 class QuadBlox(Scene):
+
     def __init__(self, game):
         super().__init__(game)
 
         self.particle_group = pygame.sprite.Group()
+        self.background_layer = self.new_layer()
 
         self.client_run = True
 
@@ -78,8 +97,8 @@ class QuadBlox(Scene):
         self.high_score = None
 
         self.standard_font_size = 20
-        # self.standard_stroke = False
-        self.standard_stroke = True
+        self.standard_stroke = False
+        # self.standard_stroke = True
         self.standard_stroke_color = (0, 0, 0)
         self.standard_stroke_thickness = 1
 
@@ -102,6 +121,39 @@ class QuadBlox(Scene):
             "time": self.standard_text("time"),
         }
 
+        # create our fast dynamic texts
+        pos = self.player_board.pos
+        bs = self.player_board.block_size
+
+        self.fast_texts = {}
+        self.fast_texts["points"] = FastText(
+            self, str(self.player_board.points), (pos[0] + bs * 11, pos[1])
+        )
+        for y in range(4):
+            self.fast_texts[f"clears{y}"] = FastText(
+                self,
+                f"{y + 1}x " + str(self.player_board.clears[y]),
+                (pos[0] + bs * 11, pos[1] + 40 + y * 20),
+            )
+        self.fast_texts["lines_cleared"] = FastText(
+            self,
+            str(self.player_board.lines_cleared),
+            (pos[0] + bs * 11, pos[1] + 40 + 7 * 20),
+        )
+        self.fast_texts["level"] = FastText(
+            self,
+            str(self.player_board.level),
+            (pos[0] + bs * 11, pos[1] + 40 + 9 * 20),
+        )
+        self.fast_texts["next_level"] = FastText(
+            self,
+            str(self.player_board.next_level),
+            (pos[0] + bs * 11, pos[1] + 40 + 11 * 20),
+        )
+
+        # pre render the background layer
+        self.render_background_layer()
+
         # record our starting frame
         self.start_frame = self.game.frame_count()
 
@@ -116,6 +168,41 @@ class QuadBlox(Scene):
             self.client_run = True
             self.game_client = threading.Thread(target=self.client_thread)
             self.game_client.start()
+
+    def render_background_layer(self):
+
+        # draw the player stats
+        pos = self.player_board.pos
+        bs = self.player_board.block_size
+
+        self.background_layer.blit(
+            self.texts["clears"], (pos[0] + bs * 11, pos[1] + 20)
+        )
+        self.background_layer.blit(
+            self.texts["lines"], (pos[0] + bs * 11, pos[1] + 40 + 6 * 20)
+        )
+        self.background_layer.blit(
+            self.texts["level"], (pos[0] + bs * 11, pos[1] + 40 + 8 * 20)
+        )
+        self.background_layer.blit(
+            self.texts["next"], (pos[0] + bs * 11, pos[1] + 40 + 10 * 20)
+        )
+
+        lines_to_draw = [
+            self.texts["time"],
+            self.texts["frames"],
+            self.texts["blocks"],
+            self.texts["bpm"],
+            self.texts["lpm"],
+            self.texts["speed"],
+            self.texts["das"],
+        ]
+
+        x = settings.RESOLUTION[0] // 2
+        y = 10
+        for line in lines_to_draw:
+            self.background_layer.blit(line, (x, y))
+            y += 40
 
     def shutdown_client(self):
         self.client_run = False
@@ -560,6 +647,9 @@ class QuadBlox(Scene):
 
         # plasma scene will handle filling the background back up
 
+        # draw the background layer of static elements
+        self.screen.blit(self.background_layer, (0, 0))
+
         # draw the player board
         self.draw_player_board()
 
@@ -577,47 +667,25 @@ class QuadBlox(Scene):
 
         self.particle_group.draw(self.screen)
 
+    def draw_fast_texts(self):
+
+        self.fast_texts["points"].text = str(self.player_board.points)
+        for y in range(4):
+            self.fast_texts[f"clears{y}"].text = (
+                f"{y + 1}x {self.player_board.clears[y]}"
+            )
+        self.fast_texts["lines_cleared"].text = str(self.player_board.lines_cleared)
+        self.fast_texts["level"].text = str(self.player_board.level)
+        self.fast_texts["next_level"].text = str(self.player_board.next_level)
+
+        for text in self.fast_texts.values():
+            text.draw()
+
     def draw_player_board(self):
         self.draw_board(self.player_board)
         self.draw_projected_piece()
 
-        # draw the player stats
-        pos = self.player_board.pos
-        bs = self.player_board.block_size
-
-        self.screen.blit(
-            self.standard_text(str(self.player_board.points)),
-            (pos[0] + bs * 11, pos[1]),
-        )
-
-        self.screen.blit(self.texts["clears"], (pos[0] + bs * 11, pos[1] + 20))
-
-        for y in range(4):
-            self.screen.blit(
-                self.standard_text(f"{y + 1}x " + str(self.player_board.clears[y])),
-                (pos[0] + bs * 11, pos[1] + 40 + y * 20),
-            )
-
-        self.screen.blit(self.texts["lines"], (pos[0] + bs * 11, pos[1] + 40 + 6 * 20))
-
-        self.screen.blit(
-            self.standard_text(str(self.player_board.lines_cleared)),
-            (pos[0] + bs * 11, pos[1] + 40 + 7 * 20),
-        )
-
-        self.screen.blit(self.texts["level"], (pos[0] + bs * 11, pos[1] + 40 + 8 * 20))
-
-        self.screen.blit(
-            self.standard_text(f"{self.player_board.level}"),
-            (pos[0] + bs * 11, pos[1] + 40 + 9 * 20),
-        )
-
-        self.screen.blit(self.texts["next"], (pos[0] + bs * 11, pos[1] + 40 + 10 * 20))
-
-        self.screen.blit(
-            self.standard_text(f"{self.player_board.next_level}"),
-            (pos[0] + bs * 11, pos[1] + 40 + 11 * 20),
-        )
+        self.draw_fast_texts()
 
         # draw our piece
         self.draw_piece()
@@ -785,24 +853,17 @@ class QuadBlox(Scene):
             dr = self.held_right_for
 
         lines_to_draw = [
-            self.texts["time"],
             self.standard_text(f"{et:.3f}"),
-            self.texts["frames"],
             self.standard_text(f"{fr}"),
-            self.texts["blocks"],
             self.standard_text(str(self.player_board.blocks_placed)),
-            self.texts["bpm"],
             self.standard_text(f"{bpm:.2f}"),
-            self.texts["lpm"],
             self.standard_text(f"{lpm:.2f}"),
-            self.texts["speed"],
             self.standard_text(f"{self.drop_at} : {self.drop_count}"),
-            self.texts["das"],
             self.standard_text(f"{dl} : {dd} : {dr}"),
         ]
 
         x = settings.RESOLUTION[0] // 2
-        y = 10
+        y = 30
         for line in lines_to_draw:
             self.screen.blit(line, (x, y))
-            y += 20
+            y += 40

@@ -190,11 +190,23 @@ class Scene:
         pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
         surface.blit(shape_surf, rect)
 
-    def make_surface(self, size):  # an alias for make_transparent_surface
+    def make_surface(self, size) -> pygame.Surface:
+        """an alias for make_transparent_surface
+
+        Returns:
+            pygame.Surface: a transparent surface
+        """
         return self.make_transparent_surface(size)
 
-    def make_transparent_surface(self, size):
+    def make_transparent_surface(self, size) -> pygame.Surface:
         return pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
+
+    def new_layer(self):
+        """Creates a new surface layer to draw on the size of the screen."""
+
+        return self.make_transparent_surface(
+            (settings.RESOLUTION[0], settings.RESOLUTION[1])
+        )
 
     def make_text(
         self,
