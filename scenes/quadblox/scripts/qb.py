@@ -192,6 +192,12 @@ class Board:
         self.blocks_placed = 0
         self.level = start_level
         self.start_level = start_level
+        self.next_level = 0
+
+        # calculate lines for first level up
+        level_up_lines_a = (self.level - self.start_level) * 10 + 10
+        level_up_lines_b = max(100, self.start_level * 10 - 50)
+        self.next_level = min(level_up_lines_a, level_up_lines_b)
 
         self.last_update = time.time()  # for server
 
@@ -275,8 +281,14 @@ class Board:
             self.clears[lines_cleared - 1] += 1
             self.outgoing_attack_queue += lines_cleared - 1
 
+        # score points
         clear_points = [0, 40, 100, 300, 1200]
         self.points += clear_points[lines_cleared] * (self.level + 1)
+
+        # level up
+        if self.lines_cleared >= self.next_level:
+            self.level += 1
+            self.next_level += 10
 
         return lines_cleared
 

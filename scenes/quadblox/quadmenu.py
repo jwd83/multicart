@@ -28,6 +28,8 @@ class QuadMenu(Scene):
         ]
         self.selected = 0
 
+        self.play_music("quadblox/korobeiniki-rearranged-arr-for-music-box-184978.mp3")
+
     def update(self):
         if pygame.K_ESCAPE in self.game.just_pressed and not settings.WASM:
             self.game.scene_replace = "GameSelect"
