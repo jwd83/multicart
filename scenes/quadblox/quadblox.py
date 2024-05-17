@@ -637,7 +637,7 @@ class QuadBlox(Scene):
         pygame.draw.rect(
             self.screen,
             (0, 0, 0),
-            (pos[0], pos[1], 10 * bs, 24 * bs),
+            (pos[0] - 1, pos[1] - 1, 10 * bs + 1, 24 * bs + 1),
         )
 
         # draw a red horizontal line after the first 4 rows
