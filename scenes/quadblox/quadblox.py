@@ -10,9 +10,38 @@ import time
 import os
 
 
+class BoxParticle(pygame.sprite.Sprite):
+    def __init__(self, row, col, color, board: Board):
+        super().__init__()
+
+        self.alpha = random.randint(64, 128)
+
+        self.image = pygame.Surface(
+            (board.block_size, board.block_size)
+        ).convert_alpha()
+        self.image.set_alpha(self.alpha)
+        self.speed = (random.uniform(-0.25, 0.25), random.uniform(-1.5, -0.5))
+        self.image.fill(colors[color])
+        self.rect = self.image.get_rect()
+        tlx = board.pos[0] + board.block_size * col
+        tly = board.pos[1] + board.block_size * row
+        self.rect.topleft = (tlx, tly)
+
+    def update(self):
+        self.alpha -= 2
+        if self.alpha <= 0:
+            self.kill()
+            return
+        self.rect.x += self.speed[0]
+        self.rect.y += self.speed[1]
+        self.image.set_alpha(self.alpha)
+
+
 class QuadBlox(Scene):
     def __init__(self, game):
         super().__init__(game)
+
+        self.particle_group = pygame.sprite.Group()
 
         self.client_run = True
 
@@ -432,6 +461,9 @@ class QuadBlox(Scene):
         # handle the main player input
         self.update_player()
 
+        # update particle effects
+        self.particle_group.update()
+
         # check for end of 40 line rush if we are still alive
         if not self.died_frame:
             if (
@@ -471,7 +503,7 @@ class QuadBlox(Scene):
     def place(self):
         self.log(f"Placing piece: {self.player_piece.shape}")
         # place the current piece and get a new piece
-        lines_cleared = self.player_board.place(self.player_piece)
+        results = self.player_board.place(self.player_piece)
         self.drop_at = self.player_board.level_speed()
         self.player_piece = self.next_piece
         self.next_piece = self.next_piece_in_queue()
@@ -479,14 +511,27 @@ class QuadBlox(Scene):
         # from dropping right away when just placed
         self.held_down_for = 0
 
-        if lines_cleared:
+        if len(results):
+            # self.log(f"Lines cleared: {len(lines_cleared)} {lines_cleared}")
             clear_sound = ""
-            if lines_cleared >= 3:
+            if len(results) == 4:
+                # todo: get a better sound for this
                 clear_sound = "level-up-bonus-sequence-3-186892"
-            elif lines_cleared == 2:
+            elif len(results) == 3:
+                clear_sound = "level-up-bonus-sequence-3-186892"
+            elif len(results) == 2:
                 clear_sound = "level-up-bonus-sequence-2-186891"
             else:
                 clear_sound = "level-up-bonus-sequence-1-186890"
+
+            # generate particles for the cleared lines
+            for row in results:
+                for col in range(10):
+                    self.particle_group.add(
+                        BoxParticle(
+                            row["row"], col, row["blocks"][col], self.player_board
+                        )
+                    )
 
             # self.play_sound("jsfxr-qb-lines-explode")
             self.play_sound(clear_sound)
@@ -527,6 +572,10 @@ class QuadBlox(Scene):
         else:
             # draw the single player stuff
             self.draw_solo_stats()
+
+        # draw the particle effects
+
+        self.particle_group.draw(self.screen)
 
     def draw_player_board(self):
         self.draw_board(self.player_board)

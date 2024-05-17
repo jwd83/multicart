@@ -1,6 +1,7 @@
 from enum import Enum, auto
 import random
 import time
+import copy
 
 # from https://colorkit.co/palette/ffadad-ffd6a5-fdffb6-caffbf-9bf6ff-a0c4ff-bdb2ff-ffc6ff/
 colors = [
@@ -258,7 +259,7 @@ class Board:
     def zero_timeout(self):
         self.last_update = 0
 
-    def place(self, piece: Piece):
+    def place(self, piece: Piece) -> list[dict]:
         self.blocks_placed += 1
         for row in range(piece.box_size):
             for col in range(piece.box_size):
@@ -267,11 +268,13 @@ class Board:
 
         return self.score()
 
-    def score(self):
+    def score(self) -> list[dict]:
+        results = []
         lines_cleared = 0
         for row in range(self.rows):
             if all(self.grid[row]):
                 lines_cleared += 1
+                results.append({"row": row, "blocks": copy.deepcopy(self.grid[row])})
                 self.grid.pop(row)
                 self.grid.insert(0, [0 for _ in range(self.cols)])
 
@@ -290,7 +293,7 @@ class Board:
             self.level += 1
             self.next_level += 10
 
-        return lines_cleared
+        return results
 
     def dead(self):
         return (
