@@ -7,6 +7,7 @@ import sys
 import asyncio
 import configparser
 import time
+from gamecontrollerdb import GameController
 
 
 class Game:
@@ -60,12 +61,6 @@ class Game:
         # load settings from config file
         self.config = configparser.ConfigParser()
         self.__load_config()
-
-        # joystick support
-        self.joysticks = [
-            pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())
-        ]
-        self.log("self.joysticks=" + str(self.joysticks))
 
         # load all sounds in assets/sounds as sound effects
         for sound in os.listdir("assets/sounds"):

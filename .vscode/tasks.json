@@ -19,6 +19,24 @@
                 "clear": true
             }
         },
+            {
+            "label": "Run Controller Tests",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "gamecontrollerdb.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
         {
             "label": "Run QuadBlox Server",
             "type": "shell",
