@@ -5,3 +5,4 @@ requests
 numpy
 psycopg[binary]
 python-dotenv
+Pillow
