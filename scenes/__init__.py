@@ -6,6 +6,7 @@ from .gameselect import GameSelect
 from .tvstatic import TVStatic
 from .plasma import Plasma
 from .lavalamp import LavaLamp
+from .fractal import Fractal
 
 # console
 from .console import Console
