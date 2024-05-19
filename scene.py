@@ -51,7 +51,7 @@ class Scene:
         self,
         text: str,
         font_size: int | None = None,
-    ):
+    ) -> pygame.Surface:
 
         if font_size is None:
             font_size = self.standard_font_size
