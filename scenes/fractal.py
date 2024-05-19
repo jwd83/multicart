@@ -38,9 +38,9 @@ class Fractal(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
-        self.x1 *= 0.99
+        self.x1 *= 0.98
         self.y1 *= 0.99
-        self.x2 *= 0.99
+        self.x2 *= 0.998
         self.y2 *= 0.99
 
         self.render_fractal()
