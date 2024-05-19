@@ -4,9 +4,12 @@ from scenes.menu import Menu
 from .jackgames import JackGames
 from .gameselect import GameSelect
 from .tvstatic import TVStatic
-from .plasma import Plasma
-from .lavalamp import LavaLamp
-from .fractal import Fractal
+
+# backgrounds
+from .backgrounds.plasma import Plasma
+from .backgrounds.lavalamp import LavaLamp
+from .backgrounds.fractal import Mandelbrot
+from .backgrounds.julia import Julia
 
 # console
 from .console import Console

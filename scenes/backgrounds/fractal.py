@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 
 
-class Fractal(Scene):
+class Mandelbrot(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.texts = {}
