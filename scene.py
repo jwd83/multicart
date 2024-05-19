@@ -6,7 +6,7 @@ import os
 
 
 class FastText(pygame.sprite.Sprite):
-    def __init__(self, scene: "Scene", text: str, pos: tuple):
+    def __init__(self, scene: "Scene", text: str, pos: tuple, anchor: str = "topleft"):
         super().__init__()
         # this must be set before text for the setattr trigger to work
         self.__last_rendered_text: str | None = None
@@ -14,6 +14,7 @@ class FastText(pygame.sprite.Sprite):
         self.scene: Scene = scene
         self.image: pygame.Surface = None
         self.rect: pygame.Rect = None
+        self.anchor: str = anchor
 
         # this will trigger the __render method so assign it last
         self.text: str = text
@@ -31,7 +32,7 @@ class FastText(pygame.sprite.Sprite):
 
             self.image = self.scene.standard_text(self.text)
             self.rect = self.image.get_rect()
-            self.rect.topleft = self.pos
+            setattr(self.rect, self.anchor, self.pos)
             self.__last_rendered_text = self.text
 
     def draw(self):
@@ -59,11 +60,24 @@ class Scene:
         self.standard_font_size = 40
         self.standard_color = (240, 240, 240)
         self.standard_font = None  # use the default font
-        self.all_text = pygame.sprite.Group()
+        self.__all_text = pygame.sprite.Group()
 
-    def Text(self, text: str, pos: tuple) -> FastText:
-        t = FastText(self, text, pos)
-        self.all_text.add(t)
+    def TextDraw(self):
+        self.__all_text.draw(self.screen)
+
+    def Text(self, text: str, pos: tuple, anchor: str = "topleft") -> FastText:
+        """Generates a FastText object and adds it to the scene's all_text group.
+
+        Args:
+            text (str): The text to generate
+            pos (tuple): The position of the text
+            anchor (str, optional): Where to anchor the text such as center or topleft. Defaults to "topleft".
+
+        Returns:
+            FastText: a FastText object that has been added to the all_text group. Update it's text attribute to change the text automatically.
+        """
+        t = FastText(self, text, pos, anchor)
+        self.__all_text.add(t)
         return t
 
     def standard_text(

@@ -13,6 +13,12 @@ class TVStatic(Scene):
         self.time_total = self.time_static + self.time_blank
         # self.play_sound("dash")
 
+        self.text_static = self.Text(
+            "Static",
+            (settings.RESOLUTION[0] // 2, settings.RESOLUTION[1] // 2),
+            anchor="center",
+        )
+
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.
         if pygame.K_ESCAPE in self.game.just_pressed:
@@ -34,3 +40,5 @@ class TVStatic(Scene):
                         pygame.draw.rect(
                             self.screen, (255, 255, 255), (x, y, box_size, box_size)
                         )
+
+        self.TextDraw()
