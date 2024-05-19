@@ -353,7 +353,7 @@ class Game:
         if found:
             self.log(f"valid scene name: {scene}")
         else:
-            self.log(f"Warning! valid scene name: {scene}")
+            self.log(f"Warning! Invalid scene name: {scene}")
         return found
 
     def __quit_all_scenes(self):
