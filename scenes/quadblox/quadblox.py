@@ -10,23 +10,6 @@ import time
 import os
 
 
-class FastText:
-    def __init__(self, scene: Scene, text: str, pos: tuple):
-        self.text = text
-        self.pos = pos
-        self.scene = scene
-        self.__render()
-
-    def __render(self):
-        self.image = self.scene.standard_text(self.text)
-        self.__last_rendered_text = self.text
-
-    def draw(self):
-        if self.text != self.__last_rendered_text:
-            self.__render()
-        self.scene.screen.blit(self.image, self.pos)
-
-
 class BoxParticle(pygame.sprite.Sprite):
     def __init__(self, row, col, color, board: Board):
         super().__init__()
@@ -126,27 +109,23 @@ class QuadBlox(Scene):
         bs = self.player_board.block_size
 
         self.fast_texts = {}
-        self.fast_texts["points"] = FastText(
-            self, str(self.player_board.points), (pos[0] + bs * 11, pos[1])
+        self.fast_texts["points"] = self.Text(
+            str(self.player_board.points), (pos[0] + bs * 11, pos[1])
         )
         for y in range(4):
-            self.fast_texts[f"clears{y}"] = FastText(
-                self,
+            self.fast_texts[f"clears{y}"] = self.Text(
                 f"{y + 1}x " + str(self.player_board.clears[y]),
                 (pos[0] + bs * 11, pos[1] + 40 + y * 20),
             )
-        self.fast_texts["lines_cleared"] = FastText(
-            self,
+        self.fast_texts["lines_cleared"] = self.Text(
             str(self.player_board.lines_cleared),
             (pos[0] + bs * 11, pos[1] + 40 + 7 * 20),
         )
-        self.fast_texts["level"] = FastText(
-            self,
+        self.fast_texts["level"] = self.Text(
             str(self.player_board.level),
             (pos[0] + bs * 11, pos[1] + 40 + 9 * 20),
         )
-        self.fast_texts["next_level"] = FastText(
-            self,
+        self.fast_texts["next_level"] = self.Text(
             str(self.player_board.next_level),
             (pos[0] + bs * 11, pos[1] + 40 + 11 * 20),
         )
@@ -858,29 +837,29 @@ class QuadBlox(Scene):
 
         # build the fast texts if they don't exist
         if "solo_time" not in self.fast_texts:
-            self.fast_texts["solo_time"] = FastText(self, f"{et:.3f}", (x, y))
+            self.fast_texts["solo_time"] = self.Text(f"{et:.3f}", (x, y))
             y += 40
 
-            self.fast_texts["solo_frames"] = FastText(self, f"{fr}", (x, y))
+            self.fast_texts["solo_frames"] = self.Text(f"{fr}", (x, y))
             y += 40
 
-            self.fast_texts["solo_blocks_placed"] = FastText(
-                self, str(self.player_board.blocks_placed), (x, y)
+            self.fast_texts["solo_blocks_placed"] = self.Text(
+                str(self.player_board.blocks_placed), (x, y)
             )
             y += 40
 
-            self.fast_texts["solo_bpm"] = FastText(self, f"{bpm:.1f}", (x, y))
+            self.fast_texts["solo_bpm"] = self.Text(f"{bpm:.1f}", (x, y))
             y += 40
 
-            self.fast_texts["solo_lpm"] = FastText(self, f"{lpm:.1f}", (x, y))
+            self.fast_texts["solo_lpm"] = self.Text(f"{lpm:.1f}", (x, y))
             y += 40
 
-            self.fast_texts["solo_drop"] = FastText(
-                self, f"{self.drop_at} : {self.drop_count}", (x, y)
+            self.fast_texts["solo_drop"] = self.Text(
+                f"{self.drop_at} : {self.drop_count}", (x, y)
             )
             y += 40
 
-            self.fast_texts["solo_das"] = FastText(self, f"{dl} : {dd} : {dr}", (x, y))
+            self.fast_texts["solo_das"] = self.Text(f"{dl} : {dd} : {dr}", (x, y))
 
         else:
             # update the fast texts

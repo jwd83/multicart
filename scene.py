@@ -5,7 +5,25 @@ import settings
 import os
 
 
+class FastText:
+    def __init__(self, scene: "Scene", text: str, pos: tuple):
+        self.text: str = text
+        self.pos: tuple = pos
+        self.scene: Scene = scene
+        self.__render()
+
+    def __render(self):
+        self.image = self.scene.standard_text(self.text)
+        self.__last_rendered_text = self.text
+
+    def draw(self):
+        if self.text != self.__last_rendered_text:
+            self.__render()
+        self.scene.screen.blit(self.image, self.pos)
+
+
 class Scene:
+
     def __init__(self, game):
         # prevent circular import by importing game here for type hinting
         import game as g
@@ -25,6 +43,9 @@ class Scene:
         self.standard_font_size = 40
         self.standard_color = (240, 240, 240)
         self.standard_font = None  # use the default font
+
+    def Text(self, text: str, pos) -> FastText:
+        return FastText(self, text, pos)
 
     def standard_text(
         self,
