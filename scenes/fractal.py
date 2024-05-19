@@ -26,7 +26,7 @@ class Fractal(Scene):
 
     def render_fractal(self):
         pil_image = Image.effect_mandelbrot(
-            (640, 360), (self.x1, self.y1, self.x2, self.y2), 200
+            (640, 360), (self.x1, self.y1, self.x2, self.y2), 5000
         )
         print(pil_image)
         pil_image = pil_image.convert("RGB")
