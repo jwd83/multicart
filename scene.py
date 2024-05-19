@@ -10,10 +10,11 @@ class FastText(pygame.sprite.Sprite):
         super().__init__()
         # this must be set before text for the setattr trigger to work
         self.__last_rendered_text: str | None = None
+        # this must be set before pos for the setattr trigger to work
+        self.rect: pygame.Rect | None = None
         self.pos: tuple = pos
         self.scene: Scene = scene
         self.image: pygame.Surface = None
-        self.rect: pygame.Rect = None
         self.anchor: str = anchor
 
         # this will trigger the __render method so assign it last
@@ -26,6 +27,10 @@ class FastText(pygame.sprite.Sprite):
         # If the attribute being changed is 'text', call __render
         if name == "text":
             self.__render()
+
+        # If the attribute being changed is 'pos' update the rect
+        if name == "pos" and self.rect is not None:
+            setattr(self.rect, self.anchor, value)
 
     def __render(self):
         if self.text != self.__last_rendered_text:
