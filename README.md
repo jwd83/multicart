@@ -14,4 +14,6 @@ To build on Windows for web browsers use `build-web.bat`.
 
 ### Game Server
 
-Game server is currently being tested on railway and fly.io
+Game server is currently being tested on railway ~~and fly.io~~
+
+Looks like railway has a free tier that will work for now with a postgres instance for the leaderboard. 
