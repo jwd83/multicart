@@ -12,12 +12,17 @@ from numba import jit, njit
 class Julia(Scene):
     def __init__(self, game):
         super().__init__(game)
+        self.standard_font_size = 10
+        self.f_text = self.Text("", (10, 10))
         self.update_f()
 
     def update_f(self):
         t = self.elapsed()
         self.f = math.sin(t)
-        self.f_text = self.Text(f"f = sin(t) = sin({t:.4f}) = {self.f:.4f}", (10, 10))
+        self.cx = math.cos(t / 7)
+        self.f_text.text = (
+            f"t = {t:.4f}, f = sin(t) = {self.f:.4f}, cx = cos(t/7) = {self.cx:.4f}"
+        )
 
     def update(self):
         # if the user presses escape show the menu
@@ -26,9 +31,10 @@ class Julia(Scene):
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        self.f = math.sin(self.elapsed())
+        self.update_f()
+
         self.julia_set = generate_julia(
-            settings.RESOLUTION[0], settings.RESOLUTION[1], self.f
+            settings.RESOLUTION[0], settings.RESOLUTION[1], self.f, self.cx
         )
 
         # Draw the surface on the screen
@@ -49,13 +55,13 @@ def draw_julia_set(screen, julia_set):
 
 
 @njit
-def generate_julia(h, w, f):
+def generate_julia(h, w, f, cx):
 
     re_min = -2.0
     re_max = 2.0
     im_min = -2.0
     im_max = 2.0
-    c = complex(0.0, f)
+    c = complex(cx, f)
     real_range = np.arange(re_min, re_max, (re_max - re_min) / w)
     image_range = np.arange(im_max, im_min, (im_min - im_max) / h)
     julia_set = np.zeros((h, w))
