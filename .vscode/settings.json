@@ -49,6 +49,8 @@
         "multicart",
         "namebuilder",
         "ndarray",
+        "njit",
+        "numba",
         "numhats",
         "offgrid",
         "opengameart",
