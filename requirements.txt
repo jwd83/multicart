@@ -6,3 +6,4 @@ numpy
 psycopg[binary]
 python-dotenv
 Pillow
+numba
