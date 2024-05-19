@@ -658,8 +658,9 @@ class QuadBlox(Scene):
         self.fast_texts["level"].text = str(self.player_board.level)
         self.fast_texts["next_level"].text = str(self.player_board.next_level)
 
-        for text in self.fast_texts.values():
-            text.draw()
+        # for text in self.fast_texts.values():
+        #     text.draw()
+        self.all_text.draw(self.screen)
 
     def draw_player_board(self):
         self.draw_board(self.player_board)

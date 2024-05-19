@@ -5,20 +5,36 @@ import settings
 import os
 
 
-class FastText:
+class FastText(pygame.sprite.Sprite):
     def __init__(self, scene: "Scene", text: str, pos: tuple):
-        self.text: str = text
+        super().__init__()
+        # this must be set before text for the setattr trigger to work
+        self.__last_rendered_text: str | None = None
         self.pos: tuple = pos
         self.scene: Scene = scene
-        self.__render()
+        self.image: pygame.Surface = None
+        self.rect: pygame.Rect = None
+
+        # this will trigger the __render method so assign it last
+        self.text: str = text
+
+    def __setattr__(self, name, value):
+        # Call the original __setattr__
+        super().__setattr__(name, value)
+
+        # If the attribute being changed is 'text', call __render
+        if name == "text":
+            self.__render()
 
     def __render(self):
-        self.image = self.scene.standard_text(self.text)
-        self.__last_rendered_text = self.text
+        if self.text != self.__last_rendered_text:
+
+            self.image = self.scene.standard_text(self.text)
+            self.rect = self.image.get_rect()
+            self.rect.topleft = self.pos
+            self.__last_rendered_text = self.text
 
     def draw(self):
-        if self.text != self.__last_rendered_text:
-            self.__render()
         self.scene.screen.blit(self.image, self.pos)
 
 
@@ -43,9 +59,12 @@ class Scene:
         self.standard_font_size = 40
         self.standard_color = (240, 240, 240)
         self.standard_font = None  # use the default font
+        self.all_text = pygame.sprite.Group()
 
-    def Text(self, text: str, pos) -> FastText:
-        return FastText(self, text, pos)
+    def Text(self, text: str, pos: tuple) -> FastText:
+        t = FastText(self, text, pos)
+        self.all_text.add(t)
+        return t
 
     def standard_text(
         self,
