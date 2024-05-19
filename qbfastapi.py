@@ -6,14 +6,14 @@ from dotenv import load_dotenv
 # fastapi
 import uvicorn
 from fastapi import FastAPI
-import scenes.quadblox.scripts.qb as qb
-
+from fastapi.responses import RedirectResponse
 
 # Postgres
 import psycopg
 from psycopg.rows import dict_row
 
-# my custom namebuilder
+# my custom quadblox and namebuilder
+import scenes.quadblox.scripts.qb as qb
 import namebuilder
 
 TIMEOUT = 30  # seconds
@@ -22,9 +22,9 @@ STARTING_LOBBY_COUNT = 3
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/", status_code=301)
 def read_root():
-    return get_active_games()
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/leaderboard")
