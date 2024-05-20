@@ -5,24 +5,41 @@ import numpy as np
 import math
 import settings
 from numba import jit, njit
+import threading
 
+# Adapted from the following code:
 # https://github.com/Apsis/Synthetic-Programming
 
 
 class Julia(Scene):
     def __init__(self, game):
         super().__init__(game)
+
+        self.w = settings.RESOLUTION[0]
+        self.h = settings.RESOLUTION[1]
+
+        self.draw_a = True
+
+        self.drawing = False
+
+        # make 2 frames to switch between, one to be drawing on and one to be displaying
+        self.frame_a = pygame.Surface((self.w, self.h))
+        self.frame_b = pygame.Surface((self.w, self.h))
+
+        self.frame_a.fill((0, 0, 0))
+        self.frame_b.fill((0, 0, 0))
+
         self.standard_font_size = 10
-        self.f_text = self.Text("", (10, 10))
+        # self.f_text = self.Text("", (10, 10))
         self.update_f()
 
     def update_f(self):
         t = self.elapsed()
         self.f = math.sin(t)
         self.cx = math.cos(t / 7)
-        self.f_text.text = (
-            f"t = {t:.4f}, f = sin(t) = {self.f:.4f}, cx = cos(t/7) = {self.cx:.4f}"
-        )
+        # self.f_text.text = (
+        #     f"t = {t:.4f}, f = sin(t) = {self.f:.4f}, cx = cos(t/7) = {self.cx:.4f}"
+        # )
 
     def update(self):
         # if the user presses escape show the menu
@@ -30,6 +47,33 @@ class Julia(Scene):
             self.game.scene_push = "Menu"
 
     def draw(self):
+        if not self.drawing:
+            self.drawing = True
+            threading.Thread(target=self.render_julia_set).start()
+
+        if self.draw_a:
+            self.screen.blit(self.frame_a, (0, 0))
+        else:
+            self.screen.blit(self.frame_b, (0, 0))
+
+    def render_julia_set(self):
+        # self.log("Rendering Julia Set")
+        self.update_f()
+
+        self.julia_set = generate_julia(
+            settings.RESOLUTION[0], settings.RESOLUTION[1], self.f, self.cx
+        )
+
+        # update the frame we are not currently drawing on
+        if self.draw_a:
+            draw_julia_set(self.frame_b, self.julia_set)
+        else:
+            draw_julia_set(self.frame_a, self.julia_set)
+
+        self.draw_a = not self.draw_a
+        self.drawing = False
+
+    def draw_old(self):
         self.screen.fill((0, 0, 0))
         self.update_f()
 
@@ -40,7 +84,7 @@ class Julia(Scene):
         # Draw the surface on the screen
         draw_julia_set(self.screen, self.julia_set)
 
-        self.TextDraw()
+        # self.TextDraw()
 
 
 # def draw_julia_set(screen, julia_set):
