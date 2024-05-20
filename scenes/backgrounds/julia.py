@@ -4,7 +4,7 @@ from utils import *
 import numpy as np
 import math
 import settings
-from numba import jit, njit
+from numba import njit
 import threading
 
 # Adapted from the following code:
@@ -66,40 +66,16 @@ class Julia(Scene):
 
         # update the frame we are not currently drawing on
         if self.draw_a:
-            draw_julia_set(self.frame_b, self.julia_set)
+            draw_julia_set(self.frame_b, self.julia_set, self.elapsed())
         else:
-            draw_julia_set(self.frame_a, self.julia_set)
+            draw_julia_set(self.frame_a, self.julia_set, self.elapsed())
 
         self.draw_a = not self.draw_a
         self.drawing = False
 
-    def draw_old(self):
-        self.screen.fill((0, 0, 0))
-        self.update_f()
-
-        self.julia_set = generate_julia(
-            settings.RESOLUTION[0], settings.RESOLUTION[1], self.f, self.cx
-        )
-
-        # Draw the surface on the screen
-        draw_julia_set(self.screen, self.julia_set)
-
-        # self.TextDraw()
-
-
-# def draw_julia_set(screen, julia_set):
-#     # Convert grayscale to RGB
-#     rgb_julia_set = np.stack((julia_set,) * 3, axis=-1)
-
-#     # Convert numpy array to Pygame surface
-#     surface = pygame.surfarray.make_surface(rgb_julia_set)
-
-#     # Draw the surface on the screen
-#     screen.blit(surface, (0, 0))
-
 
 @njit
-def color_mapping(iteration):
+def color_mapping(iteration, t):
     # Map the iteration count to a color
     # Here we use a simple linear mapping to the RGB color space
     # You can replace this with any function you like
@@ -110,7 +86,7 @@ def color_mapping(iteration):
 
 
 @njit
-def add_color(julia_set):
+def add_color(julia_set, t: float):
     # Convert grayscale to RGB
     rgb_julia_set = np.zeros(
         (julia_set.shape[0], julia_set.shape[1], 3), dtype=np.uint8
@@ -122,7 +98,7 @@ def add_color(julia_set):
     return rgb_julia_set
 
 
-def draw_julia_set(screen, julia_set):
+def draw_julia_set(screen, julia_set, t: float):
 
     rgb_julia_set = add_color(julia_set)
 
