@@ -336,7 +336,6 @@ class Scene:
         target.blit(source, source_position)
 
     def play_sound(self, sound):
-        self.log("play_sound: " + sound)
 
         # verify the sound is loaded
         if sound not in self.game.sfx:
@@ -349,7 +348,6 @@ class Scene:
         pygame.mixer.Sound.play(self.game.sfx[sound])
 
     def play_music(self, path_in_assets):  # play a sound in an endless loop
-        self.log("play_music: " + path_in_assets)
         # stop any music that is currently playing
         pygame.mixer.music.stop()
 
