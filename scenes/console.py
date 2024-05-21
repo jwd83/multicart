@@ -18,7 +18,7 @@ class Console(Scene):
         self.terminal_rows = 30
         self.standard_font_size = 16
         self.standard_stroke = 0
-        self.standard_font = "system-ui"
+        self.standard_font = "assets/fonts/MercutioNbpBasic-2rLv.ttf"
         self.standard_color = (255, 255, 255)
         self.console_title = self.standard_text("PyGame Console")
         self.help_docs = [
