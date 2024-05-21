@@ -549,7 +549,6 @@ class QuadBlox(Scene):
         self.projected_piece = None
 
     def place(self):
-        self.log(f"Placing piece: {self.player_piece.shape}")
         # place the current piece and get a new piece
         results = self.player_board.place(self.player_piece)
         self.drop_at = self.player_board.level_speed()
