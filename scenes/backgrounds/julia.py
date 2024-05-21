@@ -84,36 +84,10 @@ class Julia(Scene):
         # self.TextDraw()
 
 
-@njit
-def color_mapping(iteration):
-    # Map the iteration count to a color
-    # Here we use a simple linear mapping to the RGB color space
-    # You can replace this with any function you like
-    r = (iteration % 8) * 32
-    g = (iteration % 16) * 16
-    b = (iteration % 32) * 8
-    return (r, g, b)
-
-
-@njit
-def add_color(julia_set):
-    # Convert grayscale to RGB
-    rgb_julia_set = np.zeros(
-        (julia_set.shape[0], julia_set.shape[1], 3), dtype=np.uint8
-    )
-    for i in range(julia_set.shape[0]):
-        for j in range(julia_set.shape[1]):
-            rgb_julia_set[i, j] = color_mapping(julia_set[i, j])
-
-    return rgb_julia_set
-
-
 def draw_julia_set(screen, julia_set):
 
-    # rgb_julia_set = add_color(julia_set)
-
     # Convert numpy array to Pygame surface
-    # surface = pygame.surfarray.make_surface(rgb_julia_set)
+
     surface = pygame.surfarray.make_surface(julia_set)
 
     # Draw the surface on the screen
