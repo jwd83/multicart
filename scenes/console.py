@@ -7,9 +7,12 @@ import settings
 class Console(Scene):
     def __init__(self, game):
         super().__init__(game)
-        self.background = self.make_transparent_surface(self.screen.get_size())
-        self.terminal_output = self.make_transparent_surface(self.screen.get_size())
-        self.background.fill((0, 0, 0, 200))
+        self.slide_in_frames = 10
+        self.slide_in_remaining = self.slide_in_frames
+        self.terminal_output_cache = self.make_transparent_surface(
+            self.screen.get_size()
+        )
+        self.terminal_surface = self.make_transparent_surface(self.screen.get_size())
         self.history = []
         self.command_history = []
         self.command = ""
@@ -127,22 +130,20 @@ class Console(Scene):
                 self.command = ""
                 continue
 
-    def execute_command(self, command):
-        pass
-
     def draw(self):
 
         prompt_text = f"$ {self.command}"
         prompt_texture = self.standard_text(prompt_text)
 
-        self.screen.blit(self.background, (0, 0))
-        self.screen.blit(self.console_title, (10, 10))
-        self.screen.blit(prompt_texture, (10, 10 + self.terminal_row_height))
+        self.terminal_surface.fill((0, 0, 0, 200))
+
+        self.terminal_surface.blit(self.console_title, (10, 10))
+        self.terminal_surface.blit(prompt_texture, (10, 10 + self.terminal_row_height))
 
         # draw a blinking cursor next to the prompt texture
         if self.game.frame_count() % 60 < 30:
             cursor = self.standard_text("_")
-            self.screen.blit(
+            self.terminal_surface.blit(
                 cursor, (10 + prompt_texture.get_width(), 10 + self.terminal_row_height)
             )
 
@@ -155,11 +156,31 @@ class Console(Scene):
             self.last_render = drawn_cache
 
             # create a fresh surface to draw the terminal output
-            self.terminal_output = self.make_transparent_surface(self.screen.get_size())
+            self.terminal_output_cache = self.make_transparent_surface(
+                self.screen.get_size()
+            )
             for i, h in enumerate(self.history[-self.terminal_rows :]):
-                self.terminal_output.blit(
+                self.terminal_output_cache.blit(
                     self.standard_text(str(h)),
                     (10, 19 + self.terminal_row_height * (i + 2)),
                 )
 
-        self.screen.blit(self.terminal_output, (0, 0))
+        self.terminal_surface.blit(self.terminal_output_cache, (0, 0))
+
+        if self.slide_in_remaining:
+            self.slide_in_remaining -= 1
+            self.screen.blit(
+                self.terminal_surface,
+                (
+                    0,
+                    -(
+                        self.slide_in_remaining
+                        / self.slide_in_frames
+                        * settings.RESOLUTION[1]
+                    ),
+                ),
+            )
+
+        else:
+
+            self.screen.blit(self.terminal_surface, (0, 0))

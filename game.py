@@ -597,6 +597,7 @@ class Game:
     def __toggle_console(self):
         # toggle the console
         self.console.active = not self.console.active
+        self.console.slide_in_remaining = self.console.slide_in_frames
 
         if self.console.active:
             # if it is now active add it to the scene stack
