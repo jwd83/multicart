@@ -17,9 +17,9 @@ class Console(Scene):
         self.last_render = None
         self.terminal_rows = 20
         self.terminal_row_height = 15
-        self.standard_font_size = 16
+        self.standard_font_size = 14
         self.standard_stroke = 0
-        self.standard_font = "assets/fonts/MercutioNbpBasic-2rLv.ttf"
+        self.standard_font = "assets/fonts/RobotoMono-VariableFont_wght.ttf"
         self.standard_color = (255, 255, 255)
         self.console_title = self.standard_text("PyGame Console")
         self.help_docs = [
@@ -137,12 +137,14 @@ class Console(Scene):
 
         self.screen.blit(self.background, (0, 0))
         self.screen.blit(self.console_title, (10, 10))
-        self.screen.blit(prompt_texture, (10, 20))
+        self.screen.blit(prompt_texture, (10, 10 + self.terminal_row_height))
 
         # draw a blinking cursor next to the prompt texture
         if self.game.frame_count() % 60 < 30:
             cursor = self.standard_text("_")
-            self.screen.blit(cursor, (10 + prompt_texture.get_width(), 20))
+            self.screen.blit(
+                cursor, (10 + prompt_texture.get_width(), 10 + self.terminal_row_height)
+            )
 
         # draw the most recent history elements
         drawn_cache = ""
@@ -156,7 +158,8 @@ class Console(Scene):
             self.terminal_output = self.make_transparent_surface(self.screen.get_size())
             for i, h in enumerate(self.history[-self.terminal_rows :]):
                 self.terminal_output.blit(
-                    self.standard_text(str(h)), (10, 30 + self.terminal_row_height * i)
+                    self.standard_text(str(h)),
+                    (10, 19 + self.terminal_row_height * (i + 2)),
                 )
 
         self.screen.blit(self.terminal_output, (0, 0))
