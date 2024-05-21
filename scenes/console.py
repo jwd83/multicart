@@ -15,7 +15,8 @@ class Console(Scene):
         self.command = ""
         self.active = False
         self.last_render = None
-        self.terminal_rows = 30
+        self.terminal_rows = 20
+        self.terminal_row_height = 15
         self.standard_font_size = 16
         self.standard_stroke = 0
         self.standard_font = "assets/fonts/MercutioNbpBasic-2rLv.ttf"
@@ -143,7 +144,7 @@ class Console(Scene):
             cursor = self.standard_text("_")
             self.screen.blit(cursor, (10 + prompt_texture.get_width(), 20))
 
-        # draw the last 5 history elements
+        # draw the most recent history elements
         drawn_cache = ""
         for dci in self.history[-self.terminal_rows :]:
             drawn_cache += str(dci) + "\n"
@@ -154,6 +155,8 @@ class Console(Scene):
             # create a fresh surface to draw the terminal output
             self.terminal_output = self.make_transparent_surface(self.screen.get_size())
             for i, h in enumerate(self.history[-self.terminal_rows :]):
-                self.terminal_output.blit(self.standard_text(str(h)), (10, 30 + 10 * i))
+                self.terminal_output.blit(
+                    self.standard_text(str(h)), (10, 30 + self.terminal_row_height * i)
+                )
 
         self.screen.blit(self.terminal_output, (0, 0))
