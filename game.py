@@ -83,6 +83,15 @@ class Game:
             self.screen: pygame.Surface = pygame.display.set_mode(settings.RESOLUTION)
         else:
             # desktop
+            self.log(f"Running on desktop: {os.name}")
+
+            # check if we are on windows and disable windows scaling
+            if os.name == "nt":
+                # disable windows scaling
+                import ctypes
+
+                ctypes.windll.user32.SetProcessDPIAware()
+
             if self.fullscreen:
                 self.screen: pygame.Surface = pygame.display.set_mode(
                     settings.RESOLUTION, pygame.FULLSCREEN | pygame.SCALED
