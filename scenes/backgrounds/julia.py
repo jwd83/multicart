@@ -4,7 +4,7 @@ from utils import *
 import numpy as np
 import math
 import settings
-from numba import njit
+from numba import jit, njit
 import threading
 
 # Adapted from the following code:
@@ -34,12 +34,9 @@ class Julia(Scene):
         self.update_f()
 
     def update_f(self):
-        t = self.elapsed()
+        t = self.elapsed() / 3
         self.f = math.sin(t)
         self.cx = math.cos(t / 7)
-        # self.f_text.text = (
-        #     f"t = {t:.4f}, f = sin(t) = {self.f:.4f}, cx = cos(t/7) = {self.cx:.4f}"
-        # )
 
     def update(self):
         # if the user presses escape show the menu
@@ -66,16 +63,29 @@ class Julia(Scene):
 
         # update the frame we are not currently drawing on
         if self.draw_a:
-            draw_julia_set(self.frame_b, self.julia_set, self.elapsed())
+            draw_julia_set(self.frame_b, self.julia_set)
         else:
-            draw_julia_set(self.frame_a, self.julia_set, self.elapsed())
+            draw_julia_set(self.frame_a, self.julia_set)
 
         self.draw_a = not self.draw_a
         self.drawing = False
 
+    def draw_old(self):
+        self.screen.fill((0, 0, 0))
+        self.update_f()
+
+        self.julia_set = generate_julia(
+            settings.RESOLUTION[0], settings.RESOLUTION[1], self.f, self.cx
+        )
+
+        # Draw the surface on the screen
+        draw_julia_set(self.screen, self.julia_set)
+
+        # self.TextDraw()
+
 
 @njit
-def color_mapping(iteration, t):
+def color_mapping(iteration):
     # Map the iteration count to a color
     # Here we use a simple linear mapping to the RGB color space
     # You can replace this with any function you like
@@ -86,7 +96,7 @@ def color_mapping(iteration, t):
 
 
 @njit
-def add_color(julia_set, t: float):
+def add_color(julia_set):
     # Convert grayscale to RGB
     rgb_julia_set = np.zeros(
         (julia_set.shape[0], julia_set.shape[1], 3), dtype=np.uint8
@@ -98,12 +108,13 @@ def add_color(julia_set, t: float):
     return rgb_julia_set
 
 
-def draw_julia_set(screen, julia_set, t: float):
+def draw_julia_set(screen, julia_set):
 
-    rgb_julia_set = add_color(julia_set)
+    # rgb_julia_set = add_color(julia_set)
 
     # Convert numpy array to Pygame surface
-    surface = pygame.surfarray.make_surface(rgb_julia_set)
+    # surface = pygame.surfarray.make_surface(rgb_julia_set)
+    surface = pygame.surfarray.make_surface(julia_set)
 
     # Draw the surface on the screen
     screen.blit(surface, (0, 0))
