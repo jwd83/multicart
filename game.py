@@ -92,6 +92,19 @@ class Game:
 
                 ctypes.windll.user32.SetProcessDPIAware()
 
+                # TODO:     from stackoverflow this might also be needed
+                # https://gamedev.stackexchange.com/questions/105750/pygame-fullsreen-display-issue
+
+                # Calling ctypes.windll.user32.SetProcessDPIAware() will disable
+                # the screen stretching. The reason true_res = (windll.user32.GetSystemMetrics(0),windll.user32.GetSystemMetrics(1))
+                # needs to be called and used for the resolution is because there is fullscreen issues
+                # when using a resolution that is not native. If one is using a resolution smaller than
+                # this, they can simply create a surface for the game to run on and keep the sides black,
+                # or he/she can stretch this surface to fit the display size.
+
+                # true_res = (windll.user32.GetSystemMetrics(0),windll.user32.GetSystemMetrics(1))
+                # pygame.display.set_mode(true_res,pygame.Fullscreen)
+
             if self.fullscreen:
                 self.screen: pygame.Surface = pygame.display.set_mode(
                     settings.RESOLUTION, pygame.FULLSCREEN | pygame.SCALED
