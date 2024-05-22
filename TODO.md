@@ -2,10 +2,11 @@
 
 ## Major goals
 
+-   Controller and local multiplayer interface
+
 -   Recreate roy carnassus. via galactica started. maybe scrap it for a pirate ship game? jackpirates?
 -   Create a roguelike game. jack wizards started.
 -   finish up jack ninjas
--   update builds to copy config.ini into the build directory
 
 ## Minor goals
 
