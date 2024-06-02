@@ -10,3 +10,6 @@ JackGamesMulticart.spec
 web.zip
 web*.zip
 .env
+main.build/
+main.dist/
+main.exe
