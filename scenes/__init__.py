@@ -46,3 +46,6 @@ from .superball.superballfield import SuperBallField
 from .quadblox.quadleadearboard import QuadLeaderboard
 from .quadblox.quadblox import QuadBlox
 from .quadblox.quadmenu import QuadMenu
+
+# multitest
+from .multitest.multitest import MultiTest

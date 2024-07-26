@@ -17,7 +17,7 @@ class GameSelect(Scene):
         self.standard_font_size = 40
         self.text_multicart = self.standard_text("Jack Games Multicart")
         self.text_choose = self.standard_text("make a selection")
-        self.standard_font_size = 20
+        self.standard_font_size = 15
         self.options = [
             self.standard_text("QuadBlox"),
             self.standard_text("Jack Ninjas"),
@@ -25,8 +25,9 @@ class GameSelect(Scene):
             self.standard_text("Jack Wizards"),
             self.standard_text("Julia"),
             self.standard_text("Golden"),
-            # self.standard_text("Font Test"),
             self.standard_text("4 Jacks"),
+            self.standard_text("Font Test"),
+            self.standard_text("Multi Test"),
             self.standard_text("Options"),
             self.standard_text("Quit to Desktop"),
         ]
@@ -64,11 +65,14 @@ class GameSelect(Scene):
             elif self.selected == 5:
                 self.game.scene_replace = "Golden"
             elif self.selected == 6:
-                # self.game.scene_replace = "FontTest"
                 self.game.scene_replace = "FourJacksTitle"
             elif self.selected == 7:
+                self.game.scene_replace = "FontTest"
+            elif self.selected == 8:
+                self.game.scene_replace = "MultiTest"
+            elif self.selected == 9:
                 self.game.scene_push = "Menu"
-            elif self.selected == 8 and not settings.WASM:
+            elif self.selected == 10 and not settings.WASM:
                 self.game.quit = True
 
     def draw(self):
@@ -76,7 +80,7 @@ class GameSelect(Scene):
         # self.screen.fill((18, 27, 180))
         # self.screen.blit(self.background, (0, 0))
 
-        y_spacing = 25
+        y_spacing = self.standard_font_size + 5
 
         self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
         self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))

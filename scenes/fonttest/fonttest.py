@@ -10,7 +10,7 @@ class FontTest(Scene):
         self.test_strings = []
 
         for i in [20, 40, 60, 80, 100, 120, 140]:
-            self.log("Making text with size", i)
+            self.log(f"Making text with size {i}")
             self.test_strings.append(
                 self.make_text(
                     text=str(i) + ": .,;?! the quick brown fox jumps over the lazy dog",
