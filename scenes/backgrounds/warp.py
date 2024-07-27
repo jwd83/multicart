@@ -31,7 +31,7 @@ class Star:
             // 2
         )
 
-        r = int(interpolate(self.z, 0, settings.WIDTH, 16, 0))
+        r = int(interpolate(self.z, 0, settings.WIDTH, 6, 0))
 
         px = (
             int(interpolate(self.x / self.pz, 0, 1, 0, settings.WIDTH) + settings.WIDTH)
@@ -47,7 +47,11 @@ class Star:
 
         self.pz = self.z
 
+        # draw trail
         pygame.draw.line(screen, (255, 255, 255), (px, py), (sx, sy), 1)
+
+        # draw star
+        # pygame.draw.circle(screen, (255, 255, 255), (sx, sy), r)
 
 
 class Warp(Scene):
