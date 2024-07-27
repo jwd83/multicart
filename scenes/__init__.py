@@ -11,6 +11,7 @@ from .backgrounds.lavalamp import LavaLamp
 from .backgrounds.fractal import Mandelbrot
 from .backgrounds.julia import Julia
 from .backgrounds.golden import Golden
+from .backgrounds.warp import Warp
 
 # console
 from .console import Console

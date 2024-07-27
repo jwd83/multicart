@@ -28,6 +28,7 @@ class GameSelect(Scene):
             self.standard_text("4 Jacks"),
             self.standard_text("Font Test"),
             self.standard_text("Multi Test"),
+            self.standard_text("Warp"),
             self.standard_text("Options"),
             self.standard_text("Quit to Desktop"),
         ]
@@ -71,8 +72,10 @@ class GameSelect(Scene):
             elif self.selected == 8:
                 self.game.scene_replace = "MultiTest"
             elif self.selected == 9:
+                self.game.scene_push = "Warp"
+            elif self.selected == 10:
                 self.game.scene_push = "Menu"
-            elif self.selected == 10 and not settings.WASM:
+            elif self.selected == 11 and not settings.WASM:
                 self.game.quit = True
 
     def draw(self):
