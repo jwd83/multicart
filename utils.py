@@ -5,6 +5,14 @@ import random
 import math
 
 
+# a function to map ranges between two values
+def interpolate(in_value, in_min, in_max, out_min, out_max):
+    # check for division by zero
+    if in_max - in_min == 0:
+        raise ValueError("Division by zero")
+    return (in_value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
 # load a single image
 def load_tpng(assets_path) -> pygame.Surface:
     img = pygame.image.load("assets/" + assets_path).convert_alpha()
