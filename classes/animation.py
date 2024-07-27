@@ -50,7 +50,6 @@ class Animation(pygame.sprite.Sprite):
     # load a single image
     def __load_image(self, path) -> pygame.Surface:
         img = pygame.image.load(path).convert_alpha()
-        img.set_colorkey((0, 0, 0))
         return img
 
     # load all images in a directory
