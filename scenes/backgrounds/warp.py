@@ -10,9 +10,11 @@ class Star:
         self.y = random.randint(-settings.HEIGHT, settings.HEIGHT)
         self.z = random.randint(0, settings.WIDTH)
         self.pz = self.z
+        self.r = 1
 
-    def update(self, speed):
+    def update(self, speed, width):
         self.z -= speed
+        self.width = width
         if self.z < 1:
             self.x = random.randint(-settings.WIDTH, settings.WIDTH)
             self.y = random.randint(-settings.HEIGHT, settings.HEIGHT)
@@ -48,7 +50,7 @@ class Star:
         self.pz = self.z
 
         # draw trail
-        pygame.draw.line(screen, (255, 255, 255), (px, py), (sx, sy), 1)
+        pygame.draw.line(screen, (255, 255, 255), (px, py), (sx, sy), int(self.width))
 
         # draw star
         # pygame.draw.circle(screen, (255, 255, 255), (sx, sy), r)
@@ -67,9 +69,10 @@ class Warp(Scene):
             self.game.scene_push = "Menu"
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
+        width = interpolate(mouse_y, 0, settings.HEIGHT, 1, 4)
         speed = interpolate(mouse_x, 0, settings.WIDTH, 0, 50)
         for star in self.stars:
-            star.update(speed)
+            star.update(speed, width)
 
     def draw(self):
         self.screen.fill((0, 0, 0))
