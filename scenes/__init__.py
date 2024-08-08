@@ -30,6 +30,11 @@ from .fourjacks.fourjackstitle import FourJacksTitle
 from .fourjacks.fourjacksgameboard import FourJacksGameBoard
 from .fourjacks.fourjacksgameover import FourJacksGameOver
 
+# jackTD
+from .jackdefense.jackdefensetitle import JackDefenseTitle
+from .jackdefense.jackdefensegameboard import FourJacksGameBoard
+from .jackdefense.jackdefensegameover import FourJacksGameOver
+
 # font test
 from .fonttest.fonttest import FontTest
 
