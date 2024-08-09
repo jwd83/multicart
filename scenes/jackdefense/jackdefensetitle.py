@@ -11,7 +11,7 @@ class JackDefenseTitle(Scene):
         self.background_image = pygame.transform.scale(self.background_image, self.screen.get_size())                                                          
         self.background.blit(self.background_image, (0, 0))
 
-        self.start_button = Button(self.screen, pos = (100, 100), size = (100, 100), content = self.load_png("opengameart-jeton-bleu.png")[0])
+        self.start_button = Button(self.screen, pos = (self.screen.get_size()[0] // 2, (self.screen.get_size()[1] // 1.4)), size = (100, 100), content = "Start")
 
     def update(self):
 
@@ -29,5 +29,5 @@ class JackDefenseTitle(Scene):
 
             # Draw our start button
             if self.start_button.draw(): 
-                print('Start button clicked!')
+                self.game.scene_replace = "JackDefenseGameBoard"
 

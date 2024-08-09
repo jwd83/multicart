@@ -62,7 +62,7 @@ class Button():
             self.image = content
 
         self.rect = self.image.get_rect()
-        self.rect.topleft = pos
+        self.rect.center = pos
 
         self.clicked = False
         self.last_pressed = False
@@ -147,13 +147,13 @@ class Button():
         offset = self.rect.copy()
         if self.activating:
             # draw our button indented while activating
-            offset.x += 3
-            offset.y += 3
+            offset.x += 2
+            offset.y += 2
         else:
             # draw the mouse hover outdent while hovered
             if in_button:    
-                offset.x -= 2
-                offset.y -= 2
+                offset.x -= 1
+                offset.y -= 1
 
         self.screen.blit(self.image, offset)
         return action
