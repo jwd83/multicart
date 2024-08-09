@@ -25,7 +25,7 @@ class GameSelect(Scene):
             self.standard_text("Jack Wizards"),
             self.standard_text("Julia"),
             self.standard_text("Golden"),
-            self.standard_text("4 Jacks"),
+            self.standard_text("JackTD"),
             self.standard_text("Font Test"),
             self.standard_text("Multi Test"),
             self.standard_text("Warp"),
@@ -66,7 +66,7 @@ class GameSelect(Scene):
             elif self.selected == 5:
                 self.game.scene_replace = "Golden"
             elif self.selected == 6:
-                self.game.scene_replace = "FourJacksTitle"
+                self.game.scene_replace = "JackDefenseTitle"
             elif self.selected == 7:
                 self.game.scene_replace = "FontTest"
             elif self.selected == 8:
