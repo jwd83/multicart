@@ -9,5 +9,5 @@ class Deck():
         return self.deck.copy()
 
     def draw_from_deck(self,):
-        return self.deck[random.randint(0, len(self.deck) - 1)]
+        return random.choices(self.deck)
 

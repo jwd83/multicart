@@ -38,6 +38,16 @@ def load_tpng_folder(assets_path):
 
     return images
 
+# Draws a grid covering the specified screen, with the optional tile_size and color arguments. 
+# Default color is an off-white.
+def draw_grid(surf, tile_size = 16, color = (242,245,255)):
+    width = surf.get_width()
+    height = surf.get_height()
+
+    for x in range(0, int(width // tile_size) + 1):
+        pygame.draw.line(surf, color, (0, x * tile_size), (width, x * tile_size))
+        pygame.draw.line(surf, color, (x * tile_size, 0), (x * tile_size, height))
+
 class Button():
     def __init__(
             self, 
