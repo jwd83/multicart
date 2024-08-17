@@ -109,6 +109,22 @@ class PhysicsEntity:
         )
 
 
+class Enemy(PhysicsEntity):
+    def __init__(self, scene: Scene, pos, size):
+        super().__init__(scene, "enemy", pos, size)
+
+        self.walking = 0
+
+    def update(self, tilemap, movement=(0, 0)):
+        if self.walking:
+            movement = (movement[0] - 0.5 if self.flip else 0.6, movement[1])
+            self.walking = max(0, self.walking - 1)
+        elif random.random() < 0.01:
+            self.walking = random.randint(30, 120)
+
+        super().update(tilemap, movement)
+
+
 class Player(PhysicsEntity):
     def __init__(self, scene: Scene, pos, size):
         super().__init__(scene, "player", pos, size)
@@ -243,8 +259,8 @@ class Player(PhysicsEntity):
             particle_angle = random.random() * math.pi * 2  # radians
             particle_speed = random.random() * 0.5 + 0.5
             particle_velocity = [
-                math.cos(particle_angle) * particle_speed,
-                math.sin(particle_angle) * particle_speed,
+                abs(self.dashing) / self.dashing * random.random() * 3,
+                0,
             ]
             self.scene.particles.append(
                 Particle(

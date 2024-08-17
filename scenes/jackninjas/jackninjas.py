@@ -3,7 +3,7 @@ import random
 import sys
 import pygame
 from scene import Scene
-from .scripts.entities import PhysicsEntity, Player
+from .scripts.entities import PhysicsEntity, Enemy, Player
 from .scripts.utils import load_image, load_images, Animation
 from .scripts.tilemap import Tilemap
 from .scripts.clouds import Clouds
@@ -29,6 +29,8 @@ class JackNinjas(Scene):
             "player": load_image("entities/player.png"),
             "background": load_image("background.png"),
             "clouds": load_images("clouds"),
+            "enemy/idle": Animation(load_images("entities/enemy/idle"), img_dur=8),
+            "enemy/run": Animation(load_images("entities/enemy/run"), img_dur=4),
             "player/idle": Animation(load_images("entities/player/idle"), img_dur=8),
             "player/run": Animation(load_images("entities/player/run"), img_dur=4),
             "player/jump": Animation(load_images("entities/player/jump")),
@@ -44,8 +46,6 @@ class JackNinjas(Scene):
                 load_images("particles/particle"), img_dur=6, loop=False
             ),
         }
-        # print our loaded assets
-        self.log(self.assets)
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
         self.player = Player(self, (75, 75), (8, 15))
@@ -67,6 +67,15 @@ class JackNinjas(Scene):
             self.leaf_spawners.append(
                 pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
             )
+
+        self.enemies = []
+        extract = self.tilemap.extract([("spawners", 0), ("spawners", 1)])
+        for spawner in extract:
+            if spawner["variant"] == 0:
+                self.player.pos = spawner["pos"]
+            else:
+                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
+
         self.particles = []
 
     def perform_quit(self):
@@ -142,6 +151,11 @@ class JackNinjas(Scene):
 
         # draw our tilemap
         self.tilemap.render(self.display, offset=render_scroll)
+
+        # draw our enemies
+        for enemy in self.enemies:
+            enemy.update(self.tilemap)
+            enemy.render(self.display, offset=render_scroll)
 
         # update and draw our player
         self.player.render(self.display, offset=render_scroll)
