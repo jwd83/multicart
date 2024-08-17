@@ -79,7 +79,7 @@ class JackNinjas(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
-        # if the user presses escape or F5 key, quit the event loop.
+        # movement input
         if (
             pygame.K_LEFT in self.game.just_pressed
             or pygame.K_a in self.game.just_pressed
@@ -109,13 +109,12 @@ class JackNinjas(Scene):
         ):
             self.player.jump()
 
-        if (pygame.K_x in self.game.just_pressed):
+        if pygame.K_x in self.game.just_pressed:
             self.player.dash()
 
         self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
         # TODO - rewrite the joystick/gamepad input logic.
-
 
     def draw_background(self):
         # let's go for a sky blue

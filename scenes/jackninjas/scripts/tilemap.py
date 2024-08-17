@@ -63,7 +63,6 @@ class Tilemap:
 
         return matches
 
-
     def save(self, path):
         with open(path, "w") as f:
             json.dump(
@@ -136,7 +135,7 @@ class Tilemap:
                 (tile["pos"][0] - offset[0], tile["pos"][1] - offset[1]),
             )
 
-        # optimzied grid tile renderer
+        # optimized grid tile renderer
         for x in range(
             offset[0] // self.tile_size,
             (offset[0] + surf.get_width()) // self.tile_size + 1,

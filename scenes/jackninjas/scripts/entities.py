@@ -39,7 +39,6 @@ class PhysicsEntity:
             if self.jumps == self.max_jumps:
                 self.jumps -= 1
 
-
         # only change the animation if it's different
         if action != self.action:
             self.action = action
@@ -81,7 +80,7 @@ class PhysicsEntity:
         entity_rect = self.rect()
         for rect in tilemap.physics_rects_around(self.pos):
             if entity_rect.colliderect(rect):
-                # if we are moving right and collided with a tile
+                # if we are moving down and collided with a tile
                 if frame_movement[1] > 0:
                     entity_rect.bottom = rect.top
                     self.collisions["down"] = True
@@ -131,7 +130,7 @@ class Player(PhysicsEntity):
             for x in range(frame.get_width()):
                 for y in range(frame.get_height()):
 
-                    r,g,b,a = frame.get_at((x, y))
+                    r, g, b, a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (g, r, b, a))
 
@@ -139,16 +138,15 @@ class Player(PhysicsEntity):
             for x in range(frame.get_width()):
                 for y in range(frame.get_height()):
 
-                    r,g,b,a = frame.get_at((x, y))
+                    r, g, b, a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (r | b, g, b, a))
-
 
         if self.jumps == 0:
             for x in range(frame.get_width()):
                 for y in range(frame.get_height()):
 
-                    r,g,b,a = frame.get_at((x, y))
+                    r, g, b, a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (r | b, g | b, b, a))
 
@@ -160,7 +158,6 @@ class Player(PhysicsEntity):
             ),
         )
 
-
     def dash(self):
         # old check was
         # if not self.dashing
@@ -171,7 +168,6 @@ class Player(PhysicsEntity):
                 self.dashing = -60
             else:
                 self.dashing = 60
-
 
     def jump(self):
         if self.wall_slide:
@@ -244,16 +240,19 @@ class Player(PhysicsEntity):
             self.velocity[0] = abs(self.dashing) / self.dashing * 8
 
             # create a particle effect
-            particle_angle = random.random() * math.pi * 2 # radians
+            particle_angle = random.random() * math.pi * 2  # radians
             particle_speed = random.random() * 0.5 + 0.5
-            particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+            particle_velocity = [
+                math.cos(particle_angle) * particle_speed,
+                math.sin(particle_angle) * particle_speed,
+            ]
             self.scene.particles.append(
                 Particle(
                     self.scene,
-                    'particle',
+                    "particle",
                     self.rect().center,
                     velocity=particle_velocity,
-                    frame=random.randint(0,7)
+                    frame=random.randint(0, 7),
                 )
             )
 
@@ -263,24 +262,25 @@ class Player(PhysicsEntity):
             for _ in range(20):
 
                 # create a particle effect
-                particle_angle = random.random() * math.pi * 2 # radians
+                particle_angle = random.random() * math.pi * 2  # radians
                 particle_speed = random.random() * 0.5 + 0.5
-                particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+                particle_velocity = [
+                    math.cos(particle_angle) * particle_speed,
+                    math.sin(particle_angle) * particle_speed,
+                ]
                 self.scene.particles.append(
                     Particle(
                         self.scene,
-                        'particle',
+                        "particle",
                         self.rect().center,
                         velocity=particle_velocity,
-                        frame=random.randint(0,7)
+                        frame=random.randint(0, 7),
                     )
                 )
-
 
         # slow down after the dash
         if abs(self.dashing) == 50:
             self.velocity[0] *= 0.2
-
 
         # air resistance/friction to slow us down
         if self.velocity[0] > 0:
