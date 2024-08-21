@@ -45,6 +45,8 @@ class JackNinjas(Scene):
             "particle/particle": Animation(
                 load_images("particles/particle"), img_dur=6, loop=False
             ),
+            "gun": load_image("gun.png"),
+            "projectile": load_image("projectile.png"),
         }
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
@@ -76,6 +78,7 @@ class JackNinjas(Scene):
             else:
                 self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
+        self.projectiles = []
         self.particles = []
 
     def perform_quit(self):
@@ -153,9 +156,25 @@ class JackNinjas(Scene):
         self.tilemap.render(self.display, offset=render_scroll)
 
         # draw our enemies
-        for enemy in self.enemies:
+        for enemy in self.enemies.copy():
             enemy.update(self.tilemap)
             enemy.render(self.display, offset=render_scroll)
+
+        # projectile defined as [[x,y], direction, timer]
+        for projectile in self.projectiles.copy():
+            projectile[0][0] += projectile[1] # adjust the x coordinate by the direction of the bullet
+            projectile[2] += 1 # adjust the timer by one
+            img = self.assets['projectile']
+            self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2  - render_scroll[1]))
+            if self.tilemap.solid_check(projectile[0]):
+                self.projectiles.remove(projectile)
+            elif projectile[2] > 360:
+                self.projectiles.remove(projectile)
+            elif abs(self.player.dashing) < 50: # fast part of dash is over
+                if self.player.rect().collidepoint(projectile[0]):
+                    self.projectiles.remove(projectile)
+
+
 
         # update and draw our player
         self.player.render(self.display, offset=render_scroll)
