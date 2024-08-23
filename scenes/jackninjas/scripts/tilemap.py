@@ -79,7 +79,7 @@ class Tilemap:
             data = json.load(f)
             self.tilemap = data["tilemap"]
             self.tile_size = data["tile_size"]
-            self.offgrid_tiles = data["offgrid_tiles"]
+            self.offgrid_tiles = data["offgrid"]
 
     def autotile(self):
         for loc in self.tilemap:
