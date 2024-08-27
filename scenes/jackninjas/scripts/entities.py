@@ -246,7 +246,8 @@ class Player(PhysicsEntity):
             # create a particle effect
             particle_angle = random.random() * math.pi * 2 # radians
             particle_speed = random.random() * 0.5 + 0.5
-            particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+            particle_velocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
+            # particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
             self.scene.particles.append(
                 Particle(
                     self.scene,

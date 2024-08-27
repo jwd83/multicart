@@ -48,6 +48,50 @@ def draw_grid(surf, tile_size = 16, color = (242,245,255)):
         pygame.draw.line(surf, color, (0, x * tile_size), (width, x * tile_size))
         pygame.draw.line(surf, color, (x * tile_size, 0), (x * tile_size, height))
 
+class UserInterface():
+    def __init__(
+            self,
+            screen,
+            pos: tuple[int, int] = (0, 0),
+            size: tuple[int, int] = None,
+            growth_dir: tuple[int, int] = (0, 1), # default menu expansion direction, used as a tuple for control in both directions
+            gap: int = 4, # default number of pixels between each item
+    ):
+        self.screen = screen
+        self.image = make_surface(size)
+        self.pos = pos
+
+        self.growth_dir = growth_dir
+        self.gap = gap
+
+        self.items: dict = {
+
+        }
+        
+    def add_item(self, item, draw = True, path = None,):
+        if path: 
+            if path not in self.items.keys():
+                self.screen.log("ERROR: Path not found!")
+                return 
+            self.items[path][item] = {
+                "draw": draw
+            }
+        else:
+            self.items[item] = {}
+
+    # Removes specified element path from our list and returns the element
+    def remove_item(self, path):
+        return self.items[path].pop()
+
+    def toggle_draw(self, item):
+        item["draw"] = !(item["draw"].)
+
+    def update():
+        pass
+
+    def render():
+        pass
+
 class Button():
     def __init__(
             self, 
@@ -110,7 +154,7 @@ class Button():
             surf_text.get_width() + strokeThickness * 3,
             surf_text.get_height() + strokeThickness * 3,
         )
-        surface = self.make_transparent_surface(size)
+        surface = make_transparent_surface(size)
 
         # blit the stroke text to the surface
         for i in range(strokeThickness * 2 + 1):
@@ -344,7 +388,16 @@ def blit_outline(source: pygame.Surface, target: pygame.Surface, dest: tuple):
     target.blit(mask, (x, y - 1))
     target.blit(mask, (x, y + 1))
 
+def make_surface(self, size) -> pygame.Surface:
+    """an alias for make_transparent_surface
 
+    Returns:
+        pygame.Surface: a transparent surface
+    """
+    return self.make_transparent_surface(size)
+
+def make_transparent_surface(size) -> pygame.Surface:
+    return pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 # test our utilities if ran directly
 if __name__ == "__main__":
     # test the Seed class
