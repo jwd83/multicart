@@ -21,6 +21,7 @@ class JackNinjasEditor(Scene):
             "grass": load_images("tiles/grass"),
             "large_decor": load_images("tiles/large_decor"),
             "stone": load_images("tiles/stone"),
+            "spawners": load_images("tiles/spawners"),
         }
 
         # attempt to load our tilemap
@@ -67,23 +68,23 @@ class JackNinjasEditor(Scene):
         if 3 in self.game.just_mouse_down:
             self.right_clicking = True
 
-            # change type and variant on scroll wheel (+shift)
-            if not self.shift:
-                if 4 in self.game.just_mouse_down:  # mouse wheel up
-                    self.tile_variant = (self.tile_variant - 1) % len(
-                        self.assets[self.tile_list[self.tile_group]]
-                    )
-                if 5 in self.game.just_mouse_down:  # mouse wheel down
-                    self.tile_variant = (self.tile_variant + 1) % len(
-                        self.assets[self.tile_list[self.tile_group]]
-                    )
-            else:
-                if 4 in self.game.just_mouse_down:  # mouse wheel up
-                    self.tile_group = (self.tile_group - 1) % len(self.tile_list)
-                    self.tile_variant = 0
-                if 5 in self.game.just_mouse_down:  # mouse wheel down
-                    self.tile_group = (self.tile_group + 1) % len(self.tile_list)
-                    self.tile_variant = 0
+        # change type and variant on scroll wheel (+shift)
+        if not self.shift:
+            if 4 in self.game.just_mouse_down:  # mouse wheel up
+                self.tile_variant = (self.tile_variant - 1) % len(
+                    self.assets[self.tile_list[self.tile_group]]
+                )
+            if 5 in self.game.just_mouse_down:  # mouse wheel down
+                self.tile_variant = (self.tile_variant + 1) % len(
+                    self.assets[self.tile_list[self.tile_group]]
+                )
+        else:
+            if 4 in self.game.just_mouse_down:  # mouse wheel up
+                self.tile_group = (self.tile_group - 1) % len(self.tile_list)
+                self.tile_variant = 0
+            if 5 in self.game.just_mouse_down:  # mouse wheel down
+                self.tile_group = (self.tile_group + 1) % len(self.tile_list)
+                self.tile_variant = 0
 
         # mouse up checks
         if 1 in self.game.just_mouse_up:
@@ -99,6 +100,8 @@ class JackNinjasEditor(Scene):
             self.game.scene_push = "Menu"
         if pygame.K_o in self.game.just_pressed:
             self.tilemap.save("assets/jackninjas/map.json")
+            self.log("Map saved")
+            self.play_sound("click")
         if pygame.K_t in self.game.just_pressed:
             self.tilemap.autotile()
         if pygame.K_g in self.game.just_pressed:

@@ -47,11 +47,11 @@ class Tilemap:
         matches = []
         for tile in self.offgrid_tiles.copy():
             if (tile["type"], tile["variant"]) in id_pairs:
-                matches.append(tile)
+                matches.append(tile.copy())
                 if not keep:
                     self.offgrid_tiles.remove(tile)
 
-        for loc in self.tilemap:
+        for loc in list(self.tilemap):
             tile = self.tilemap[loc]
             if (tile["type"], tile["variant"]) in id_pairs:
                 matches.append(tile.copy())
@@ -62,7 +62,6 @@ class Tilemap:
                     del self.tilemap[loc]
 
         return matches
-
 
     def save(self, path):
         with open(path, "w") as f:
@@ -80,7 +79,7 @@ class Tilemap:
             data = json.load(f)
             self.tilemap = data["tilemap"]
             self.tile_size = data["tile_size"]
-            self.offgrid_tiles = data["offgrid_tiles"]
+            self.offgrid_tiles = data["offgrid"]
 
     def generative_load(self, path):
         with open(path, "r") as f:
@@ -134,6 +133,12 @@ class Tilemap:
                     )
                 )
         return rects
+    
+    def solid_check(self, pos):
+        tile_loc = str(int(pos[0] // self.tile_size)) + ";" + str(int(pos[1] // self.tile_size))
+        if tile_loc in self.tilemap:
+            if self.tilemap[tile_loc]["type"] in PHYSICS_TILES:
+                return self.tilemap[tile_loc]
 
     def render(self, surf, offset=(0, 0)):
         # draw the offgrid tiles first
@@ -143,7 +148,7 @@ class Tilemap:
                 (tile["pos"][0] - offset[0], tile["pos"][1] - offset[1]),
             )
 
-        # optimzied grid tile renderer
+        # optimized grid tile renderer
         for x in range(
             offset[0] // self.tile_size,
             (offset[0] + surf.get_width()) // self.tile_size + 1,

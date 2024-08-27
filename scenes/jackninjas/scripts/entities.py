@@ -3,6 +3,7 @@ import random
 import pygame
 from .particle import Particle
 from scene import Scene
+from .spark import Spark
 
 GRAVITY = 0.1
 MAX_FALL_SPEED = 5
@@ -38,7 +39,6 @@ class PhysicsEntity:
         if action == "fall":
             if self.jumps == self.max_jumps:
                 self.jumps -= 1
-
 
         # only change the animation if it's different
         if action != self.action:
@@ -81,7 +81,7 @@ class PhysicsEntity:
         entity_rect = self.rect()
         for rect in tilemap.physics_rects_around(self.pos):
             if entity_rect.colliderect(rect):
-                # if we are moving right and collided with a tile
+                # if we are moving down and collided with a tile
                 if frame_movement[1] > 0:
                     entity_rect.bottom = rect.top
                     self.collisions["down"] = True
@@ -110,6 +110,106 @@ class PhysicsEntity:
         )
 
 
+class Enemy(PhysicsEntity):
+    def __init__(self, scene: Scene, pos, size):
+        super().__init__(scene, "enemy", pos, size)
+
+        self.walking = 0
+
+    def update(self, tilemap, movement=(0, 0)):
+        if self.walking:
+            if tilemap.solid_check(
+                (self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)
+            ):
+                if self.collisions["left"] or self.collisions["right"]:
+                    self.flip = not self.flip
+                else:
+                    movement = (
+                        movement[0] - 0.5 if self.flip else movement[0] + 0.5,
+                        movement[1],
+                    )
+            else:
+                self.flip = not self.flip
+
+            self.walking = max(0, self.walking - 1)
+
+            if not self.walking:
+                dis = (
+                    self.scene.player.pos[0] - self.pos[0],
+                    self.scene.player.pos[1] - self.pos[1],
+                )
+
+                # check if the player is in range vertically
+                if abs(dis[1]) < 16:
+                    # check if we are facing the player
+                    shoot = False
+                    shoot_mul = 1
+                    shoot_offset = 7
+                    shoot_speed = 1.5
+
+                    # determine if we shoot
+                    if self.flip and dis[0] < 0:
+                        shoot = True
+                        shoot_mul = -1
+                    elif not self.flip and dis[0] > 0:
+                        shoot = True
+
+                    # take the shot
+                    if shoot:
+                        start_timer = 0
+                        self.scene.projectiles.append(
+                            [
+                                [
+                                    self.rect().centerx + shoot_offset * shoot_mul,
+                                    self.rect().centery,
+                                ],
+                                shoot_speed * shoot_mul,
+                                start_timer,
+                            ]
+                        )
+                        for i in range(4):
+                            self.scene.sparks.append(
+                                Spark(
+                                    self.scene.projectiles[-1][0],
+                                    random.random()
+                                    - 0.5
+                                    + (0 if shoot_mul == 1 else math.pi),
+                                    2 + random.random(),
+                                )
+                            )
+
+                #  .projectiles
+        elif random.random() < 0.01:
+            self.walking = random.randint(30, 120)
+
+        super().update(tilemap, movement)
+
+        if movement[0] != 0:
+            self.set_action("run")
+        else:
+            self.set_action("idle")
+
+    def render(self, surf, offset=(0, 0)):
+        super().render(surf=surf, offset=offset)
+
+        if self.flip:
+            surf.blit(
+                pygame.transform.flip(self.scene.assets["gun"], True, False),
+                (
+                    self.rect().centerx
+                    - 4
+                    - self.scene.assets["gun"].get_width()
+                    - offset[0],
+                    self.rect().centery - offset[1],
+                ),
+            )
+        else:
+            surf.blit(
+                self.scene.assets["gun"],
+                (self.rect().centerx + 4 - offset[0], self.rect().centery - offset[1]),
+            )
+
+
 class Player(PhysicsEntity):
     def __init__(self, scene: Scene, pos, size):
         super().__init__(scene, "player", pos, size)
@@ -131,7 +231,7 @@ class Player(PhysicsEntity):
             for x in range(frame.get_width()):
                 for y in range(frame.get_height()):
 
-                    r,g,b,a = frame.get_at((x, y))
+                    r, g, b, a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (g, r, b, a))
 
@@ -139,16 +239,15 @@ class Player(PhysicsEntity):
             for x in range(frame.get_width()):
                 for y in range(frame.get_height()):
 
-                    r,g,b,a = frame.get_at((x, y))
+                    r, g, b, a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (r | b, g, b, a))
-
 
         if self.jumps == 0:
             for x in range(frame.get_width()):
                 for y in range(frame.get_height()):
 
-                    r,g,b,a = frame.get_at((x, y))
+                    r, g, b, a = frame.get_at((x, y))
 
                     frame.set_at((x, y), (r | b, g | b, b, a))
 
@@ -160,7 +259,6 @@ class Player(PhysicsEntity):
             ),
         )
 
-
     def dash(self):
         # old check was
         # if not self.dashing
@@ -171,7 +269,6 @@ class Player(PhysicsEntity):
                 self.dashing = -60
             else:
                 self.dashing = 60
-
 
     def jump(self):
         if self.wall_slide:
@@ -244,17 +341,24 @@ class Player(PhysicsEntity):
             self.velocity[0] = abs(self.dashing) / self.dashing * 8
 
             # create a particle effect
-            particle_angle = random.random() * math.pi * 2 # radians
+            particle_angle = random.random() * math.pi * 2  # radians
             particle_speed = random.random() * 0.5 + 0.5
+<<<<<<< HEAD
             particle_velocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
             # particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+=======
+            particle_velocity = [
+                abs(self.dashing) / self.dashing * random.random() * 3,
+                0,
+            ]
+>>>>>>> cbd0d84cc053696f81d3a991ee904085763e01dc
             self.scene.particles.append(
                 Particle(
                     self.scene,
-                    'particle',
+                    "particle",
                     self.rect().center,
                     velocity=particle_velocity,
-                    frame=random.randint(0,7)
+                    frame=random.randint(0, 7),
                 )
             )
 
@@ -264,24 +368,25 @@ class Player(PhysicsEntity):
             for _ in range(20):
 
                 # create a particle effect
-                particle_angle = random.random() * math.pi * 2 # radians
+                particle_angle = random.random() * math.pi * 2  # radians
                 particle_speed = random.random() * 0.5 + 0.5
-                particle_velocity = [math.cos(particle_angle) * particle_speed, math.sin(particle_angle) * particle_speed]
+                particle_velocity = [
+                    math.cos(particle_angle) * particle_speed,
+                    math.sin(particle_angle) * particle_speed,
+                ]
                 self.scene.particles.append(
                     Particle(
                         self.scene,
-                        'particle',
+                        "particle",
                         self.rect().center,
                         velocity=particle_velocity,
-                        frame=random.randint(0,7)
+                        frame=random.randint(0, 7),
                     )
                 )
-
 
         # slow down after the dash
         if abs(self.dashing) == 50:
             self.velocity[0] *= 0.2
-
 
         # air resistance/friction to slow us down
         if self.velocity[0] > 0:

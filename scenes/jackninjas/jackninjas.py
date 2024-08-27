@@ -3,11 +3,12 @@ import random
 import sys
 import pygame
 from scene import Scene
-from .scripts.entities import PhysicsEntity, Player
+from .scripts.entities import PhysicsEntity, Enemy, Player
 from .scripts.utils import load_image, load_images, Animation
 from .scripts.tilemap import Tilemap
 from .scripts.clouds import Clouds
 from .scripts.particle import Particle
+from .scripts.spark import Spark
 
 
 class JackNinjas(Scene):
@@ -20,6 +21,7 @@ class JackNinjas(Scene):
         self.clock = pygame.time.Clock()
 
         self.play_music("sounds/ambience.wav")
+        self.movement = [False, False]
 
         self.assets = {
             "decor": load_images("tiles/decor"),
@@ -29,6 +31,8 @@ class JackNinjas(Scene):
             "player": load_image("entities/player.png"),
             "background": load_image("background.png"),
             "clouds": load_images("clouds"),
+            "enemy/idle": Animation(load_images("entities/enemy/idle"), img_dur=8),
+            "enemy/run": Animation(load_images("entities/enemy/run"), img_dur=4),
             "player/idle": Animation(load_images("entities/player/idle"), img_dur=8),
             "player/run": Animation(load_images("entities/player/run"), img_dur=4),
             "player/jump": Animation(load_images("entities/player/jump")),
@@ -43,31 +47,41 @@ class JackNinjas(Scene):
             "particle/particle": Animation(
                 load_images("particles/particle"), img_dur=6, loop=False
             ),
+            "gun": load_image("gun.png"),
+            "projectile": load_image("projectile.png"),
         }
-        # print our loaded assets
-        self.log(self.assets)
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
         self.player = Player(self, (75, 75), (8, 15))
-
         self.tilemap = Tilemap(self, tile_size=16)
-        try:
-            self.tilemap.load("assets/jackninjas/map.json")
-        except FileNotFoundError:
-            pass
 
-        self.movement = [False, False]
+        self.load_level(0)
+        
 
-        # setup our pseudo camera
-        self.scroll = [0, 0]
+    def load_level(self, map_id):
 
+        self.tilemap.load("assets/jackninjas/maps/" + str(map_id) + '.json')
+        
         # setup leaf spawners
         self.leaf_spawners = []
         for tree in self.tilemap.extract([("large_decor", 2)], keep=True):
             self.leaf_spawners.append(
                 pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
             )
+
+        self.enemies = []
+        extract = self.tilemap.extract([("spawners", 0), ("spawners", 1)])
+        for spawner in extract:
+            if spawner["variant"] == 0:
+                self.player.pos = spawner["pos"]
+            else:
+                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
+
+        self.projectiles = []
         self.particles = []
+        self.sparks = []
+        # setup our pseudo camera
+        self.scroll = [0, 0]
 
     def perform_quit(self):
         pygame.quit()
@@ -79,7 +93,7 @@ class JackNinjas(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
-        # if the user presses escape or F5 key, quit the event loop.
+        # movement input
         if (
             pygame.K_LEFT in self.game.just_pressed
             or pygame.K_a in self.game.just_pressed
@@ -109,13 +123,12 @@ class JackNinjas(Scene):
         ):
             self.player.jump()
 
-        if (pygame.K_x in self.game.just_pressed):
+        if pygame.K_x in self.game.just_pressed:
             self.player.dash()
 
         self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
         # TODO - rewrite the joystick/gamepad input logic.
-
 
     def draw_background(self):
         # let's go for a sky blue
@@ -144,8 +157,38 @@ class JackNinjas(Scene):
         # draw our tilemap
         self.tilemap.render(self.display, offset=render_scroll)
 
-        # update and draw our player
-        self.player.render(self.display, offset=render_scroll)
+        # draw our enemies
+        for enemy in self.enemies.copy():
+            enemy.update(self.tilemap)
+            enemy.render(self.display, offset=render_scroll)
+
+        # projectile defined as [[x,y], direction, timer]
+        for projectile in self.projectiles.copy():
+            projectile[0][0] += projectile[1] # adjust the x coordinate by the direction of the bullet
+            projectile[2] += 1 # adjust the timer by one
+            img = self.assets['projectile']
+            self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2  - render_scroll[1]))
+            if self.tilemap.solid_check(projectile[0]):
+                self.projectiles.remove(projectile)
+                for i in range(4):
+                    self.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
+            elif projectile[2] > 360:
+                self.projectiles.remove(projectile)
+            elif abs(self.player.dashing) < 50: # fast part of dash is over
+                if self.player.rect().collidepoint(projectile[0]):
+                    self.projectiles.remove(projectile)
+                    for i in range(30):
+                        angle = random.random() * math.pi 
+                        speed = random.random() * 5
+                        self.sparks.append(Spark(self.player.rect().center, angle, 2 + random.random()))
+                        self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=(math.cos(angle + math.pi) * speed * 0.5, math.sin(angle * math.pi) * speed * 0.5), frame = random.randint(0, 7)))
+
+        for spark in self.sparks.copy():
+            kill = spark.update()
+            spark.render(self.display, offset = render_scroll)
+            if kill:
+                self.sparks.remove(spark)
+
 
         # spawn leaf particles
         for rect in self.leaf_spawners:
@@ -172,6 +215,9 @@ class JackNinjas(Scene):
             particle.render(self.display, offset=render_scroll)
             if kill:
                 self.particles.remove(particle)
+
+        # update and draw our player
+        self.player.render(self.display, offset=render_scroll)
 
         # FRAME COMPLETE
         # we finished drawing our frame, lets render it to the screen and
