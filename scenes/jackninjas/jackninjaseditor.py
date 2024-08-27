@@ -2,6 +2,7 @@ import pygame
 from scene import Scene
 from .scripts.utils import load_images
 from .scripts.tilemap import Tilemap
+from utils import Button
 
 
 class JackNinjasEditor(Scene):

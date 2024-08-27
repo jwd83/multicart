@@ -79,6 +79,13 @@ class Tilemap:
             data = json.load(f)
             self.tilemap = data["tilemap"]
             self.tile_size = data["tile_size"]
+            self.offgrid_tiles = data["offgrid"]
+
+    def generative_load(self, path):
+        with open(path, "r") as f:
+            data = json.load(f)
+            self.tilemap = data["tilemap"]
+            self.tile_size = data["tile_size"]
             self.offgrid_tiles = data["offgrid_tiles"]
 
     def autotile(self):
