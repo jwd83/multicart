@@ -38,7 +38,7 @@ def load_tpng_folder(assets_path):
 
     return images
 
-# Draws a grid covering the specified screen, with the optional tile_size and color arguments. 
+# Draws a grid covering the specified screen, with the optional tile_size and color arguments.
 # Default color is an off-white.
 def draw_grid(surf, tile_size = 16, color = (242,245,255)):
     width = surf.get_width()
@@ -50,18 +50,18 @@ def draw_grid(surf, tile_size = 16, color = (242,245,255)):
 
 class Button():
     def __init__(
-            self, 
+            self,
             screen,
-            pos: tuple[int, int], 
-            size: tuple[int, int], 
-            content: str | pygame.surface.Surface, 
+            pos: tuple[int, int],
+            size: tuple[int, int],
+            content: str | pygame.surface.Surface,
 
             # properties for text buttons
-            font = None, 
-            fontSize = 32, 
-            color = (255, 255, 255) 
+            font = None,
+            fontSize = 32,
+            color = (255, 255, 255)
         ):
-        
+
         self.screen = screen
 
         # If our content is a string, render the text onto a surface with any given settings
@@ -151,7 +151,7 @@ class Button():
             # confirm activation on a mouse button up inside the button
             if mouse_up and self.activating:
                 action = True
-                self.activating = False    
+                self.activating = False
 
         # offset button for float/pending activation
         offset = self.rect.copy()
@@ -161,7 +161,7 @@ class Button():
             offset.y += 2
         else:
             # draw the mouse hover outdent while hovered
-            if in_button:    
+            if in_button:
                 offset.x -= 1
                 offset.y -= 1
 
