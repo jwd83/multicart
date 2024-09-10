@@ -334,7 +334,7 @@ class Player(PhysicsEntity):
 
         # if we fall for too long we die
         if self.air_time > 120:
-            self.scene.dead += 1
+            self.scene.dead += 40
             self.air_time = 0
 
         if self.collisions["down"]:
