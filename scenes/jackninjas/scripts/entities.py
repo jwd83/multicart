@@ -178,7 +178,6 @@ class Enemy(PhysicsEntity):
                                 )
                             )
 
-                #  .projectiles
         elif random.random() < 0.01:
             self.walking = random.randint(30, 120)
 
@@ -188,6 +187,39 @@ class Enemy(PhysicsEntity):
             self.set_action("run")
         else:
             self.set_action("idle")
+
+        if abs(self.scene.player.dashing) >= 50:
+            if self.rect().colliderect(self.scene.player.rect()):
+
+                # generate the primary explosion
+                for i in range(30):
+                    angle = random.random() * math.pi
+                    speed = random.random() * 5
+                    self.scene.sparks.append(
+                        Spark(self.rect().center, angle, 2 + random.random())
+                    )
+                    self.scene.particles.append(
+                        Particle(
+                            self.scene,
+                            "particle",
+                            self.rect().center,
+                            velocity=(
+                                math.cos(angle + math.pi) * speed * 0.5,
+                                math.sin(angle * math.pi) * speed * 0.5,
+                            ),
+                            frame=random.randint(0, 7),
+                        )
+                    )
+
+                # add 2 more big sparks that go left and right
+                self.scene.sparks.append(
+                    Spark(self.rect().center, 0, 5 + random.random())
+                )
+                self.scene.sparks.append(
+                    Spark(self.rect().center, math.pi, 5 + random.random())
+                )
+
+                return True
 
     def render(self, surf, offset=(0, 0)):
         super().render(surf=surf, offset=offset)

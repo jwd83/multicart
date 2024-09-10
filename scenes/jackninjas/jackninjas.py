@@ -56,12 +56,11 @@ class JackNinjas(Scene):
         self.tilemap = Tilemap(self, tile_size=16)
 
         self.load_level(0)
-        
 
     def load_level(self, map_id):
 
-        self.tilemap.load("assets/jackninjas/maps/" + str(map_id) + '.json')
-        
+        self.tilemap.load("assets/jackninjas/maps/" + str(map_id) + ".json")
+
         # setup leaf spawners
         self.leaf_spawners = []
         for tree in self.tilemap.extract([("large_decor", 2)], keep=True):
@@ -82,6 +81,7 @@ class JackNinjas(Scene):
         self.sparks = []
         # setup our pseudo camera
         self.scroll = [0, 0]
+        self.dead = 0
 
     def perform_quit(self):
         pygame.quit()
@@ -126,8 +126,6 @@ class JackNinjas(Scene):
         if pygame.K_x in self.game.just_pressed:
             self.player.dash()
 
-        self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-
         # TODO - rewrite the joystick/gamepad input logic.
 
     def draw_background(self):
@@ -137,6 +135,11 @@ class JackNinjas(Scene):
 
     def draw(self):
         self.draw_background()
+
+        if self.dead:
+            self.dead += 1
+            if self.dead > 40:
+                self.load_level(0)  # this will clear the dead counter
 
         # adjust camera position
         self.scroll[0] += (
@@ -159,36 +162,68 @@ class JackNinjas(Scene):
 
         # draw our enemies
         for enemy in self.enemies.copy():
-            enemy.update(self.tilemap)
+            kill = enemy.update(self.tilemap)
             enemy.render(self.display, offset=render_scroll)
+            if kill:
+                self.enemies.remove(enemy)
 
         # projectile defined as [[x,y], direction, timer]
         for projectile in self.projectiles.copy():
-            projectile[0][0] += projectile[1] # adjust the x coordinate by the direction of the bullet
-            projectile[2] += 1 # adjust the timer by one
-            img = self.assets['projectile']
-            self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2  - render_scroll[1]))
+            projectile[0][0] += projectile[
+                1
+            ]  # adjust the x coordinate by the direction of the bullet
+            projectile[2] += 1  # adjust the timer by one
+            img = self.assets["projectile"]
+            self.display.blit(
+                img,
+                (
+                    projectile[0][0] - img.get_width() / 2 - render_scroll[0],
+                    projectile[0][1] - img.get_height() / 2 - render_scroll[1],
+                ),
+            )
             if self.tilemap.solid_check(projectile[0]):
                 self.projectiles.remove(projectile)
                 for i in range(4):
-                    self.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
+                    self.sparks.append(
+                        Spark(
+                            projectile[0],
+                            random.random()
+                            - 0.5
+                            + (math.pi if projectile[1] > 0 else 0),
+                            2 + random.random(),
+                        )
+                    )
             elif projectile[2] > 360:
                 self.projectiles.remove(projectile)
-            elif abs(self.player.dashing) < 50: # fast part of dash is over
+            elif abs(self.player.dashing) < 50:  # fast part of dash is over
                 if self.player.rect().collidepoint(projectile[0]):
+                    # player got hit
                     self.projectiles.remove(projectile)
+                    self.dead += 1
                     for i in range(30):
-                        angle = random.random() * math.pi 
+                        angle = random.random() * math.pi
                         speed = random.random() * 5
-                        self.sparks.append(Spark(self.player.rect().center, angle, 2 + random.random()))
-                        self.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=(math.cos(angle + math.pi) * speed * 0.5, math.sin(angle * math.pi) * speed * 0.5), frame = random.randint(0, 7)))
+                        self.sparks.append(
+                            Spark(self.player.rect().center, angle, 2 + random.random())
+                        )
+                        self.particles.append(
+                            Particle(
+                                self,
+                                "particle",
+                                self.player.rect().center,
+                                velocity=(
+                                    math.cos(angle + math.pi) * speed * 0.5,
+                                    math.sin(angle * math.pi) * speed * 0.5,
+                                ),
+                                frame=random.randint(0, 7),
+                            )
+                        )
 
         for spark in self.sparks.copy():
             kill = spark.update()
-            spark.render(self.display, offset = render_scroll)
+            spark.render(self.display, offset=render_scroll)
             if kill:
                 self.sparks.remove(spark)
-
 
         # spawn leaf particles
         for rect in self.leaf_spawners:
@@ -217,7 +252,9 @@ class JackNinjas(Scene):
                 self.particles.remove(particle)
 
         # update and draw our player
-        self.player.render(self.display, offset=render_scroll)
+        if not self.dead:
+            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+            self.player.render(self.display, offset=render_scroll)
 
         # FRAME COMPLETE
         # we finished drawing our frame, lets render it to the screen and

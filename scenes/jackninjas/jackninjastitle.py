@@ -2,6 +2,7 @@ import pygame
 from scene import Scene
 from utils import *
 
+
 class JackNinjasTitle(Scene):
     def __init__(self, game):
         super().__init__(game)
@@ -15,8 +16,6 @@ class JackNinjasTitle(Scene):
 
         if pygame.K_RETURN in self.game.just_pressed:
             self.game.scene_replace = "JackNinjas"
-
-
 
     def draw(self):
         self.screen.fill((0, 0, 0))
