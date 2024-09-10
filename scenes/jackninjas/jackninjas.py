@@ -73,6 +73,7 @@ class JackNinjas(Scene):
         for spawner in extract:
             if spawner["variant"] == 0:
                 self.player.pos = spawner["pos"]
+                self.player.air_time = 0
             else:
                 self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
