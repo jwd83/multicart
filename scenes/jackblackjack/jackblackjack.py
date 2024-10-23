@@ -319,7 +319,7 @@ class JackBlackJack(Scene):
         if self.state == GameState.TAKING_BETS:
 
             if bet_more:
-                self.bet = min(self.balance, self.bet + 1)
+                self.bet = max(1, min(self.balance, self.bet + 1))
 
             if bet_less:
                 self.bet = max(1, self.bet - 1)
