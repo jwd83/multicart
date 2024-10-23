@@ -48,11 +48,12 @@ class Card:
 class Deck:
     def __init__(self, decks: int = 1):
         self.cards = []
-        self.reset(decks)
+        self.decks = max(1, decks)
+        self.reset()
 
-    def reset(self, decks: int = 1):
-        decks = max(1, decks)
-        self.cards = [Card(suit, rank) for suit in Suit for rank in Rank] * decks
+    def reset(self):
+        self.decks = max(1, self.decks)
+        self.cards = [Card(suit, rank) for suit in Suit for rank in Rank] * self.decks
         self.shuffle()
 
     def __str__(self):
@@ -65,7 +66,11 @@ class Deck:
         return len(self.cards)
 
     def draw(self):
-        return self.cards.pop()
+        if len(self.cards):
+            return self.cards.pop()
+        else:
+            self.reset()
+            return self.cards.pop()
 
 
 class Hand:

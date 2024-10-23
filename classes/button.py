@@ -5,29 +5,44 @@ import settings
 class Button:
     def __init__(
         self,
+        scene,
         screen,
         pos: tuple[int, int],
         size: tuple[int, int],
         content: str | pygame.surface.Surface,
         # properties for text buttons
         font=None,
-        fontSize=32,
+        fontSize=30,
         color=(255, 255, 255),
     ):
-
+        self.scene = scene
         self.screen = screen
 
         # If our content is a string, render the text onto a surface with any given settings
         if type(content) == str:
-            self.image = pygame.transform.scale(
-                self.make_text(content, color, fontSize, font), size
+            pass
+            # make a transparent surface for the button
+            self.image = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
+
+            # fill the image with gray
+            self.image.fill((100, 100, 100))
+
+            # outline the image with a darker gray
+            pygame.draw.rect(self.image, (50, 50, 50), (0, 0, size[0], size[1]), 2)
+
+            # render the text onto the image
+            self.image.blit(
+                self.scene.make_text(content, color, fontSize, font), (4, 4)
             )
+            # self.image = pygame.transform.scale(
+            #     self.make_text(content, color, fontSize, font), size
+            # )
         # otherwise it should be a surface, so we can just assign it to our image
         else:
             self.image = content
 
         self.rect = self.image.get_rect()
-        self.rect.center = pos
+        self.rect.topleft = pos
 
         self.clicked = False
         self.last_pressed = False
