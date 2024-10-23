@@ -46,8 +46,13 @@ class Card:
 
 
 class Deck:
-    def __init__(self):
-        self.cards = [Card(suit, rank) for suit in Suit for rank in Rank]
+    def __init__(self, decks: int = 1):
+        self.cards = []
+        self.reset(decks)
+
+    def reset(self, decks: int = 1):
+        decks = max(1, decks)
+        self.cards = [Card(suit, rank) for suit in Suit for rank in Rank] * decks
         self.shuffle()
 
     def __str__(self):
@@ -55,6 +60,9 @@ class Deck:
 
     def shuffle(self):
         random.shuffle(self.cards)
+
+    def cards_remaining(self):
+        return len(self.cards)
 
     def draw(self):
         return self.cards.pop()
@@ -66,6 +74,9 @@ class Hand:
 
     def __str__(self):
         return "\n".join([str(card) for card in self.cards])
+
+    def empty(self):
+        self.cards = []
 
     def add_card(self, card):
         self.cards.append(card)
@@ -93,8 +104,9 @@ if __name__ == "__main__":
 
     # creating a deck
     print("Creating a test deck")
-    test_deck = Deck()
-    # print(test_deck)
+    test_deck = Deck(3)
+    print(f"Cards remaining: {test_deck.cards_remaining()}")
+    print(test_deck)
 
     # give the dealer a hand
     dealer_hand = Hand()
