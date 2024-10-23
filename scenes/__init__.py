@@ -55,3 +55,7 @@ from .quadblox.quadmenu import QuadMenu
 
 # multitest
 from .multitest.multitest import MultiTest
+
+# blackjack
+from .jackblackjack.jackblackjacktitle import JackBlackJackTitle
+from .jackblackjack.jackblackjack import JackBlackJack
