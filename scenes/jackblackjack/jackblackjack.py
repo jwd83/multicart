@@ -302,7 +302,7 @@ class JackBlackJack(Scene):
         bet_more: bool = self.buttons["bet more"].draw()
         bet_less: bool = self.buttons["bet less"].draw()
         deal: bool = self.buttons["deal"].draw()
-        new_game: bool = self.buttons["next hand"].draw()
+        next_hand: bool = self.buttons["next hand"].draw()
 
         self.TextDraw()
 
@@ -329,10 +329,6 @@ class JackBlackJack(Scene):
 
         if self.state == GameState.WAIT_NEXT_HAND:
 
-            if new_game:
+            if next_hand:
                 self.texts["winner"].text = ""
                 self.state = GameState.NEW_HAND
-
-        # # draw the buttons
-        # for button in self.buttons.values():
-        #     button.draw()
