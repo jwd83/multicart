@@ -29,6 +29,14 @@ class Rank(Enum):
     ACE = 14
 
 
+class HandStrength(Enum):
+    """Enum for hand strengths"""
+
+    NATURAL_BLACKJACK = 40
+    FIVE_CARD_CHARLIE = 30
+    BUST = -1
+
+
 class Card:
     def __init__(self, suit: Suit, rank: Rank):
         self.suit = suit
@@ -46,7 +54,7 @@ class Card:
 
 
 class Deck:
-    def __init__(self, decks: int = 1):
+    def __init__(self, decks: int = 6):
         self.cards = []
         self.decks = max(1, decks)
         self.reset()
@@ -66,11 +74,37 @@ class Deck:
         return len(self.cards)
 
     def draw(self):
+
+        card_out = None
         if len(self.cards):
-            return self.cards.pop()
+            card_out = self.cards.pop()
+
+            # check if this was the last card
+            if len(self.cards) == 0:
+                self.reset()
+
         else:
             self.reset()
-            return self.cards.pop()
+            card_out = self.cards.pop()
+
+        return card_out
+
+    def running_count(self):
+        running_count = 0
+        for card in self.cards:
+            if card.rank in [Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE]:
+                running_count += 1
+            elif card.rank in [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE, Rank.SIX]:
+                running_count -= 1
+
+        return running_count
+
+    def decks_remaining(self):
+        return len(self.cards) / 52
+
+    def true_count(self):
+
+        return self.running_count() / self.decks_remaining()
 
 
 class Hand:
@@ -94,11 +128,41 @@ class Hand:
             num_aces -= 1
         return value
 
+    def minimum_value(self):
+        # like value but all aces are worth 1
+        value = sum([card.value() for card in self.cards])
+        num_aces = sum([1 for card in self.cards if card.rank == Rank.ACE])
+        while num_aces:
+            value -= 10
+            num_aces -= 1
+        return value
+
     def is_bust(self):
         return self.value() > 21
 
     def dealer_showing(self):
         return self.cards[1]
+
+    def hand_strength(self):
+        # natural blackjack = 40
+        # five card charlie = 30
+        # hand sum = 4-21
+        # bust = -1
+
+        # look for perfect blackjack
+        if self.value() == 21 and len(self.cards) == 2:
+            return HandStrength.NATURAL_BLACKJACK
+
+        # look for five card charlie
+        if self.minimum_value() < 21 and len(self.cards) == 5:
+            return HandStrength.FIVE_CARD_CHARLIE
+
+        # look for busted hand
+        if self.is_bust():
+            return HandStrength.BUST
+
+        # default to hand sum if none of the above match
+        return self.value()
 
 
 if __name__ == "__main__":

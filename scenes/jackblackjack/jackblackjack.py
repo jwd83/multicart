@@ -7,6 +7,21 @@ from enum import Enum, auto
 import settings
 
 
+## todo
+# double down
+# split
+# insurance
+# five card charlie
+
+
+# blackjack hand strength
+# -------------------------
+# blackjack with ace and (10, J, Q, K) = 21 in 2 cards only!
+# 5 card charlie = 5 cards without busting
+# hands up to and including 21 are ranked by the sum of their cards
+# bust = over 21
+
+
 class GameState(Enum):
     NEW_GAME = auto()
     NEW_HAND = auto()
@@ -28,6 +43,7 @@ class JackBlackJack(Scene):
         self.hand_player = bj.Hand()
         self.hand_dealer = bj.Hand()
 
+        self.game_board = load_tpng("jackblackjack/game-board.png")
         self.card_front = load_tpng("jackblackjack/card-blank-border.png")
         self.card_back = load_tpng("jackblackjack/card-back.png")
         self.suit_spades = load_tpng("jackblackjack/spades.png")
@@ -42,8 +58,9 @@ class JackBlackJack(Scene):
 
         self.state: GameState = GameState.TAKING_BETS
 
-        self.bet: int = 1
-        self.balance: int = 25
+        self.bet_increment: int = 10
+        self.bet: int = 10
+        self.balance: int = 250
 
         button_width = 160
         button_height = 40
@@ -122,20 +139,24 @@ class JackBlackJack(Scene):
             self.texts["balance"].text = f"balance: {self.balance}"
             self.texts["bet"].text = f"bet: {self.bet}"
             self.texts["state"].text = self.state.name
+            positive_sign = "+" if self.deck.running_count() > 0 else ""
+            self.texts["count"].text = (
+                f"rc:{positive_sign}{int(self.deck.running_count())}, dr: {self.deck.decks_remaining():.2f}, tc: {positive_sign}{self.deck.true_count():.1f}, cr: {self.deck.cards_remaining()}"
+            )
 
         else:
 
             left_pos = 320
-            y_base = 0
+            y_base = -30
             y_step = 30
 
             self.texts["dealer"] = self.Text(
                 " ",
-                (0, 85),
+                (0, 75),
             )
             self.texts["player"] = self.Text(
                 " ",
-                (0, 320),
+                (0, 305),
             )
             self.texts["balance"] = self.Text(
                 f"balance: ?", (left_pos, y_base + y_step * 4)
@@ -146,6 +167,7 @@ class JackBlackJack(Scene):
                 f"state: ?", (left_pos, y_base + y_step * 6)
             )
             self.texts["winner"] = self.Text(f"", (left_pos, y_base + y_step * 7))
+            self.texts["count"] = self.Text(f"", (0, 328))
 
     def new_game(self):
 
@@ -161,8 +183,8 @@ class JackBlackJack(Scene):
             self.hand_player.empty()
             self.hand_dealer.empty()
 
-            self.balance = 25
-            self.bet = 1
+            self.balance = 250
+            self.bet = self.bet_increment
             self.state = GameState.TAKING_BETS
 
         if self.state == GameState.NEW_HAND:
@@ -170,7 +192,7 @@ class JackBlackJack(Scene):
             self.hand_player.empty()
             self.hand_dealer.empty()
 
-            self.bet = 1
+            self.bet = self.bet_increment
             self.state = GameState.TAKING_BETS
 
         if self.state == GameState.DEALING:
@@ -197,28 +219,49 @@ class JackBlackJack(Scene):
                 self.state = GameState.DEALER_WIN
                 self.texts["winner"].text = "Dealer wins! The player busts! "
             else:
-                while self.hand_dealer.value() < 17:
-                    self.hand_dealer.add_card(self.deck.draw())
-
-                if self.hand_dealer.is_bust():
-                    self.state = GameState.PLAYER_WIN
-                    self.texts["winner"].text = "Player wins! The dealer busts! "
-
-                elif self.hand_player.value() > self.hand_dealer.value():
-                    self.texts["winner"].text = "Player wins!"
-
-                    self.state = GameState.PLAYER_WIN
-
-                elif self.hand_player.value() < self.hand_dealer.value():
-                    self.texts["winner"].text = "Dealer wins!"
-                    self.state = GameState.DEALER_WIN
-
+                # check for player having five card charlie
+                if (
+                    self.hand_player.hand_strength()
+                    == bj.HandStrength.FIVE_CARD_CHARLIE
+                ):
+                    if (
+                        self.hand_dealer.hand_strength()
+                        == bj.HandStrength.NATURAL_BLACKJACK
+                    ):
+                        self.state = GameState.DEALER_WIN
+                        self.texts["winner"].text = "Blackjack beats charlie!"
+                    else:
+                        self.state = GameState.PLAYER_WIN
+                        self.texts["winner"].text = "Five Card Charlie!"
                 else:
-                    self.state = GameState.TIE
-                    self.texts["winner"].text = "Tie!"
+
+                    while self.hand_dealer.value() < 17:
+                        self.hand_dealer.add_card(self.deck.draw())
+
+                    if self.hand_dealer.is_bust():
+                        self.state = GameState.PLAYER_WIN
+                        self.texts["winner"].text = "Player wins! The dealer busts! "
+
+                    elif self.hand_player.value() > self.hand_dealer.value():
+                        self.texts["winner"].text = "Player wins!"
+
+                        self.state = GameState.PLAYER_WIN
+
+                    elif self.hand_player.value() < self.hand_dealer.value():
+                        self.texts["winner"].text = "Dealer wins!"
+                        self.state = GameState.DEALER_WIN
+
+                    else:
+                        self.state = GameState.TIE
+                        self.texts["winner"].text = "Tie!"
 
         if self.state == GameState.PLAYER_WIN:
-            self.balance += self.bet
+            # check if the player had blackjack for 3:2 payout
+            if self.hand_player.hand_strength() == bj.HandStrength.NATURAL_BLACKJACK:
+                self.balance += int(self.bet * 1.5)
+            else:
+
+                self.balance += self.bet
             self.state = GameState.WAIT_NEXT_HAND
 
         if self.state == GameState.DEALER_WIN:
@@ -279,20 +322,24 @@ class JackBlackJack(Scene):
     def draw_hands(self):
 
         card_spacing = 80
+        dealer_top = 110
+        player_top = 210
 
         # DRAW THE PLAYERS HAND
         for i, card in enumerate(self.hand_player.cards):
-            self.draw_card(card, 50 + i * card_spacing, 210)
+            self.draw_card(card, 50 + i * card_spacing, player_top)
 
         # draw the dealer's hand
         for i, card in enumerate(self.hand_dealer.cards):
             if i == 0 and self.state == GameState.PLAYER_TURN:
-                self.screen.blit(self.card_back, (50 + i * card_spacing, 120))
+                self.screen.blit(self.card_back, (50 + i * card_spacing, dealer_top))
             else:
-                self.draw_card(card, 50 + i * card_spacing, 120)
+                self.draw_card(card, 50 + i * card_spacing, dealer_top)
 
     def draw(self):
-        self.screen.fill((20, 120, 20))
+        # self.screen.fill((20, 120, 20))
+
+        self.screen.blit(self.game_board, (0, 0))
 
         self.draw_hands()
         self.update_texts()
@@ -313,16 +360,21 @@ class JackBlackJack(Scene):
                 if self.hand_player.is_bust():
                     self.state = GameState.DEALER_TURN
 
+                if len(self.hand_player.cards) == 5:
+                    self.state = GameState.DEALER_TURN
+
             if stand:
                 self.state = GameState.DEALER_TURN
 
         if self.state == GameState.TAKING_BETS:
 
             if bet_more:
-                self.bet = max(1, min(self.balance, self.bet + 1))
+                self.bet = max(
+                    self.bet_increment, min(self.balance, self.bet + self.bet_increment)
+                )
 
             if bet_less:
-                self.bet = max(1, self.bet - 1)
+                self.bet = max(self.bet_increment, self.bet - self.bet_increment)
 
             if deal:
                 self.state = GameState.DEALING
