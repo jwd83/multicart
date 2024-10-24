@@ -34,9 +34,6 @@ class Button:
             self.image.blit(
                 self.scene.make_text(content, color, fontSize, font), (4, 4)
             )
-            # self.image = pygame.transform.scale(
-            #     self.make_text(content, color, fontSize, font), size
-            # )
         # otherwise it should be a surface, so we can just assign it to our image
         else:
             self.image = content
@@ -47,51 +44,6 @@ class Button:
         self.clicked = False
         self.last_pressed = False
         self.activating = False
-
-    def make_text(
-        self,
-        text,
-        color,
-        fontSize,
-        font=None,
-        stroke=False,
-        strokeColor=(0, 0, 0),
-        strokeThickness=1,
-    ):
-        if font is None:
-            font = "assets/fonts/" + settings.FONT
-
-        if font == "system-ui":
-            font = None
-
-        # if we aren't stroking return the text directly
-        if not stroke:
-            return pygame.font.Font(font, fontSize).render(text, 1, color)
-
-        # if we are stroking, render the text with the stroke
-        # first render the text without the stroke
-
-        # create a version of the text in the stroke color and blit it to the surface
-        surf_text = pygame.font.Font(font, fontSize).render(text, 1, color)
-        surf_text_stroke = pygame.font.Font(font, fontSize).render(text, 1, strokeColor)
-
-        # create a transparent surface to draw the text and stroke on
-        size = (
-            surf_text.get_width() + strokeThickness * 3,
-            surf_text.get_height() + strokeThickness * 3,
-        )
-        surface = self.make_transparent_surface(size)
-
-        # blit the stroke text to the surface
-        for i in range(strokeThickness * 2 + 1):
-            for j in range(strokeThickness * 2 + 1):
-                surface.blit(surf_text_stroke, (i, j))
-
-        # blit the text on top of the stroke
-        surface.blit(surf_text, (strokeThickness, strokeThickness))
-
-        # return the surface
-        return surface
 
     def draw(self):
         action = False
