@@ -342,7 +342,7 @@ class JackBlackJack(Scene):
     def draw_hands(self):
 
         card_spacing = 80
-        dealer_top = 110
+        dealer_top = 100
         player_top = 210
 
         # DRAW THE PLAYERS HAND
@@ -360,6 +360,10 @@ class JackBlackJack(Scene):
         # self.screen.fill((20, 120, 20))
 
         self.screen.blit(self.game_board, (0, 0))
+
+        # draw the shoe/deck of cards we are drawing from, 1 pixel per 10 cards
+        for i in range(self.deck.cards_remaining() // 10):
+            self.screen.blit(self.card_back, (640 - 80, 50 - i))
 
         self.draw_hands()
         self.update_texts()
