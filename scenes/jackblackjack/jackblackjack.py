@@ -172,8 +172,8 @@ class JackBlackJack(Scene):
                 (0, 305),
             )
 
+            self.texts["bet"] = self.Text(f"bet: ?", (0, 0))
             self.texts["balance"] = self.Text(f"balance: 0", (0, 30))
-            self.texts["bet"] = self.Text(f"bet: ?", (500, 0))
 
             self.texts["winner"] = self.Text(f"", (left_pos, y_base + y_step * 7))
             self.texts["count"] = self.Text(f"", (0, 328))
