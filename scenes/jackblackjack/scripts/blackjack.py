@@ -29,14 +29,6 @@ class Rank(Enum):
     ACE = 14
 
 
-class HandStrength(Enum):
-    """Enum for hand strengths"""
-
-    NATURAL_BLACKJACK = 40
-    FIVE_CARD_CHARLIE = 30
-    BUST = -1
-
-
 class Card:
     def __init__(self, suit: Suit, rank: Rank):
         self.suit = suit
@@ -102,6 +94,9 @@ class Deck:
     def decks_remaining(self):
         return len(self.cards) / 52
 
+    def draw_percentage(self):
+        return self.cards_remaining() / (52 * self.decks)
+
     def true_count(self):
 
         return self.running_count() / self.decks_remaining()
@@ -151,15 +146,15 @@ class Hand:
 
         # look for perfect blackjack
         if self.value() == 21 and len(self.cards) == 2:
-            return HandStrength.NATURAL_BLACKJACK
+            return 40
 
         # look for five card charlie
-        if self.minimum_value() < 21 and len(self.cards) == 5:
-            return HandStrength.FIVE_CARD_CHARLIE
+        if self.minimum_value() <= 21 and len(self.cards) == 5:
+            return 30
 
         # look for busted hand
         if self.is_bust():
-            return HandStrength.BUST
+            return -1
 
         # default to hand sum if none of the above match
         return self.value()

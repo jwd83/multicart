@@ -14,6 +14,7 @@ class Button:
         font=None,
         fontSize=30,
         color=(255, 255, 255),
+        bg_color=(100, 100, 100),
     ):
         self.scene = scene
         self.screen = screen
@@ -25,14 +26,22 @@ class Button:
             self.image = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 
             # fill the image with gray
-            self.image.fill((100, 100, 100))
+            self.image.fill(bg_color)
 
             # outline the image with a darker gray
             pygame.draw.rect(self.image, (50, 50, 50), (0, 0, size[0], size[1]), 2)
 
             # render the text onto the image
+
+            text_image = self.scene.make_text(content, color, fontSize, font)
+
+            # blit the text onto the center of the button
             self.image.blit(
-                self.scene.make_text(content, color, fontSize, font), (4, 4)
+                text_image,
+                (
+                    size[0] // 2 - text_image.get_width() // 2,
+                    size[1] // 2 - text_image.get_height() // 2,
+                ),
             )
         # otherwise it should be a surface, so we can just assign it to our image
         else:

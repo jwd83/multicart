@@ -64,10 +64,11 @@ class JackBlackJack(Scene):
 
         button_width = 160
         button_height = 40
-        button_font_size = 30
-        left_col = 0
-        middle_col = button_width
-        right_col = button_width * 2
+        button_font_size = 20
+        button_font_size_large = 40
+
+        left_col = (640 / 2) - button_width
+        right_col = 640 / 2
         high_row = 0
         low_row = 40
 
@@ -79,26 +80,29 @@ class JackBlackJack(Scene):
             "hit": Button(
                 screen=self.screen,
                 scene=self,
-                pos=(left_col, low_row),
-                size=(button_width, button_height),
+                pos=(left_col, high_row),
+                size=(button_width, button_height * 2),
                 content="Hit",
-                fontSize=button_font_size,
+                fontSize=button_font_size_large,
+                bg_color=(40, 120, 120),
             ),
             "stand": Button(
                 screen=self.screen,
                 scene=self,
-                pos=(middle_col, low_row),
-                size=(button_width, button_height),
+                pos=(right_col, high_row),
+                size=(button_width, button_height * 2),
                 content="Stand",
-                fontSize=button_font_size,
+                fontSize=button_font_size_large,
+                bg_color=(120, 120, 40),
             ),
             "bet more": Button(
                 screen=self.screen,
                 scene=self,
-                pos=(middle_col, high_row),
+                pos=(right_col, high_row),
                 size=(button_width, button_height),
                 content="Bet More",
                 fontSize=button_font_size,
+                bg_color=(100, 240, 100),
             ),
             "bet less": Button(
                 screen=self.screen,
@@ -107,22 +111,25 @@ class JackBlackJack(Scene):
                 size=(button_width, button_height),
                 content="Bet Less",
                 fontSize=button_font_size,
+                bg_color=(240, 100, 100),
             ),
             "deal": Button(
                 screen=self.screen,
                 scene=self,
-                pos=(right_col, high_row),
-                size=(button_width, button_height),
+                pos=(left_col, low_row),
+                size=(button_width * 2, button_height),
                 content="Deal",
                 fontSize=button_font_size,
+                bg_color=(100, 100, 240),
             ),
             "next hand": Button(
                 screen=self.screen,
                 scene=self,
-                pos=(right_col, low_row),
-                size=(button_width, button_height),
+                pos=(left_col, high_row),
+                size=(button_width * 2, button_height * 2),
                 content="next hand",
-                fontSize=button_font_size,
+                fontSize=button_font_size_large,
+                bg_color=(100, 240, 100),
             ),
         }
 
@@ -130,15 +137,19 @@ class JackBlackJack(Scene):
 
         # check if texts have been defined
         if "dealer" in self.texts:
-            if self.state == GameState.PLAYER_TURN:
-                self.texts["dealer"].text = f"dealer has ?"
-            else:
+            if self.state == GameState.WAIT_NEXT_HAND:
                 self.texts["dealer"].text = f"dealer has {self.hand_dealer.value()}"
+            else:
+                self.texts["dealer"].text = ""
 
-            self.texts["player"].text = f"player has {self.hand_player.value()}"
+            if self.hand_player.value() != 0:
+                self.texts["player"].text = f"player has {self.hand_player.value()}"
+            else:
+                self.texts["player"].text = f""
+
             self.texts["balance"].text = f"balance: {self.balance}"
             self.texts["bet"].text = f"bet: {self.bet}"
-            self.texts["state"].text = self.state.name
+
             positive_sign = "+" if self.deck.running_count() > 0 else ""
             self.texts["count"].text = (
                 f"rc:{positive_sign}{int(self.deck.running_count())}, dr: {self.deck.decks_remaining():.2f}, tc: {positive_sign}{self.deck.true_count():.1f}, cr: {self.deck.cards_remaining()}"
@@ -150,6 +161,8 @@ class JackBlackJack(Scene):
             y_base = -30
             y_step = 30
 
+            self.standard_font_size = 20
+
             self.texts["dealer"] = self.Text(
                 " ",
                 (0, 75),
@@ -158,14 +171,10 @@ class JackBlackJack(Scene):
                 " ",
                 (0, 305),
             )
-            self.texts["balance"] = self.Text(
-                f"balance: ?", (left_pos, y_base + y_step * 4)
-            )
-            self.texts["bet"] = self.Text(f"bet: ?", (left_pos, y_base + y_step * 5))
 
-            self.texts["state"] = self.Text(
-                f"state: ?", (left_pos, y_base + y_step * 6)
-            )
+            self.texts["balance"] = self.Text(f"balance: 0", (0, 30))
+            self.texts["bet"] = self.Text(f"bet: ?", (500, 0))
+
             self.texts["winner"] = self.Text(f"", (left_pos, y_base + y_step * 7))
             self.texts["count"] = self.Text(f"", (0, 328))
 
@@ -185,12 +194,17 @@ class JackBlackJack(Scene):
 
             self.balance = 250
             self.bet = self.bet_increment
-            self.state = GameState.TAKING_BETS
+            self.state = GameState.NEW_HAND
 
         if self.state == GameState.NEW_HAND:
 
+            # empty hands
             self.hand_player.empty()
             self.hand_dealer.empty()
+
+            # draw a new deck if the percentage of cards remaining is less than 25%
+            if self.deck.draw_percentage() < 0.25:
+                self.deck.reset()
 
             self.bet = self.bet_increment
             self.state = GameState.TAKING_BETS
@@ -220,14 +234,8 @@ class JackBlackJack(Scene):
                 self.texts["winner"].text = "Dealer wins! The player busts! "
             else:
                 # check for player having five card charlie
-                if (
-                    self.hand_player.hand_strength()
-                    == bj.HandStrength.FIVE_CARD_CHARLIE
-                ):
-                    if (
-                        self.hand_dealer.hand_strength()
-                        == bj.HandStrength.NATURAL_BLACKJACK
-                    ):
+                if self.hand_player.hand_strength() == 30:
+                    if self.hand_dealer.hand_strength() == 40:
                         self.state = GameState.DEALER_WIN
                         self.texts["winner"].text = "Blackjack beats charlie!"
                     else:
@@ -238,16 +246,26 @@ class JackBlackJack(Scene):
                     while self.hand_dealer.value() < 17:
                         self.hand_dealer.add_card(self.deck.draw())
 
+                    self.log(f"dealer hand strength: {self.hand_dealer.value()} ")
+                    self.log(f"player hand strength: {self.hand_player.value()} ")
+
                     if self.hand_dealer.is_bust():
                         self.state = GameState.PLAYER_WIN
                         self.texts["winner"].text = "Player wins! The dealer busts! "
 
-                    elif self.hand_player.value() > self.hand_dealer.value():
+                    elif (
+                        self.hand_player.hand_strength()
+                        > self.hand_dealer.hand_strength()
+                    ):
                         self.texts["winner"].text = "Player wins!"
 
                         self.state = GameState.PLAYER_WIN
 
-                    elif self.hand_player.value() < self.hand_dealer.value():
+                    elif (
+                        self.hand_player.hand_strength()
+                        < self.hand_dealer.hand_strength()
+                    ):
+
                         self.texts["winner"].text = "Dealer wins!"
                         self.state = GameState.DEALER_WIN
 
@@ -257,11 +275,13 @@ class JackBlackJack(Scene):
 
         if self.state == GameState.PLAYER_WIN:
             # check if the player had blackjack for 3:2 payout
-            if self.hand_player.hand_strength() == bj.HandStrength.NATURAL_BLACKJACK:
+            if self.hand_player.hand_strength() == 40:
                 self.balance += int(self.bet * 1.5)
             else:
-
-                self.balance += self.bet
+                if self.hand_player.hand_strength() == 30:
+                    self.balance += int(self.bet * 1.2)
+                else:
+                    self.balance += self.bet
             self.state = GameState.WAIT_NEXT_HAND
 
         if self.state == GameState.DEALER_WIN:
@@ -344,12 +364,17 @@ class JackBlackJack(Scene):
         self.draw_hands()
         self.update_texts()
 
-        hit: bool = self.buttons["hit"].draw()
-        stand: bool = self.buttons["stand"].draw()
-        bet_more: bool = self.buttons["bet more"].draw()
-        bet_less: bool = self.buttons["bet less"].draw()
-        deal: bool = self.buttons["deal"].draw()
-        next_hand: bool = self.buttons["next hand"].draw()
+        if self.state == GameState.TAKING_BETS:
+            bet_more: bool = self.buttons["bet more"].draw()
+            bet_less: bool = self.buttons["bet less"].draw()
+            deal: bool = self.buttons["deal"].draw()
+
+        if self.state == GameState.PLAYER_TURN:
+            hit: bool = self.buttons["hit"].draw()
+            stand: bool = self.buttons["stand"].draw()
+
+        if self.state == GameState.WAIT_NEXT_HAND:
+            next_hand: bool = self.buttons["next hand"].draw()
 
         self.TextDraw()
 
