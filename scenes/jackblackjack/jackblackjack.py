@@ -211,13 +211,15 @@ class JackBlackJack(Scene):
 
         if self.state == GameState.DEALING:
 
-            self.hand_player.add_card(self.deck.draw())
-            self.hand_player.add_card(self.deck.draw())
+            if self.deal_start + 1 < self.elapsed():
+                self.log(f"Finished dealing at {self.elapsed() - self.deal_start}")
+                self.hand_player.add_card(self.deck.draw())
+                self.hand_dealer.add_card(self.deck.draw())
 
-            self.hand_dealer.add_card(self.deck.draw())
-            self.hand_dealer.add_card(self.deck.draw())
+                self.hand_player.add_card(self.deck.draw())
+                self.hand_dealer.add_card(self.deck.draw())
 
-            self.state = GameState.PLAYER_TURN
+                self.state = GameState.PLAYER_TURN
 
         if self.state == GameState.PLAYER_TURN:
 
@@ -363,7 +365,7 @@ class JackBlackJack(Scene):
 
         # draw the shoe/deck of cards we are drawing from, 1 pixel per 10 cards
         for i in range(self.deck.cards_remaining() // 10):
-            self.screen.blit(self.card_back, (640 - 80, 50 - i))
+            self.screen.blit(self.card_back, (640 - 80 - i // 3, 50 - i))
 
         self.draw_hands()
         self.update_texts()
@@ -381,6 +383,50 @@ class JackBlackJack(Scene):
             next_hand: bool = self.buttons["next hand"].draw()
 
         self.TextDraw()
+
+        if self.state == GameState.DEALING:
+            if self.deal_start + 0.25 > self.elapsed():
+                # slide 4 cards out from the top of the deck
+                start_pos = (
+                    640 - 80 - (self.deck.cards_remaining() // 10) // 3,
+                    50 - (self.deck.cards_remaining() // 10),
+                )
+
+                for i in range(4):
+                    self.screen.blit(
+                        self.card_back,
+                        (
+                            start_pos[0] + i * (self.elapsed() - self.deal_start) * 160,
+                            start_pos[1],
+                        ),
+                    )
+            else:
+
+                card_spacing = 80
+                dealer_top = 100
+                player_top = 210
+                card_1 = 50
+                card_2 = 50 + card_spacing
+
+                progress = self.elapsed() - self.deal_start
+                remaining = 1 - progress
+
+                self.screen.blit(
+                    self.card_back,
+                    (card_1 + max(0, remaining - 0.3) * 2200, dealer_top),
+                )
+                self.screen.blit(
+                    self.card_back,
+                    (card_2 + max(0, remaining - 0.1) * 2200, dealer_top),
+                )
+                self.screen.blit(
+                    self.card_back,
+                    (card_1 + max(0, remaining - 0.4) * 2200, player_top),
+                )
+                self.screen.blit(
+                    self.card_back,
+                    (card_2 + max(0, remaining - 0.2) * 2200, player_top),
+                )
 
         if self.state == GameState.PLAYER_TURN:
 
@@ -406,6 +452,7 @@ class JackBlackJack(Scene):
                 self.bet = max(self.bet_increment, self.bet - self.bet_increment)
 
             if deal:
+                self.deal_start = self.elapsed()
                 self.state = GameState.DEALING
 
         if self.state == GameState.WAIT_NEXT_HAND:
