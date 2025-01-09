@@ -57,6 +57,9 @@ class JackNinjas(Scene):
 
         self.load_level(0)
 
+        # setup screenshake variables
+        self.screen_shake = 0
+
     def load_level(self, map_id):
 
         self.tilemap.load("assets/jackninjas/maps/" + str(map_id) + ".json")
@@ -137,6 +140,10 @@ class JackNinjas(Scene):
     def draw(self):
         self.draw_background()
 
+        self.screen_shake = max(
+            0, self.screen_shake - 1
+        )  # decrement the screen shake counter by one each frame
+
         if self.dead:
             self.dead += 1
             if self.dead > 40:
@@ -201,6 +208,9 @@ class JackNinjas(Scene):
                     # player got hit
                     self.projectiles.remove(projectile)
                     self.dead += 1
+                    self.screen_shake = max(
+                        30, self.screen_shake
+                    )  # set it to 16 if it's lower
                     for i in range(30):
                         angle = random.random() * math.pi
                         speed = random.random() * 5
@@ -257,9 +267,15 @@ class JackNinjas(Scene):
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
 
+        # calculate our screen shake offset
+        shake_offset = (
+            random.random() * self.screen_shake - self.screen_shake / 2,
+            random.random() * self.screen_shake - self.screen_shake / 2,
+        )
+
         # FRAME COMPLETE
         # we finished drawing our frame, lets render it to the screen and
         # get our input events ready for the next frame and sleep for a bit
         self.screen.blit(
-            pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
+            pygame.transform.scale(self.display, self.screen.get_size()), shake_offset
         )

@@ -190,6 +190,7 @@ class Enemy(PhysicsEntity):
 
         if abs(self.scene.player.dashing) >= 50:
             if self.rect().colliderect(self.scene.player.rect()):
+                self.scene.screen_shake = max(16, self.scene.screen_shake)
 
                 # generate the primary explosion
                 for i in range(30):
@@ -333,7 +334,9 @@ class Player(PhysicsEntity):
         self.air_time += 1
 
         # if we fall for too long we die
-        if self.air_time > 120:
+        if self.air_time > 240:
+            if not self.scene.dead:
+                self.scene.screen_shake = max(16, self.scene.screen_shake)
             self.scene.dead += 40
             self.air_time = 0
 
