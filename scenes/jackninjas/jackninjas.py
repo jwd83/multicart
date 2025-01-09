@@ -2,6 +2,7 @@ import math
 import random
 import sys
 import pygame
+import os
 from scene import Scene
 from .scripts.entities import PhysicsEntity, Enemy, Player
 from .scripts.utils import load_image, load_images, Animation
@@ -54,8 +55,8 @@ class JackNinjas(Scene):
         self.clouds = Clouds(self.assets["clouds"], count=16)
         self.player = Player(self, (75, 75), (8, 15))
         self.tilemap = Tilemap(self, tile_size=16)
-
-        self.load_level(0)
+        self.level = 0
+        self.load_level(self.level)
 
         # setup screenshake variables
         self.screen_shake = 0
@@ -86,6 +87,8 @@ class JackNinjas(Scene):
         # setup our pseudo camera
         self.scroll = [0, 0]
         self.dead = 0
+
+        self.transition = -30
 
     def perform_quit(self):
         pygame.quit()
@@ -147,7 +150,7 @@ class JackNinjas(Scene):
         if self.dead:
             self.dead += 1
             if self.dead > 40:
-                self.load_level(0)  # this will clear the dead counter
+                self.load_level(self.level)  # this will clear the dead counter
 
         # adjust camera position
         self.scroll[0] += (
