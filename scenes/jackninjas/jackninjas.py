@@ -147,6 +147,16 @@ class JackNinjas(Scene):
             0, self.screen_shake - 1
         )  # decrement the screen shake counter by one each frame
 
+        # check if all enemies have been killed
+        if not len(self.enemies):
+            self.transition += 1
+            if self.transition > 30:
+                self.level += 1
+                self.load_level(self.level)
+
+        if self.transition < 0:
+            self.transition += 1
+
         if self.dead:
             self.dead += 1
             if self.dead > 40:
@@ -269,6 +279,18 @@ class JackNinjas(Scene):
         if not self.dead:
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
+
+        # handle our transition effect
+        if self.transition:  # when non-zero
+            t_surf = pygame.Surface(self.display.get_size())
+            pygame.draw.circle(
+                t_surf,
+                (255, 255, 255),
+                (self.display.get_width() // 2, self.display.get_height() // 2),
+                (30 - abs(self.transition)) * 8,
+            )
+            t_surf.set_colorkey((255, 255, 255))
+            self.display.blit(t_surf, (0, 0))
 
         # calculate our screen shake offset
         shake_offset = (
