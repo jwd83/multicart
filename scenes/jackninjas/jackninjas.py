@@ -17,7 +17,8 @@ class JackNinjas(Scene):
         super().__init__(game)
 
         # we will render at 320x180 and then scale it up
-        self.display = pygame.Surface((320, 180))
+        self.display = pygame.Surface((320, 180), pygame.SRCALPHA)
+        self.display_2 = pygame.Surface((320, 180))
 
         self.clock = pygame.time.Clock()
 
@@ -135,13 +136,9 @@ class JackNinjas(Scene):
 
         # TODO - rewrite the joystick/gamepad input logic.
 
-    def draw_background(self):
-        # let's go for a sky blue
-        # self.display.fill((15,220,250))
-        self.display.blit(self.assets["background"], (0, 0))
-
     def draw(self):
-        self.draw_background()
+        self.display.fill((0, 0, 0, 0))  # pure transparency
+        self.display_2.blit(self.assets["background"], (0, 0))
 
         self.screen_shake = max(
             0, self.screen_shake - 1
@@ -180,7 +177,7 @@ class JackNinjas(Scene):
 
         # draw our clouds
         self.clouds.update()
-        self.clouds.render(self.display, offset=render_scroll)
+        self.clouds.render(self.display_2, offset=render_scroll)
 
         # draw our tilemap
         self.tilemap.render(self.display, offset=render_scroll)
@@ -253,6 +250,20 @@ class JackNinjas(Scene):
             if kill:
                 self.sparks.remove(spark)
 
+        # update and draw our player
+        if not self.dead:
+            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+            self.player.render(self.display, offset=render_scroll)
+
+        # outline what has been drawn so far
+        display_mask = pygame.mask.from_surface(self.display)
+        display_silhouette = display_mask.to_surface(
+            setcolor=(0, 0, 0, 180), unsetcolor=(0, 0, 0, 0)
+        )
+
+        for silhouette_offset in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            self.display_2.blit(display_silhouette, silhouette_offset)
+
         # spawn leaf particles
         for rect in self.leaf_spawners:
             if random.random() * 50000 < rect.width * rect.height:
@@ -279,11 +290,6 @@ class JackNinjas(Scene):
             if kill:
                 self.particles.remove(particle)
 
-        # update and draw our player
-        if not self.dead:
-            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display, offset=render_scroll)
-
         # handle our transition effect
         if self.transition:  # when non-zero
             t_surf = pygame.Surface(self.display.get_size())
@@ -296,6 +302,8 @@ class JackNinjas(Scene):
             t_surf.set_colorkey((255, 255, 255))
             self.display.blit(t_surf, (0, 0))
 
+        self.display_2.blit(self.display, (0, 0))
+
         # calculate our screen shake offset
         shake_offset = (
             random.random() * self.screen_shake - self.screen_shake / 2,
@@ -306,5 +314,5 @@ class JackNinjas(Scene):
         # we finished drawing our frame, lets render it to the screen and
         # get our input events ready for the next frame and sleep for a bit
         self.screen.blit(
-            pygame.transform.scale(self.display, self.screen.get_size()), shake_offset
+            pygame.transform.scale(self.display_2, self.screen.get_size()), shake_offset
         )
