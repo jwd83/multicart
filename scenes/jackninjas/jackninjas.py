@@ -154,7 +154,6 @@ class JackNinjas(Scene):
                 self.level = min(
                     self.level + 1, len(os.listdir("assets/jackninjas/maps")) - 1
                 )
-                self.level += 1
                 self.load_level(self.level)
 
         if self.transition < 0:
