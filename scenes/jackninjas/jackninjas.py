@@ -151,6 +151,9 @@ class JackNinjas(Scene):
         if not len(self.enemies):
             self.transition += 1
             if self.transition > 30:
+                self.level = min(
+                    self.level + 1, len(os.listdir("assets/jackninjas/maps")) - 1
+                )
                 self.level += 1
                 self.load_level(self.level)
 
@@ -159,6 +162,8 @@ class JackNinjas(Scene):
 
         if self.dead:
             self.dead += 1
+            if self.dead >= 10:
+                self.transition = min(30, self.transition + 1)
             if self.dead > 40:
                 self.load_level(self.level)  # this will clear the dead counter
 
