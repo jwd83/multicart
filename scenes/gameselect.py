@@ -30,6 +30,8 @@ class GameSelect(Scene):
             "JackBlackJackTitle": "Blackjack",
             "MultiTest": "Multi Test",
             "Warp": "Warp",
+            "ViaTitle": "Via Galactica",
+            "FourJacksTitle": "Four Jacks",
             "Menu": "Menu",
             "Quit": "Quit to Desktop",
         }
@@ -69,6 +71,7 @@ class GameSelect(Scene):
                         self.game.scene_push = "Menu"
                     else:
                         self.game.scene_replace = opt
+                selected_op += 1
 
     def draw(self):
         y_spacing = self.standard_font_size + 5

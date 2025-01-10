@@ -61,6 +61,9 @@ class QuadMenu(Scene):
             elif self.selected == 3:
                 self.game.scene_replace = "QuadLeaderboard"
 
+            elif self.selected == 4:
+                self.game.scene_replace = "GameSelect"
+
     def draw(self):
         # choose a soothing sky blue
         # self.screen.fill((18, 27, 180))
