@@ -20,18 +20,19 @@ class GameSelect(Scene):
         self.standard_font_size = 15
 
         self.opts = {
+            "JackBlackJackTitle": "Blackjack",
             "QuadMenu": "QuadBlox",
             "JackNinjasTitle": "Jack Ninjas",
             "JackNinjasEditor": "Jack Ninjas Editor",
-            "JackWizards": "Jack Wizards",
-            "Julia": "Julia",
-            "Golden": "Golden",
-            "JackDefenseTitle": "JackTD",
-            "JackBlackJackTitle": "Blackjack",
-            "MultiTest": "Multi Test",
-            "Warp": "Warp",
-            "ViaTitle": "Via Galactica",
             "FourJacksTitle": "Four Jacks",
+            "JackWizards": "Jack Wizards",
+            "JackDefenseTitle": "JackTD",
+            "ViaTitle": "Via Galactica",
+            "Golden": "Test: Golden",
+            "MultiTest": "Test: Multi",
+            "Warp": "Test: Warp",
+            "Julia": "Test: Julia",
+            "FontTest": "Test: Font",
             "Menu": "Menu",
             "Quit": "Quit to Desktop",
         }
