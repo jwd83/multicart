@@ -16,6 +16,9 @@ class JackNinjas(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        # this will store the list of items the player has collected
+        self.inventory = []
+
         # we will render at 320x180 and then scale it up
         self.display = pygame.Surface((320, 180), pygame.SRCALPHA)
         self.display_2 = pygame.Surface((320, 180))
@@ -58,7 +61,6 @@ class JackNinjas(Scene):
         self.tilemap = Tilemap(self, tile_size=16)
         self.level = 0
         self.load_level(self.level)
-
         # setup screenshake variables
         self.screen_shake = 0
 

@@ -253,6 +253,9 @@ class Player(PhysicsEntity):
         self.dashing = 0
         self.dash_ready = True
 
+    def has(self, item: str) -> bool:
+        return item in self.scene.inventory
+
     def render(self, surf, offset=(0, 0)):
         # hide the player for the first 10 frames of the dash
         if abs(self.dashing) <= 50:
