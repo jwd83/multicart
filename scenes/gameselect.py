@@ -76,19 +76,30 @@ class GameSelect(Scene):
     def draw(self):
         y_spacing = self.standard_font_size + 5
 
-        self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
-        self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
-
         i = 0
         for txt in self.texts:
             if i == self.selected:
                 self.texts[txt].set_alpha(255)
             else:
                 self.texts[txt].set_alpha(150)
-            self.screen.blit(self.texts[txt], (100, 100 + i * y_spacing))
+
+            y_offset = 0
+            if self.selected >= 5:
+                y_offset = (self.selected - 4) * y_spacing
+
+            self.screen.blit(self.texts[txt], (100, 100 + i * y_spacing - y_offset))
             i += 1
 
         self.screen.blit(
             self.img_cursor,
-            (50, 100 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 4),
+            (
+                50,
+                100
+                + self.selected * y_spacing
+                - y_offset
+                + math.sin(self.elapsed() * 4) * 4,
+            ),
         )
+
+        self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
+        self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
