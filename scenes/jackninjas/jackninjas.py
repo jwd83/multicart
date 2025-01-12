@@ -75,6 +75,7 @@ class JackNinjas(Scene):
                 pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
             )
 
+        self.collectibles = []
         self.enemies = []
         extract = self.tilemap.extract([("spawners", 0), ("spawners", 1)])
         for spawner in extract:
