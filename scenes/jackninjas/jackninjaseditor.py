@@ -62,11 +62,16 @@ class JackNinjasEditor(Scene):
         self.shift = False
         self.on_grid = True
 
+        self.help_spacing = 18
+        self.standard_font_size = 16
+        self.standard_stroke = 0
+        self.standard_font = "assets/fonts/novem___.ttf"
+        self.standard_color = (255, 255, 255)
+
         self.show_keybindings = False
         self.keybindings_surface = self.create_keybindings_surface()
 
     def create_keybindings_surface(self):
-        font = pygame.font.Font(None, 20)  # Use a smaller font size
         keybindings_text = [
             "Keybindings for JackNinjasEditor:",
             "- ESC or F5: Return to Menu",
@@ -78,15 +83,15 @@ class JackNinjasEditor(Scene):
             "- Mouse right click: Remove tile",
             "- Mouse wheel: Change tile variant (or group with LSHIFT)",
             "- LSHIFT: Hold to modify tile group instead of variant",
-            "- H: Toggle this help"
+            "- H: Toggle this help",
         ]
-        surface = pygame.Surface((320, 180))
+        surface = pygame.Surface((640, 360))
         surface.fill((0, 0, 0))
         y = 5  # Adjust starting y position
         for line in keybindings_text:
-            text_surface = font.render(line, True, (255, 255, 255))
+            text_surface = self.standard_text(line)
             surface.blit(text_surface, (5, y))  # Adjust x position
-            y += 18  # Adjust line spacing
+            y += self.help_spacing  # Adjust line spacing
         return surface
 
     def update(self):
@@ -243,11 +248,11 @@ class JackNinjasEditor(Scene):
 
         self.display.blit(current_tile_image, (5, 5))
 
-        if self.show_keybindings:
-            self.display.blit(self.keybindings_surface, (0, 0))
-
         # we finished drawing our frame, lets render it to the screen and
         # get our input events ready for the next frame and sleep for a bit
         self.screen.blit(
             pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
         )
+
+        if self.show_keybindings:
+            self.screen.blit(self.keybindings_surface, (0, 0))
