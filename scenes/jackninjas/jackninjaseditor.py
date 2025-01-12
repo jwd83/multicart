@@ -9,6 +9,7 @@ Keybindings for JackNinjasEditor:
 - Mouse right click: Remove tile
 - Mouse wheel: Change tile variant (or group with LSHIFT)
 - LSHIFT: Hold to modify tile group instead of variant
+- H: Toggle this help
 """
 
 import pygame
@@ -60,6 +61,33 @@ class JackNinjasEditor(Scene):
         self.right_clicking = False
         self.shift = False
         self.on_grid = True
+
+        self.show_keybindings = False
+        self.keybindings_surface = self.create_keybindings_surface()
+
+    def create_keybindings_surface(self):
+        font = pygame.font.Font(None, 20)  # Use a smaller font size
+        keybindings_text = [
+            "Keybindings for JackNinjasEditor:",
+            "- ESC or F5: Return to Menu",
+            "- O: Save the map",
+            "- T: Autotile",
+            "- G: Toggle grid snapping",
+            "- Arrow keys or WASD: Move the camera",
+            "- Mouse left click: Place tile",
+            "- Mouse right click: Remove tile",
+            "- Mouse wheel: Change tile variant (or group with LSHIFT)",
+            "- LSHIFT: Hold to modify tile group instead of variant",
+            "- H: Toggle this help"
+        ]
+        surface = pygame.Surface((320, 180))
+        surface.fill((0, 0, 0))
+        y = 5  # Adjust starting y position
+        for line in keybindings_text:
+            text_surface = font.render(line, True, (255, 255, 255))
+            surface.blit(text_surface, (5, y))  # Adjust x position
+            y += 18  # Adjust line spacing
+        return surface
 
     def update(self):
         # mouse down checks
@@ -120,6 +148,9 @@ class JackNinjasEditor(Scene):
             self.on_grid = not self.on_grid
         if pygame.K_LSHIFT in self.game.just_pressed:
             self.shift = True
+
+        if pygame.K_h in self.game.just_pressed:
+            self.show_keybindings = not self.show_keybindings
 
         # movement checks
         if self.game.pressed[pygame.K_LEFT] or self.game.pressed[pygame.K_a]:
@@ -211,6 +242,9 @@ class JackNinjasEditor(Scene):
                     self.tilemap.offgrid_tiles.remove(tile)
 
         self.display.blit(current_tile_image, (5, 5))
+
+        if self.show_keybindings:
+            self.display.blit(self.keybindings_surface, (0, 0))
 
         # we finished drawing our frame, lets render it to the screen and
         # get our input events ready for the next frame and sleep for a bit
