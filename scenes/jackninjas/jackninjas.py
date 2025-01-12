@@ -195,9 +195,7 @@ class JackNinjas(Scene):
 
             # check if player is colliding with collectible
             if self.player.rect().colliderect(
-                pygame.Rect(
-                    (collectible["pos"][0] - 16, collectible["pos"][1] - 16), (32, 32)
-                )
+                pygame.Rect((collectible["pos"][0], collectible["pos"][1]), (16, 16))
             ):
                 self.collectibles.remove(collectible)
                 self.inventory.append("double_jump")
