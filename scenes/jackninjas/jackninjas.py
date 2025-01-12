@@ -77,6 +77,10 @@ class JackNinjas(Scene):
             )
 
         self.collectibles = []
+        extract = self.tilemap.extract([("collectibles", 0)])
+        for collectible in extract:
+            self.collectibles.append(collectible)
+
         self.enemies = []
         extract = self.tilemap.extract([("spawners", 0), ("spawners", 1)])
         for spawner in extract:
@@ -185,6 +189,28 @@ class JackNinjas(Scene):
 
         # draw our tilemap
         self.tilemap.render(self.display, offset=render_scroll)
+
+        # draw our off grid collectibles
+        for collectible in self.collectibles:
+
+            # check if player is colliding with collectible
+            if self.player.rect().colliderect(
+                pygame.Rect(
+                    (collectible["pos"][0] - 16, collectible["pos"][1] - 16), (32, 32)
+                )
+            ):
+                self.collectibles.remove(collectible)
+                self.inventory.append("double_jump")
+
+            self.display.blit(
+                self.assets["collectibles"][0],
+                (
+                    collectible["pos"][0] - render_scroll[0],
+                    collectible["pos"][1]
+                    - render_scroll[1]
+                    + 2.5 * math.sin(self.elapsed() * 4),
+                ),
+            )
 
         # draw our enemies
         for enemy in self.enemies.copy():
