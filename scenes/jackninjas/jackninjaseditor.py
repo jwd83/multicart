@@ -35,6 +35,7 @@ class JackNinjasEditor(Scene):
             "large_decor": load_images("tiles/large_decor"),
             "stone": load_images("tiles/stone"),
             "spawners": load_images("tiles/spawners"),
+            "collectibles": load_images("tiles/collectibles"),
         }
 
         # attempt to load our tilemap
