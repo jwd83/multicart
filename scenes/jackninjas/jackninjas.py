@@ -32,6 +32,7 @@ class JackNinjas(Scene):
             "decor": load_images("tiles/decor"),
             "grass": load_images("tiles/grass"),
             "large_decor": load_images("tiles/large_decor"),
+            "collectibles": load_images("tiles/collectibles"),
             "stone": load_images("tiles/stone"),
             "player": load_image("entities/player.png"),
             "background": load_image("background.png"),
