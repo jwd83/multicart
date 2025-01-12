@@ -1,3 +1,16 @@
+"""
+Keybindings for JackNinjasEditor:
+- ESC or F5: Return to Menu
+- O: Save the map
+- T: Autotile
+- G: Toggle grid snapping
+- Arrow keys or WASD: Move the camera
+- Mouse left click: Place tile
+- Mouse right click: Remove tile
+- Mouse wheel: Change tile variant (or group with LSHIFT)
+- LSHIFT: Hold to modify tile group instead of variant
+"""
+
 import pygame
 from scene import Scene
 from .scripts.utils import load_images
