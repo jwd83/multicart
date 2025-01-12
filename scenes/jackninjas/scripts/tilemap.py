@@ -79,7 +79,7 @@ class Tilemap:
             data = json.load(f)
             self.tilemap = data["tilemap"]
             self.tile_size = data["tile_size"]
-            self.offgrid_tiles = data["offgrid"]
+            self.offgrid_tiles = data["offgrid_tiles"]
 
     def autotile(self):
         for loc in self.tilemap:
@@ -126,9 +126,13 @@ class Tilemap:
                     )
                 )
         return rects
-    
+
     def solid_check(self, pos):
-        tile_loc = str(int(pos[0] // self.tile_size)) + ";" + str(int(pos[1] // self.tile_size))
+        tile_loc = (
+            str(int(pos[0] // self.tile_size))
+            + ";"
+            + str(int(pos[1] // self.tile_size))
+        )
         if tile_loc in self.tilemap:
             if self.tilemap[tile_loc]["type"] in PHYSICS_TILES:
                 return self.tilemap[tile_loc]
