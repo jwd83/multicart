@@ -33,11 +33,14 @@ class PhysicsEntity:
 
         self.last_movement = [0, 0]
 
+    def max_jumps(self) -> int:
+        return 1
+
     def set_action(self, action):
 
         # if we are in the air and have not jumped yet then we should deduct a jump for falling off a ledge
         if action == "fall":
-            if self.jumps == self.max_jumps:
+            if self.jumps == self.max_jumps():
                 self.jumps -= 1
 
         # only change the animation if it's different
@@ -246,12 +249,16 @@ class Enemy(PhysicsEntity):
 class Player(PhysicsEntity):
     def __init__(self, scene: Scene, pos, size):
         super().__init__(scene, "player", pos, size)
+
+        self.jumps = self.max_jumps()
         self.air_time = 0
-        self.jumps = self.max_jumps = 2
         self.space_jump = False
         self.wall_slide = False
         self.dashing = 0
         self.dash_ready = True
+
+    def max_jumps(self) -> int:
+        return 2 if self.has("double_jump") else 1
 
     def has(self, item: str) -> bool:
         return item in self.scene.inventory
@@ -345,7 +352,7 @@ class Player(PhysicsEntity):
 
         if self.collisions["down"]:
             self.air_time = 0
-            self.jumps = self.max_jumps
+            self.jumps = self.max_jumps()
             self.dash_ready = True
         else:
             # we are in the air, check if we are colliding with a wall
