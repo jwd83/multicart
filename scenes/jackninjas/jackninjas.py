@@ -77,7 +77,7 @@ class JackNinjas(Scene):
             )
 
         self.collectibles = []
-        extract = self.tilemap.extract([("collectibles", 0)])
+        extract = self.tilemap.extract([("collectibles", 0), ("collectibles", 1)])
         for collectible in extract:
             self.collectibles.append(collectible)
 
@@ -198,10 +198,13 @@ class JackNinjas(Scene):
                 pygame.Rect((collectible["pos"][0], collectible["pos"][1]), (16, 16))
             ):
                 self.collectibles.remove(collectible)
-                self.inventory.append("double_jump")
+                if collectible["variant"] == 0:
+                    self.inventory.append("double_jump")
+                elif collectible["variant"] == 1:
+                    self.inventory.append("glaive")
 
             self.display.blit(
-                self.assets["collectibles"][0],
+                self.assets["collectibles"][collectible["variant"]],
                 (
                     collectible["pos"][0] - render_scroll[0],
                     collectible["pos"][1]
