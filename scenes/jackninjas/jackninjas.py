@@ -10,6 +10,8 @@ from .scripts.tilemap import Tilemap
 from .scripts.clouds import Clouds
 from .scripts.particle import Particle
 from .scripts.spark import Spark
+from .scripts.projectile import Projectile
+from typing import List
 
 
 class JackNinjas(Scene):
@@ -55,6 +57,7 @@ class JackNinjas(Scene):
             ),
             "gun": load_image("gun.png"),
             "projectile": load_image("projectile.png"),
+            "glaive": load_image("tiles/collectibles/1.png"),
         }
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
@@ -90,7 +93,7 @@ class JackNinjas(Scene):
             else:
                 self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
-        self.projectiles = []
+        self.projectiles: List[Projectile] = []
         self.particles = []
         self.sparks = []
         # setup our pseudo camera
@@ -220,36 +223,40 @@ class JackNinjas(Scene):
             if kill:
                 self.enemies.remove(enemy)
 
-        # projectile defined as [[x,y], direction, timer]
         for projectile in self.projectiles.copy():
-            projectile[0][0] += projectile[
-                1
-            ]  # adjust the x coordinate by the direction of the bullet
-            projectile[2] += 1  # adjust the timer by one
-            img = self.assets["projectile"]
+            # adjust the x coordinate by the direction of the bullet
+            projectile.pos[0] += projectile.velocity
+            # increment the projectile's timer
+            projectile.timer += 1
+
+            if projectile.variant == "bullet":
+                img = self.assets["projectile"]
+            elif projectile.variant == "glaive":
+                img = self.assets["glaive"]
+
             self.display.blit(
                 img,
                 (
-                    projectile[0][0] - img.get_width() / 2 - render_scroll[0],
-                    projectile[0][1] - img.get_height() / 2 - render_scroll[1],
+                    projectile.pos[0] - img.get_width() / 2 - render_scroll[0],
+                    projectile.pos[1] - img.get_height() / 2 - render_scroll[1],
                 ),
             )
-            if self.tilemap.solid_check(projectile[0]):
+            if self.tilemap.solid_check(projectile.pos):
                 self.projectiles.remove(projectile)
                 for i in range(4):
                     self.sparks.append(
                         Spark(
-                            projectile[0],
+                            projectile.pos,
                             random.random()
                             - 0.5
-                            + (math.pi if projectile[1] > 0 else 0),
+                            + (math.pi if projectile.velocity > 0 else 0),
                             2 + random.random(),
                         )
                     )
-            elif projectile[2] > 360:
+            elif projectile.timer > 360:
                 self.projectiles.remove(projectile)
             elif abs(self.player.dashing) < 50:  # fast part of dash is over
-                if self.player.rect().collidepoint(projectile[0]):
+                if self.player.rect().collidepoint(projectile.pos):
                     # player got hit
                     self.projectiles.remove(projectile)
                     self.dead += 1

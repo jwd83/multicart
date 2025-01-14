@@ -11,6 +11,7 @@
         "colliderect",
         "colorkey",
         "conninfo",
+        "cooldown",
         "dotenv",
         "dpad",
         "dpup",

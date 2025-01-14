@@ -4,6 +4,7 @@ import pygame
 from .particle import Particle
 from scene import Scene
 from .spark import Spark
+from .projectile import Projectile
 
 GRAVITY = 0.1
 MAX_FALL_SPEED = 5
@@ -159,21 +160,20 @@ class Enemy(PhysicsEntity):
 
                     # take the shot
                     if shoot:
-                        start_timer = 0
                         self.scene.projectiles.append(
-                            [
-                                [
+                            Projectile(
+                                pos=[
                                     self.rect().centerx + shoot_offset * shoot_mul,
                                     self.rect().centery,
                                 ],
-                                shoot_speed * shoot_mul,
-                                start_timer,
-                            ]
+                                velocity=shoot_speed * shoot_mul,
+                                timer=0,
+                            )
                         )
                         for i in range(4):
                             self.scene.sparks.append(
                                 Spark(
-                                    self.scene.projectiles[-1][0],
+                                    self.scene.projectiles[-1].pos,
                                     random.random()
                                     - 0.5
                                     + (0 if shoot_mul == 1 else math.pi),
@@ -256,6 +256,15 @@ class Player(PhysicsEntity):
         self.wall_slide = False
         self.dashing = 0
         self.dash_ready = True
+        self.throw_last = self.scene.elapsed()
+        self.throw_cooldown = 0.5
+
+    def throw_glaive(self) -> bool:
+        if self.has("glaive"):
+            t = self.scene.elapsed()
+            if t - self.throw_last > self.throw_cooldown:
+                self.throw_last = t
+                # self.scene.projectiles.append
 
     def max_jumps(self) -> int:
         return 2 if self.has("double_jump") else 1
