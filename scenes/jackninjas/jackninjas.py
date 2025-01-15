@@ -148,6 +148,11 @@ class JackNinjas(Scene):
         if pygame.K_z in self.game.just_pressed:
             self.player.throw_glaive()
 
+        # jack's optional q code for testing
+        # if pygame.K_q in self.game.just_pressed:
+        #     self.inventory.append("double_jump")
+        #     self.inventory.append("glaive")
+
         # TODO - rewrite the joystick/gamepad input logic.
 
     def draw(self):
