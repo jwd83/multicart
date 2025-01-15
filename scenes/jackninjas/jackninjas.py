@@ -242,13 +242,23 @@ class JackNinjas(Scene):
             elif projectile.variant == "glaive":
                 img = self.assets["glaive"]
 
-            self.display.blit(
-                img,
+            blt_position = (
                 (
                     projectile.pos[0] - img.get_width() / 2 - render_scroll[0],
                     projectile.pos[1] - img.get_height() / 2 - render_scroll[1],
                 ),
             )
+
+            if projectile.variant == "bullet":
+                self.display.blit(img, blt_position)
+            elif projectile.variant == "glaive":
+                self.blitRotateCenter(
+                    image=img,
+                    topleft=blt_position,
+                    angle=self.elapsed() * 1000,
+                    destination_surface=self.display,
+                )
+
             if self.tilemap.solid_check(projectile.pos):
                 self.projectiles.remove(projectile)
                 for i in range(4):

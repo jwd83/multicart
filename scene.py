@@ -85,6 +85,15 @@ class Scene:
         self.__all_text.add(t)
         return t
 
+    def blitRotateCenter(
+        self, image, topleft, angle, destination_surface: pygame.Surface
+    ):
+
+        rotated_image = pygame.transform.rotate(image, angle)
+        new_rect = rotated_image.get_rect(center=image.get_rect(topleft=topleft).center)
+
+        destination_surface.blit(rotated_image, new_rect)
+
     def standard_text(
         self,
         text: str,
