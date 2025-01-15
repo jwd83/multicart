@@ -253,7 +253,7 @@ class JackNinjas(Scene):
                             2 + random.random(),
                         )
                     )
-            elif projectile.timer > 360:
+            elif projectile.timer > projectile.timeout:
                 self.projectiles.remove(projectile)
             elif abs(self.player.dashing) < 50:  # fast part of dash is over
                 if self.player.rect().collidepoint(projectile.pos):
