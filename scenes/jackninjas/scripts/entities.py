@@ -264,7 +264,14 @@ class Player(PhysicsEntity):
             t = self.scene.elapsed()
             if t - self.throw_last > self.throw_cooldown:
                 self.throw_last = t
-                # self.scene.projectiles.append
+                self.scene.projectiles.append(
+                    Projectile(
+                        pos=self.rect().center,
+                        velocity=-4 if self.flip else 4,
+                        variant="glaive",
+                        timer=0,
+                    )
+                )
 
     def max_jumps(self) -> int:
         return 2 if self.has("double_jump") else 1

@@ -145,6 +145,9 @@ class JackNinjas(Scene):
         if pygame.K_x in self.game.just_pressed:
             self.player.dash()
 
+        if pygame.K_z in self.game.just_pressed:
+            self.player.throw_glaive()
+
         # TODO - rewrite the joystick/gamepad input logic.
 
     def draw(self):
@@ -262,7 +265,11 @@ class JackNinjas(Scene):
                 if projectile.variant == "glaive":
                     for enemy in self.enemies.copy():
                         if enemy.rect().collidepoint(projectile.pos):
-                            self.projectiles.remove(projectile)
+                            # don't remove the projectile if it's already been removed by another enemy
+                            # on a different iteration of this loop (ie, it hit more than 1 enemy, it would
+                            # already be removed)
+                            if projectile in self.projectiles:
+                                self.projectiles.remove(projectile)
                             self.enemies.remove(enemy)
                             self.screen_shake = max(8, self.screen_shake)
 
