@@ -84,7 +84,7 @@ class JackNinjas(Scene):
         for collectible in extract:
             self.collectibles.append(collectible)
 
-        self.enemies = []
+        self.enemies: List[PhysicsEntity] = []
         extract = self.tilemap.extract([("spawners", 0), ("spawners", 1)])
         for spawner in extract:
             if spawner["variant"] == 0:
@@ -255,32 +255,49 @@ class JackNinjas(Scene):
                     )
             elif projectile.timer > projectile.timeout:
                 self.projectiles.remove(projectile)
-            elif abs(self.player.dashing) < 50:  # fast part of dash is over
-                if self.player.rect().collidepoint(projectile.pos):
-                    # player got hit
-                    self.projectiles.remove(projectile)
-                    self.dead += 1
-                    self.screen_shake = max(
-                        30, self.screen_shake
-                    )  # set it to 16 if it's lower
-                    for i in range(30):
-                        angle = random.random() * math.pi
-                        speed = random.random() * 5
-                        self.sparks.append(
-                            Spark(self.player.rect().center, angle, 2 + random.random())
-                        )
-                        self.particles.append(
-                            Particle(
-                                self,
-                                "particle",
-                                self.player.rect().center,
-                                velocity=(
-                                    math.cos(angle + math.pi) * speed * 0.5,
-                                    math.sin(angle * math.pi) * speed * 0.5,
-                                ),
-                                frame=random.randint(0, 7),
-                            )
-                        )
+            else:
+                # projectile collision detection with entities starts here
+
+                # enemy collision detection
+                if projectile.variant == "glaive":
+                    for enemy in self.enemies.copy():
+                        if enemy.rect().collidepoint(projectile.pos):
+                            self.projectiles.remove(projectile)
+                            self.enemies.remove(enemy)
+                            self.screen_shake = max(8, self.screen_shake)
+
+                # player collision detection with projectile of variant "bullet"
+                if projectile.variant == "bullet":
+                    if abs(self.player.dashing) < 50:  # fast part of dash is over
+                        if self.player.rect().collidepoint(projectile.pos):
+                            # player got hit
+                            self.projectiles.remove(projectile)
+                            self.dead += 1
+                            self.screen_shake = max(
+                                30, self.screen_shake
+                            )  # set it to 16 if it's lower
+                            for i in range(30):
+                                angle = random.random() * math.pi
+                                speed = random.random() * 5
+                                self.sparks.append(
+                                    Spark(
+                                        self.player.rect().center,
+                                        angle,
+                                        2 + random.random(),
+                                    )
+                                )
+                                self.particles.append(
+                                    Particle(
+                                        self,
+                                        "particle",
+                                        self.player.rect().center,
+                                        velocity=(
+                                            math.cos(angle + math.pi) * speed * 0.5,
+                                            math.sin(angle * math.pi) * speed * 0.5,
+                                        ),
+                                        frame=random.randint(0, 7),
+                                    )
+                                )
 
         for spark in self.sparks.copy():
             kill = spark.update()
