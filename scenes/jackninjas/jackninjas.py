@@ -263,8 +263,18 @@ class JackNinjas(Scene):
 
                 # enemy collision detection
                 if projectile.variant == "glaive":
+
+                    projectile_size = 14 / 2
+                    projectile_rect = pygame.Rect(
+                        (
+                            projectile.pos[0] - projectile_size,
+                            projectile.pos[1] - projectile_size,
+                        ),
+                        (projectile_size * 2, projectile_size * 2),
+                    )
+
                     for enemy in self.enemies.copy():
-                        if enemy.rect().collidepoint(projectile.pos):
+                        if enemy.rect().colliderect(projectile_rect):
                             # don't remove the projectile if it's already been removed by another enemy
                             # on a different iteration of this loop (ie, it hit more than 1 enemy, it would
                             # already be removed)
