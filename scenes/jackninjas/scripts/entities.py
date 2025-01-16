@@ -114,6 +114,10 @@ class PhysicsEntity:
         )
 
     def explode(self):
+        # pick death sound
+
+        death_sound = random.choice(["death1", "death2", "death3", "death4"])
+        self.scene.play_sound(death_sound)
 
         # generate the primary explosion
         for _ in range(30):
