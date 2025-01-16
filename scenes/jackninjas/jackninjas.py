@@ -31,6 +31,7 @@ class JackNinjas(Scene):
         self.movement = [False, False]
 
         self.assets = {
+            "heart": load_images("heart.png"),
             "decor": load_images("tiles/decor"),
             "grass": load_images("tiles/grass"),
             "large_decor": load_images("tiles/large_decor"),
@@ -404,8 +405,9 @@ class JackNinjas(Scene):
         )
 
         # FRAME COMPLETE
-        # we finished drawing our frame, lets render it to the screen and
-        # get our input events ready for the next frame and sleep for a bit
+        # we finished drawing our frame, lets render it to the screen
         self.screen.blit(
             pygame.transform.scale(self.display_2, self.screen.get_size()), shake_offset
         )
+
+        # render UI on top of the completed frame
