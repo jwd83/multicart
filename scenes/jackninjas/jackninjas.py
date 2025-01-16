@@ -58,7 +58,7 @@ class JackNinjas(Scene):
             "gun": load_image("gun.png"),
             "projectile": load_image("projectile.png"),
             "glaive": load_image("tiles/collectibles/1.png"),
-            "heart": load_image("heart.png"),
+            "heart": load_image("heart8.png"),
         }
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
@@ -410,5 +410,19 @@ class JackNinjas(Scene):
             pygame.transform.scale(self.display_2, self.screen.get_size()), shake_offset
         )
 
+        # draw the user interface
+        self.draw_user_interface()
+
+    def draw_user_interface(self):
         # render UI on top of the completed frame
         self.screen.blit(self.assets["heart"], (4, 4))
+
+        # draw a health bar for the player next to the heart
+        health_width = max(0, self.player.health)
+
+        if health_width:
+            pygame.draw.rect(
+                surface=self.screen,
+                color=(255, 0, 0),
+                rect=(16, 4, health_width, 8),
+            )
