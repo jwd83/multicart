@@ -315,7 +315,7 @@ class JackNinjas(Scene):
                             self.screen_shake = max(
                                 30, self.screen_shake
                             )  # set it to 16 if it's lower
-                            for i in range(30):
+                            for _ in range(30):
                                 angle = random.random() * math.pi
                                 speed = random.random() * 5
                                 self.sparks.append(
