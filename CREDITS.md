@@ -44,3 +44,9 @@ Various music tracks potentially.
 
 <https://pixabay.com/users/floraphonic-38928062/>
 level up bonus and cute level up sounds
+
+## PIXBAY ALIENIGHTMARE
+dying-guy
+
+## PIXBAY moodmode
+potential music
