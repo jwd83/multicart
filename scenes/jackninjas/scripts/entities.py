@@ -373,6 +373,7 @@ class Player(PhysicsEntity):
 
         # if we fall for too long we die
         if self.air_time > 240:
+            self.scene.play_sound("wilhelm-fall")
             if not self.scene.dead:
                 self.scene.screen_shake = max(16, self.scene.screen_shake)
             self.scene.dead += 40
