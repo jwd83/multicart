@@ -145,8 +145,11 @@ class JackNinjas(Scene):
         if pygame.K_x in self.game.just_pressed:
             self.player.dash()
 
-        if pygame.K_z in self.game.just_pressed:
+        if self.game.pressed[pygame.K_z]:
             self.player.throw_glaive()
+
+        # if pygame.K_z in self.game.just_pressed:
+        #     self.player.throw_glaive()
 
         # jack's optional q code for testing
         # if pygame.K_q in self.game.just_pressed:
