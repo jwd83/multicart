@@ -302,6 +302,7 @@ class JackNinjas(Scene):
                             # already be removed)
                             if projectile in self.projectiles:
                                 self.projectiles.remove(projectile)
+                            enemy.explode()
                             self.enemies.remove(enemy)
                             self.screen_shake = max(8, self.screen_shake)
 

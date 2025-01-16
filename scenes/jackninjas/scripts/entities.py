@@ -198,7 +198,7 @@ class Enemy(PhysicsEntity):
                                 timer=0,
                             )
                         )
-                        for i in range(4):
+                        for _ in range(4):
                             self.scene.sparks.append(
                                 Spark(
                                     self.scene.projectiles[-1].pos,
