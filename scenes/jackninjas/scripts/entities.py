@@ -263,7 +263,8 @@ class Player(PhysicsEntity):
         self.dash_ready = True
         self.throw_last = self.scene.elapsed()
         self.throw_cooldown = 0.25
-        self.health = 100
+        self.health_max = 100
+        self.health = self.health_max
 
     def throw_glaive(self) -> bool:
         if self.has("glaive"):

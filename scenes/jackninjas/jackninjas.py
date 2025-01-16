@@ -70,7 +70,7 @@ class JackNinjas(Scene):
         self.screen_shake = 0
 
     def load_level(self, map_id):
-
+        self.player.health = self.player.health_max
         self.tilemap.load("assets/jackninjas/maps/" + str(map_id) + ".json")
 
         # setup leaf spawners
@@ -312,7 +312,9 @@ class JackNinjas(Scene):
                         if self.player.rect().collidepoint(projectile.pos):
                             # player got hit
                             self.projectiles.remove(projectile)
-                            self.dead += 1
+                            self.player.health = max(self.player.health - 20, 0)
+                            if self.player.health <= 0:
+                                self.dead += 1
                             self.screen_shake = max(
                                 30, self.screen_shake
                             )  # set it to 16 if it's lower
