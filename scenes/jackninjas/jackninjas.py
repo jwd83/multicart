@@ -245,6 +245,9 @@ class JackNinjas(Scene):
             elif projectile.variant == "glaive":
                 img = self.assets["glaive"]
 
+            if projectile.flip:
+                img = pygame.transform.flip(img, True, False)
+
             blt_position = (
                 (
                     projectile.pos[0] - img.get_width() / 2 - render_scroll[0],
@@ -258,8 +261,8 @@ class JackNinjas(Scene):
                 self.blitRotateCenter(
                     image=img,
                     topleft=blt_position,
-                    angle=self.elapsed() * 1000,
-                    destination_surface=self.display,
+                    angle=self.elapsed() * projectile.rotation,
+                    destination_surface=self.display_2,
                 )
 
             if self.tilemap.solid_check(projectile.pos):

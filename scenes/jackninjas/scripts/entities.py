@@ -264,12 +264,21 @@ class Player(PhysicsEntity):
             t = self.scene.elapsed()
             if t - self.throw_last > self.throw_cooldown:
                 self.throw_last = t
+                p_rotation_speed = -1000
+                p_velocity = 4
+
+                if self.flip:
+                    p_velocity = -p_velocity
+                    p_rotation_speed = -p_rotation_speed
+
                 self.scene.projectiles.append(
                     Projectile(
                         pos=self.rect().center,
-                        velocity=-4 if self.flip else 4,
+                        velocity=p_velocity,
                         variant="glaive",
                         timer=0,
+                        rotation=p_rotation_speed,
+                        flip=not self.flip,
                     )
                 )
 
