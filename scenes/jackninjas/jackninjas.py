@@ -422,6 +422,14 @@ class JackNinjas(Scene):
 
         # draw a health bar for the player next to the heart
         health_width = max(0, self.player.health)
+        health_max_width = max(0, self.player.health_max)
+
+        if health_max_width:
+            pygame.draw.rect(
+                surface=self.screen,
+                color=(80, 0, 0),
+                rect=(15, 3, health_max_width + 2, 10),
+            )
 
         if health_width:
             pygame.draw.rect(

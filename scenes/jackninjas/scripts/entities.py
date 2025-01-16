@@ -272,6 +272,8 @@ class Player(PhysicsEntity):
             if t - self.throw_last > self.throw_cooldown:
                 self.throw_last = t
 
+                self.scene.play_sound("throw")
+
                 p_rotation_speed = -1000 if self.flip else 1000
                 p_velocity = -4 if self.flip else 4
 
