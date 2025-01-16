@@ -196,7 +196,7 @@ class Enemy(PhysicsEntity):
                 self.scene.screen_shake = max(16, self.scene.screen_shake)
 
                 # generate the primary explosion
-                for i in range(30):
+                for _ in range(30):
                     angle = random.random() * math.pi
                     speed = random.random() * 5
                     self.scene.sparks.append(
