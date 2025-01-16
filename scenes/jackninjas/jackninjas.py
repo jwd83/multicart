@@ -31,7 +31,6 @@ class JackNinjas(Scene):
         self.movement = [False, False]
 
         self.assets = {
-            "heart": load_images("heart.png"),
             "decor": load_images("tiles/decor"),
             "grass": load_images("tiles/grass"),
             "large_decor": load_images("tiles/large_decor"),
@@ -59,6 +58,7 @@ class JackNinjas(Scene):
             "gun": load_image("gun.png"),
             "projectile": load_image("projectile.png"),
             "glaive": load_image("tiles/collectibles/1.png"),
+            "heart": load_image("heart.png"),
         }
 
         self.clouds = Clouds(self.assets["clouds"], count=16)
@@ -411,3 +411,4 @@ class JackNinjas(Scene):
         )
 
         # render UI on top of the completed frame
+        self.screen.blit(self.assets["heart"], (4, 4))

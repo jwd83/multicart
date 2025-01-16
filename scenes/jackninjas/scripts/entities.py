@@ -266,7 +266,7 @@ class Player(PhysicsEntity):
                 self.throw_last = t
 
                 p_rotation_speed = -1000 if self.flip else 1000
-                p_velocity = 4 if self.flip else -4
+                p_velocity = -4 if self.flip else 4
 
                 self.scene.projectiles.append(
                     Projectile(
