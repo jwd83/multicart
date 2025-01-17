@@ -90,8 +90,8 @@ class JackNinjas(Scene):
 
         for collectible in self.collectible_map.keys():
             collectible_name = self.collectible_map[collectible]
+            extract = self.tilemap.extract([("collectibles", collectible)])
             if collectible_name not in self.inventory:
-                extract = self.tilemap.extract([("collectibles", collectible)])
                 for c in extract:
                     self.collectibles.append(c)
 
