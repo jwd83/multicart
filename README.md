@@ -38,7 +38,7 @@ An adaption and implementation of the the public domain game from YouTuber
 - Metroid Style Space Jump
 - fall animation
 
-# Palette Swap
+## Palette Swap
 
 New Colors
 
