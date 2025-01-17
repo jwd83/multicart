@@ -121,6 +121,16 @@ class Console(Scene):
 
                 # CUSTOM PYTHON EXECUTION : POTENTIAL DANGER
                 else:
+                    # todo: add an option to check any running scene for a list of
+                    #  available commands to be called back to from the console
+                    # allowing scenes to hook custom functionality from the console
+                    # - initial desire for this is to allow the map editor a simple
+                    # command that when ran and supplied with a string after it that
+                    # it would then use that string as a path to load and save from
+                    # instead of the default. another command could be added to list the
+                    # current working path for the map editor to see where it's current
+                    # set to load and save from.
+
                     # we didn't match a command, so we'll try to execute the python
                     try:
                         exec(self.command)
