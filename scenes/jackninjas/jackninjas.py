@@ -68,6 +68,11 @@ class JackNinjas(Scene):
         self.load_level(self.level)
         # setup screenshake variables
         self.screen_shake = 0
+        self.collectible_map = {
+            0: "double_jump",
+            1: "glaive",
+            2: "boomerang",
+        }
 
     def load_level(self, map_id):
         self.player.health = self.player.health_max
@@ -81,9 +86,13 @@ class JackNinjas(Scene):
             )
 
         self.collectibles = []
-        extract = self.tilemap.extract([("collectibles", 0), ("collectibles", 1)])
-        for collectible in extract:
-            self.collectibles.append(collectible)
+
+        for collectible in self.collectible_map.keys():
+            collectible_name = self.collectible_map[collectible]
+            if collectible_name not in self.inventory:
+                extract = self.tilemap.extract([("collectibles", collectible)])
+                for c in extract:
+                    self.collectibles.append(c)
 
         self.enemies: List[PhysicsEntity] = []
         extract = self.tilemap.extract([("spawners", 0), ("spawners", 1)])
@@ -213,10 +222,9 @@ class JackNinjas(Scene):
                 pygame.Rect((collectible["pos"][0], collectible["pos"][1]), (16, 16))
             ):
                 self.collectibles.remove(collectible)
-                if collectible["variant"] == 0:
-                    self.inventory.append("double_jump")
-                elif collectible["variant"] == 1:
-                    self.inventory.append("glaive")
+                item_to_add = self.collectible_map.get(collectible["variant"], None)
+                if item_to_add and item_to_add not in self.inventory:
+                    self.inventory.append(item_to_add)
 
             self.display.blit(
                 self.assets["collectibles"][collectible["variant"]],
