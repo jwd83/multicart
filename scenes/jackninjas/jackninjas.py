@@ -17,6 +17,12 @@ from typing import List
 class JackNinjas(Scene):
     def __init__(self, game):
         super().__init__(game)
+        # define this at startup so it's ready for for the first load
+        self.collectible_map = {
+            0: "double_jump",
+            1: "glaive",
+            2: "boomerang",
+        }
 
         # this will store the list of items the player has collected
         self.inventory = []
@@ -68,11 +74,6 @@ class JackNinjas(Scene):
         self.load_level(self.level)
         # setup screenshake variables
         self.screen_shake = 0
-        self.collectible_map = {
-            0: "double_jump",
-            1: "glaive",
-            2: "boomerang",
-        }
 
     def load_level(self, map_id):
         self.player.health = self.player.health_max
