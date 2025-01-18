@@ -64,6 +64,7 @@ class JackNinjas(Scene):
             "gun": load_image("gun.png"),
             "projectile": load_image("projectile.png"),
             "glaive": load_image("tiles/collectibles/1.png"),
+            "boomerang": load_image("tiles/collectibles/2.png"),
             "heart": load_image("heart8.png"),
         }
 
@@ -245,6 +246,7 @@ class JackNinjas(Scene):
                 self.enemies.remove(enemy)
 
         for projectile in self.projectiles.copy():
+            projectile.update()
             # adjust the x coordinate by the direction of the bullet
             projectile.pos[0] += projectile.velocity
             # increment the projectile's timer
@@ -254,6 +256,8 @@ class JackNinjas(Scene):
                 img = self.assets["projectile"]
             elif projectile.variant == "glaive":
                 img = self.assets["glaive"]
+            elif projectile.variant == "boomerang":
+                img = self.assets["boomerang"]
 
             if projectile.flip:
                 img = pygame.transform.flip(img, True, False)
@@ -267,7 +271,7 @@ class JackNinjas(Scene):
 
             if projectile.variant == "bullet":
                 self.display.blit(img, blt_position)
-            elif projectile.variant == "glaive":
+            if projectile.variant in ["glaive", "boomerang"]:
                 self.blitRotateCenter(
                     image=img,
                     topleft=blt_position,
@@ -293,7 +297,7 @@ class JackNinjas(Scene):
                 # projectile collision detection with entities starts here
 
                 # enemy collision detection
-                if projectile.variant == "glaive":
+                if projectile.variant in ["glaive", "boomerang"]:
 
                     projectile_size = 14 / 2
                     projectile_rect = pygame.Rect(

@@ -4,7 +4,7 @@ import pygame
 from .particle import Particle
 from scene import Scene
 from .spark import Spark
-from .projectile import Projectile
+from .projectile import Projectile, Boomerang
 
 GRAVITY = 0.1
 MAX_FALL_SPEED = 5
@@ -267,13 +267,14 @@ class Player(PhysicsEntity):
         self.health = self.health_max
 
     def throw_glaive(self) -> bool:
-        if self.has("glaive"):
-            t = self.scene.elapsed()
-            if t - self.throw_last > self.throw_cooldown:
-                self.throw_last = t
+        t = self.scene.elapsed()
+        if t - self.throw_last > self.throw_cooldown:
+            self.throw_last = t
 
+            if self.has("glaive") or self.has("boomerang"):
                 self.scene.play_sound("throw")
 
+            if self.has("glaive"):
                 p_rotation_speed = -1000 if self.flip else 1000
                 p_velocity = -4 if self.flip else 4
 
@@ -282,6 +283,21 @@ class Player(PhysicsEntity):
                         pos=self.rect().center,
                         velocity=p_velocity,
                         variant="glaive",
+                        timer=0,
+                        rotation=p_rotation_speed,
+                        flip=not self.flip,
+                    )
+                )
+
+            if self.has("boomerang"):
+                p_rotation_speed = -1000 if self.flip else 1000
+                p_velocity = -5 if self.flip else 5
+
+                self.scene.projectiles.append(
+                    Boomerang(
+                        pos=self.rect().center,
+                        velocity=p_velocity,
+                        variant="boomerang",
                         timer=0,
                         rotation=p_rotation_speed,
                         flip=not self.flip,
