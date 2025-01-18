@@ -39,6 +39,7 @@ class JackNinjas(Scene):
         self.assets = {
             "decor": load_images("tiles/decor"),
             "grass": load_images("tiles/grass"),
+            "snow": load_images("tiles/snow"),
             "large_decor": load_images("tiles/large_decor"),
             "collectibles": load_images("tiles/collectibles"),
             "stone": load_images("tiles/stone"),

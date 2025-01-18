@@ -15,8 +15,8 @@ NEIGHBOR_OFFSETS = [
 
 # using a set for physics tiles is a good idea because it's faster to check if a tile is in a set than a list
 # {} without a colon is a set, not a dictionary
-PHYSICS_TILES = {"grass", "stone"}
-AUTOTILE_TYPES = {"grass", "stone"}
+PHYSICS_TILES = {"grass", "stone", "snow"}
+AUTOTILE_TYPES = {"grass", "stone", "snow"}
 
 AUTOTILE_MAP = {
     tuple(sorted([(1, 0), (0, 1)])): 0,

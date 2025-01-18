@@ -34,6 +34,7 @@ class JackNinjasEditor(Scene):
             "grass": load_images("tiles/grass"),
             "large_decor": load_images("tiles/large_decor"),
             "stone": load_images("tiles/stone"),
+            "snow": load_images("tiles/snow"),
             "spawners": load_images("tiles/spawners"),
             "collectibles": load_images("tiles/collectibles"),
         }
