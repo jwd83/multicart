@@ -1,0 +1,12 @@
+SourceR,SourceG,SourceB,SourceA,TargetR,TargetG,TargetB,TargetA
+00,00,00,00,00,00,00,00
+00,95,e9,ff,00,95,e9,ff
+12,4e,89,ff,12,4e,89,ff
+18,14,25,ff,18,14,25,ff
+26,2b,44,88,26,2b,44,88
+26,2b,44,ff,26,2b,44,ff
+9e,28,35,ff,9e,28,35,ff
+b8,6f,50,ff,b8,6f,50,ff
+c0,cb,dc,ff,c0,cb,dc,ff
+e4,a6,72,ff,e4,a6,72,ff
+ff,ff,ff,ff,ff,ff,ff,ff

@@ -1,0 +1,10 @@
+SourceR,SourceG,SourceB,SourceA,TargetR,TargetG,TargetB,TargetA,Notes
+00,00,00,ff,00,00,00,ff,
+0f,27,38,ff,0f,0f,28,ff,upper dark grass
+1a,45,3b,ff,1a,2b,45,ff,lower dark grass
+2e,6a,42,ff,2e,42,6a,ff,lower middle grass
+46,21,1f,ff,1f,21,46,ff,dark dirt
+50,9b,4b,ff,50,4b,9b,ff,upper middle grass
+62,35,30,ff,30,35,62,ff,middle dirt
+7b,cf,5c,ff,cf,de,ff,ff,bright grass
+94,55,42,ff,42,55,94,ff,bright dirt

@@ -45,6 +45,22 @@ New Colors
 - 0x0000dd ninja robe
 - 0x00008e ninja robe dark
 
+# Swappy
+Example
+
+Create palette.csv
+
+```
+python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv`
+```
+Use the palette to perform a swap once it's been updated with the swap colors
+
+```
+python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv assets\jackninjas\images\tiles\snow
+```
+
+
+
 # Credits
 
 ## DaFluffyPotato
