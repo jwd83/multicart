@@ -2,7 +2,13 @@
 
 A collection of games for the Jack Games Multicart.
 
-### Notes
+# TODOs
+* Controller and local multiplayer interface
+* Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
+* 4jacks: convert board to numpy, improve minimax algorithm
+
+
+## Notes
 
 Font sizes: Upheaval looks best when using a multiple of 20.
 
@@ -10,7 +16,7 @@ To build on Windows for Windows, use `build-win.bat`.
 
 To build on Windows for web browsers use `build-web.bat`.
 
-### Game Server
+# Game Server
 
 Game server is currently being tested on railway ~~and fly.io~~
 
@@ -46,14 +52,19 @@ New Colors
 - 0x00008e ninja robe dark
 
 # Swappy
-Example
 
-Create palette.csv
+My simple PNG/CSV based color palette swapper
+
+1. Create a CSV list of all RGBA values encountered in a folder of PNGs.
 
 ```
 python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv`
 ```
-Use the palette to perform a swap once it's been updated with the swap colors
+
+2. Modify the CSV and adjust the target RGBA values.
+
+3. Supply the CSV and source folder along with a destination folder to
+perform the palette swap.
 
 ```
 python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv assets\jackninjas\images\tiles\snow
