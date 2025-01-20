@@ -1,17 +1,4 @@
-"""
-Keybindings for JackNinjasEditor:
-- ESC or F5: Return to Menu
-- O: Save the map
-- T: Autotile
-- G: Toggle grid snapping
-- Arrow keys or WASD: Move the camera
-- Mouse left click: Place tile
-- Mouse right click: Remove tile
-- Mouse wheel: Change tile variant (or group with LSHIFT)
-- LSHIFT: Hold to modify tile group instead of variant
-- H: Toggle this help
-"""
-
+# press H to see the keybindings help menu in the scene
 import os
 import pygame
 from scene import Scene
@@ -48,10 +35,7 @@ class JackNinjasEditor(Scene):
 
         # attempt to load our tilemap
         self.tilemap = Tilemap(self, tile_size=16)
-        try:
-            self.tilemap.load(self.working_path)
-        except FileNotFoundError:
-            pass
+        self.command_load()
 
         self.movement = [False, False, False, False]
 
@@ -83,7 +67,22 @@ class JackNinjasEditor(Scene):
         self.commands = {
             "ls": self.command_ls,
             "wp": self.command_set_wp,
+            "load": self.command_load,
+            "save": self.command_save,
         }
+
+    def command_save(self, args: str | None = None):
+        self.tilemap.save(self.working_path)
+        self.log("Map saved")
+        self.play_sound("click")
+
+    def command_load(self, args: str | None = None):
+        # attempt to load our tilemap
+        self.tilemap = Tilemap(self, tile_size=16)
+        try:
+            self.tilemap.load(self.working_path)
+        except FileNotFoundError:
+            pass
 
     def command_ls(self, args: str | None = None):
         self.log("Existing map files:")
@@ -197,9 +196,9 @@ class JackNinjasEditor(Scene):
         ):
             self.game.scene_push = "Menu"
         if pygame.K_o in self.game.just_pressed:
-            self.tilemap.save(self.working_path)
-            self.log("Map saved")
-            self.play_sound("click")
+            self.command_save()
+        if pygame.K_l in self.game.just_pressed:
+            self.command_load()
         if pygame.K_t in self.game.just_pressed:
             self.tilemap.autotile()
         if pygame.K_g in self.game.just_pressed:
@@ -208,7 +207,8 @@ class JackNinjasEditor(Scene):
             self.shift = True
 
         if pygame.K_h in self.game.just_pressed:
-            self.create_keybindings_surface()  # update this with the latest working path
+            # update this with the latest working path
+            self.keybindings_surface = self.create_keybindings_surface()
             self.show_keybindings = not self.show_keybindings
 
         # movement checks
