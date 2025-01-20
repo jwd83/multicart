@@ -22,6 +22,12 @@ class JackNinjasEditor(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        # set our default working_path
+        self.working_path = None
+        self.base_path = "assets/jackninjas/maps/"
+        self.working_file = "0.json"  # default to the first level
+        self.update_working_path()
+
         # we will render at 320x180 on a surface called display and then scale it up to our screen
         self.display = pygame.Surface((320, 180))
 
@@ -42,7 +48,7 @@ class JackNinjasEditor(Scene):
         # attempt to load our tilemap
         self.tilemap = Tilemap(self, tile_size=16)
         try:
-            self.tilemap.load("assets/jackninjas/map.json")
+            self.tilemap.load(self.working_path)
         except FileNotFoundError:
             pass
 
@@ -77,7 +83,8 @@ class JackNinjasEditor(Scene):
         keybindings_text = [
             "Keybindings for JackNinjasEditor:",
             "- ESC or F5: Return to Menu",
-            "- O: Save the map",
+            "- O: Save the map from working path (wp)",
+            "- L: Load the map from working path (wp)",
             "- T: Autotile",
             "- G: Toggle grid snapping",
             "- Arrow keys or WASD: Move the camera",
@@ -86,6 +93,7 @@ class JackNinjasEditor(Scene):
             "- Mouse wheel: Change tile variant (or group with LSHIFT)",
             "- LSHIFT: Hold to modify tile group instead of variant",
             "- H: Toggle this help",
+            "wp=" + self.working_path,
         ]
         surface = pygame.Surface((640, 360))
         surface.fill((0, 0, 0))
@@ -95,6 +103,10 @@ class JackNinjasEditor(Scene):
             surface.blit(text_surface, (5, y))  # Adjust x position
             y += self.help_spacing  # Adjust line spacing
         return surface
+
+    def update_working_path(self):
+
+        self.working_path = self.base_path + self.working_file
 
     def update(self):
         # mouse down checks
@@ -146,7 +158,7 @@ class JackNinjasEditor(Scene):
         ):
             self.game.scene_push = "Menu"
         if pygame.K_o in self.game.just_pressed:
-            self.tilemap.save("assets/jackninjas/map.json")
+            self.tilemap.save(self.working_path)
             self.log("Map saved")
             self.play_sound("click")
         if pygame.K_t in self.game.just_pressed:
@@ -157,6 +169,7 @@ class JackNinjasEditor(Scene):
             self.shift = True
 
         if pygame.K_h in self.game.just_pressed:
+            self.create_keybindings_surface()  # update this with the latest working path
             self.show_keybindings = not self.show_keybindings
 
         # movement checks
