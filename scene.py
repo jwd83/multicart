@@ -70,18 +70,15 @@ class Scene:
             "test": self.default_command,
         }  # console command dictionary of callable functions
 
-    def add_history(self, text: str):
-        self.game.console.history.append(text)
-
     def default_command(self, argument: str | None = None) -> None:
         if argument is not None:
-            self.add_history(f"Hello, {argument}.")
+            self.log(f"Hello, {argument}.")
         else:
-            self.add_history("Hello, friend!")
+            self.log("Hello, friend!")
 
-        self.add_history("This is the default test command, it may optionally be")
-        self.add_history("passed an argument. If an argument is passed, it will")
-        self.add_history("be echoed back to you in the Hello message.")
+        self.log("This is the default test command, it may optionally be")
+        self.log("passed an argument. If an argument is passed, it will")
+        self.log("be echoed back to you in the Hello message.")
 
     def TextDraw(self):
         self.__all_text.draw(self.screen)
