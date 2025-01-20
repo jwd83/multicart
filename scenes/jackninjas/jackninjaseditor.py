@@ -97,7 +97,7 @@ class JackNinjasEditor(Scene):
             self.log(f"The working path is currently set to:")
             self.log(self.working_path)
             self.log("To set a new working path, use the command:")
-            self.log("wp <path>")
+            self.log("wp <file>")
             self.log("Example: wp 0.json")
             return
 
