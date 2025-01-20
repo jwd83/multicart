@@ -66,6 +66,18 @@ class Scene:
         self.standard_color = (240, 240, 240)
         self.standard_font = None  # use the default font
         self.__all_text = pygame.sprite.Group()
+        self.commands = {
+            "test": self.default_hook,
+        }  # console command dictionary of callable functions
+
+    def add_history(self, text: str):
+        self.game.console.history.append(text)
+
+    def default_hook(self, argument: str | None = None) -> None:
+        if argument is not None:
+            self.add_history(f"Hello, {argument}.")
+        else:
+            self.game.console.history.append("Hello, friend!")
 
     def TextDraw(self):
         self.__all_text.draw(self.screen)

@@ -99,7 +99,8 @@ class Console(Scene):
                     self.command_history.remove(self.command)
                 self.command_history.append(self.command)
 
-                # make the basic commands case insensitive
+                # make the basic
+                #  case insensitive
                 command_lower = self.command.lower()
                 if command_lower == "exit" or command_lower == "quit":
                     self.log("Quitting the game.")
@@ -108,6 +109,15 @@ class Console(Scene):
                     self.history = []
                 elif command_lower == "help" or command_lower == "?":
                     self.history.extend(self.help_docs)
+                    if len(self.game.scene) > 1:
+                        # check for commands registered to the scene below this one
+                        cmds = self.game.scene[-2].commands
+                        if len(cmds) > 0:
+                            self.history.append(">>HELP>>SCENE COMMANDS:")
+                            # get the key and value of each command in the scene
+                            for key, value in cmds.items():
+                                self.history.append(key)
+
                 elif command_lower == "debug":
                     settings.DEBUG = not settings.DEBUG
                 elif command_lower == "scene len":
@@ -119,7 +129,7 @@ class Console(Scene):
                     if len(self.game.scene) > 1:
                         self.game.scene[-2].__init__(self.game)
 
-                # CUSTOM PYTHON EXECUTION : POTENTIAL DANGER
+                # CUSTOM PYTHON EXECUTION AND CALLBACKS: POTENTIAL DANGER
                 else:
                     # todo: add an option to check any running scene for a list of
                     #  available commands to be called back to from the console
@@ -131,11 +141,34 @@ class Console(Scene):
                     # current working path for the map editor to see where it's current
                     # set to load and save from.
 
+                    match_found = False
+                    if len(self.game.scene) > 1:
+                        # split the current command into words
+                        words = self.command.split(" ")
+
+                        # grab the first word and see if it is a registered command
+                        command_word = words[0]
+
+                        cmds = self.game.scene[-2].commands
+                        if command_word in cmds:
+                            # record that we found a match as to not attempt to
+                            # execute this as python code
+                            match_found = True
+
+                            # make a string of the remaining words if the are any
+                            # and pass that string to the callback function that
+                            # has been registered for the command
+                            if len(words) > 1:
+                                cmds[command_word](" ".join(words[1:]))
+                            else:
+                                cmds[command_word]()
+
                     # we didn't match a command, so we'll try to execute the python
-                    try:
-                        exec(self.command)
-                    except Exception as e:
-                        self.history.append(f">>Error: {e}")
+                    if not match_found:
+                        try:
+                            exec(self.command)
+                        except Exception as e:
+                            self.history.append(f">>Error: {e}")
 
                 self.command = ""
                 continue
