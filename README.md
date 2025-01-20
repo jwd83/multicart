@@ -2,13 +2,7 @@
 
 A collection of games for the Jack Games Multicart.
 
-# TODOs
-* Controller and local multiplayer interface
-* Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
-* 4jacks: convert board to numpy, improve minimax algorithm
-
-
-## Notes
+# Notes
 
 Font sizes: Upheaval looks best when using a multiple of 20.
 
@@ -16,7 +10,16 @@ To build on Windows for Windows, use `build-win.bat`.
 
 To build on Windows for web browsers use `build-web.bat`.
 
-# Game Server
+# TODOs
+* Controller and local multiplayer interface
+* Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
+* 4jacks: convert board to numpy, improve minimax algorithm
+
+# Console
+
+* Instead of just the scene under the console having its callbacks added to the console, instead add the callbacks of every scene to the console so long as it does not conflict with the name of a callback in the scene above it. This way, the console can be used to control any active scene via callbacks.
+
+# QuadBlocks Game Server
 
 Game server is currently being tested on railway ~~and fly.io~~
 
