@@ -86,6 +86,7 @@
         "vialevel",
         "viastarfield",
         "viatitle",
+        "WASD",
         "wordlist"
     ],
     "python.analysis.typeCheckingMode": "off",

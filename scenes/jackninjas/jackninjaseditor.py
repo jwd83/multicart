@@ -12,6 +12,7 @@ Keybindings for JackNinjasEditor:
 - H: Toggle this help
 """
 
+import os
 import pygame
 from scene import Scene
 from .scripts.utils import load_images
@@ -78,6 +79,44 @@ class JackNinjasEditor(Scene):
 
         self.show_keybindings = False
         self.keybindings_surface = self.create_keybindings_surface()
+
+        self.commands = {
+            "ls": self.command_ls,
+            "wp": self.command_set_wp,
+        }
+
+    def command_ls(self, args: str | None = None):
+        self.log("Existing map files:")
+
+        # list all files in the base path
+        for file in os.listdir(self.base_path):
+            self.log(file)
+
+    def command_set_wp(self, args: str | None = None):
+        if args is None:
+            self.log(f"The working path is currently set to:")
+            self.log(self.working_path)
+            self.log("To set a new working path, use the command:")
+            self.log("wp <path>")
+            self.log("Example: wp 0.json")
+            return
+
+        # trim working path to remove any leading or trailing whitespace
+        file_path = args.strip()
+
+        # check if the path is a valid filename without a folder
+        if "/" in file_path or "\\" in file_path:
+            self.log(f"Invalid path (directory): {file_path}")
+            return
+
+        # check that the path ends in .json
+        if not file_path.endswith(".json"):
+            self.log(f"Invalid path (not .json): {file_path}")
+            return
+
+        self.working_file = file_path
+        self.update_working_path()
+        self.log("Working path set to " + self.working_path)
 
     def create_keybindings_surface(self):
         keybindings_text = [
