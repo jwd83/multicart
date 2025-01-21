@@ -1,5 +1,5 @@
 SourceR,SourceG,SourceB,SourceA,TargetR,TargetG,TargetB,TargetA,Notes
-00,00,00,ff,00,00,00,ff,
+00,00,00,ff,00,00,00,ff,blank transparency
 0f,27,38,ff,0f,0f,28,ff,upper dark grass
 1a,45,3b,ff,1a,2b,45,ff,lower dark grass
 2e,6a,42,ff,2e,42,6a,ff,lower middle grass
