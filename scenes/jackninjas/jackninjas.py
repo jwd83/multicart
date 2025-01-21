@@ -183,6 +183,8 @@ class JackNinjas(Scene):
         if not len(self.enemies):
             self.transition += 1
             if self.transition > 30:
+                if self.level + 1 >= len(os.listdir("assets/jackninjas/maps")):
+                    self.game.scene_replace = "JackNinjasWinner"
                 self.level = min(
                     self.level + 1, len(os.listdir("assets/jackninjas/maps")) - 1
                 )

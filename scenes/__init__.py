@@ -43,6 +43,7 @@ from .fonttest.fonttest import FontTest
 from .jackninjas.jackninjas import JackNinjas
 from .jackninjas.jackninjastitle import JackNinjasTitle
 from .jackninjas.jackninjaseditor import JackNinjasEditor
+from .jackninjas.jackninjaswinner import JackNinjasWinner
 
 # superball
 from .superball.superballtitle import SuperBallTitle
