@@ -184,6 +184,7 @@ class JackNinjas(Scene):
             self.transition += 1
             if self.transition > 30:
                 if self.level + 1 >= len(os.listdir("assets/jackninjas/maps")):
+                    self.game.jack_ninjas_victory_time = self.elapsed()
                     self.game.scene_replace = "JackNinjasWinner"
                 self.level = min(
                     self.level + 1, len(os.listdir("assets/jackninjas/maps")) - 1
