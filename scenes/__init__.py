@@ -60,3 +60,5 @@ from .multitest.multitest import MultiTest
 # blackjack
 from .jackblackjack.jackblackjacktitle import JackBlackJackTitle
 from .jackblackjack.jackblackjack import JackBlackJack
+
+from .jackninjas.jackninjasinventory import JackNinjasInventory # auto-generated

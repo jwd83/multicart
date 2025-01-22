@@ -26,6 +26,7 @@ class JackNinjas(Scene):
 
         # this will store the list of items the player has collected
         self.inventory = []
+        self.game.inventory = self.inventory
 
         # we will render at 320x180 and then scale it up
         self.display = pygame.Surface((320, 180), pygame.SRCALPHA)
