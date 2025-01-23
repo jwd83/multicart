@@ -22,6 +22,9 @@ class Game:
 
         # hardcode some default values
 
+        self.WIDTH = settings.RESOLUTION[0]
+        self.HEIGHT = settings.RESOLUTION[1]
+
         self.__DEFAULT_VOLUME = 50
 
         # game specific variables and references

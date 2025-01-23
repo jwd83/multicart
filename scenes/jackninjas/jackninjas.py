@@ -159,6 +159,9 @@ class JackNinjas(Scene):
         if pygame.K_x in self.game.just_pressed:
             self.player.dash()
 
+        if pygame.K_i in self.game.just_pressed:
+            self.game.scene_push = "JackNinjasInventory"
+
         if self.game.pressed[pygame.K_z]:
             self.player.throw_glaive()
 
