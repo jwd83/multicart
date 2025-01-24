@@ -27,6 +27,7 @@ from .multitest.multitest import MultiTest
 from .quadblox.quadblox import QuadBlox
 from .quadblox.quadleadearboard import QuadLeaderboard
 from .quadblox.quadmenu import QuadMenu
+from .raycaster.raycaster import RayCaster
 from .superball.superballfield import SuperBallField
 from .superball.superballtitle import SuperBallTitle
 from .tvstatic import TVStatic
