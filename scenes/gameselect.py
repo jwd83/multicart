@@ -20,10 +20,11 @@ class GameSelect(Scene):
         self.standard_font_size = 15
 
         self.opts = {
-            "JackBlackJackTitle": "Blackjack",
-            "QuadMenu": "QuadBlox",
             "JackNinjasTitle": "Jack Ninjas",
             "JackNinjasEditor": "Jack Ninjas Editor",
+            "RayCaster": "Ray Caster",
+            "JackBlackJackTitle": "Blackjack",
+            "QuadMenu": "QuadBlox",
             "FourJacksTitle": "Four Jacks",
             "JackWizards": "Jack Wizards",
             "JackDefenseTitle": "JackTD",
