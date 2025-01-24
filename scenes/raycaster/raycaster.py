@@ -17,7 +17,9 @@ class RayCaster(Scene):
 
     def command_camera(self):
         self.log(f"Camera Position: {self.camera.pos}")
-        self.log(f"Camera Angle:    {self.camera.angle}")
+        self.log(
+            f"Camera Angle:    {self.camera.angle} ({math.degrees(self.camera.angle)})"
+        )
 
     def command_distance(self):
         distance = self.level_map.wall_distance(self.camera.pos, self.camera.angle)
@@ -33,6 +35,9 @@ class RayCaster(Scene):
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
+
+        if pygame.K_LEFT in self.game.just_pressed:
+            self.camera.angle -= 0.01
 
     def draw(self):
         self.screen.fill((0, 0, 0))
