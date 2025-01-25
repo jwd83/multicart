@@ -53,11 +53,12 @@ class RayCaster(Scene):
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        # draw the map for reference
-        self.screen.blit(self.level_map.map, (0, 0))
+        self.draw_walls()
+        self.draw_map()
 
+    def draw_walls(self):
         render_width = self.game.WIDTH
-        fov = 60
+        fov = 90
         left_start = fov // 2 - fov
         right_end = fov // 2
 
@@ -82,6 +83,16 @@ class RayCaster(Scene):
                     (i, wall_height / 2),
                     (i, self.game.HEIGHT - wall_height / 2),
                 )
+
+    def draw_map(self):
+        # draw the map for reference
+        self.screen.blit(self.level_map.map, (0, 0))
+
+        # draw a 3 px red line to represent the camera facing direction
+        x, y = self.camera.pos
+        dx = math.cos(self.camera.angle) * 3
+        dy = math.sin(self.camera.angle) * 3
+        pygame.draw.line(self.screen, (255, 0, 0), (x, y), (x + dx, y + dy), 1)
 
 
 def map_range(x, in_min, in_max, out_min, out_max):
