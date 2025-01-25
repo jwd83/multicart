@@ -79,6 +79,8 @@ class RayCaster(Scene):
         fov = 60
         left_start = fov // 2 - fov
         right_end = fov // 2
+        max_height = self.game.HEIGHT
+        min_height = 1
 
         for i in range(render_width):
             angle = map_range(i, 0, render_width, left_start, right_end)
@@ -88,19 +90,13 @@ class RayCaster(Scene):
             distance = self.level_map.wall_distance(self.camera.pos, angle)
 
             if distance:
-                distance *= 7
+
                 color = max(20, 255 - distance)
-                wall_color = (color, color, color)
-
-                # distance *= math.cos(self.camera.angle - angle)
-                wall_height = map_range(distance, 0, render_width, render_width, 0)
-
-                pygame.draw.line(
-                    self.screen,
-                    wall_color,
-                    (i, wall_height / 2),
-                    (i, self.game.HEIGHT - wall_height / 2),
-                )
+                wall_color = (color, 0, 0)
+                wall_height = (1 / (distance)) * max_height
+                top = (self.game.HEIGHT / 2) - (wall_height / 2)
+                bottom = (self.game.HEIGHT / 2) + (wall_height / 2)
+                pygame.draw.line(self.screen, wall_color, (i, top), (i, bottom), 1)
 
     def draw_map(self):
         # draw the map for reference
@@ -149,11 +145,10 @@ class LevelMap:
 
     def wall_distance(self, pos=(0, 0), angle=0) -> float | bool:
         x, y = pos
+
+        # calculate the step size for the ray
         dx = math.cos(angle)
         dy = math.sin(angle)
-        # step_divider = 10
-        # dx /= step_divider
-        # dy /= step_divider
 
         while 0 <= x < self.map.get_width() and 0 <= y < self.map.get_height():
             if self.map.get_at((int(x), int(y))) == (255, 255, 255):
