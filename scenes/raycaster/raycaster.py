@@ -22,9 +22,6 @@ class RayCaster(Scene):
         )
 
     def command_distance(self):
-        distance = self.level_map.wall_distance(self.camera.pos, self.camera.angle)
-        # if distance:
-        #     self.log(f"Distance: {distance}")
         dist = self.level_map.wall_distance(self.camera.pos, self.camera.angle)
         if dist:
             self.log(f"Distance: {dist}")
@@ -33,7 +30,7 @@ class RayCaster(Scene):
 
     def update(self):
         turn_factor = 0.03
-        speed_factor = 0.15
+        speed_factor = 0.05
 
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
@@ -83,19 +80,21 @@ class RayCaster(Scene):
         min_height = 1
 
         for i in range(render_width):
-            angle = map_range(i, 0, render_width, left_start, right_end)
 
             # convert to radians
-            angle = math.radians(angle) + self.camera.angle
+            angle = (
+                math.radians(map_range(i, 0, render_width, left_start, right_end))
+                + self.camera.angle
+            )
             distance = self.level_map.wall_distance(self.camera.pos, angle)
 
-            if distance:
+            if distance != float("inf"):
 
-                color = max(20, 255 - distance)
+                color = max(20, 255 - distance * 5)
                 wall_color = (color, 0, 0)
                 wall_height = (1 / (distance)) * max_height
-                top = (self.game.HEIGHT / 2) - (wall_height / 2)
-                bottom = (self.game.HEIGHT / 2) + (wall_height / 2)
+                top = (self.game.HEIGHT // 2) - (wall_height // 2)
+                bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
                 pygame.draw.line(self.screen, wall_color, (i, top), (i, bottom), 1)
 
     def draw_map(self):
@@ -146,14 +145,60 @@ class LevelMap:
     def wall_distance(self, pos=(0, 0), angle=0) -> float | bool:
         x, y = pos
 
-        # calculate the step size for the ray
         dx = math.cos(angle)
         dy = math.sin(angle)
 
         while 0 <= x < self.map.get_width() and 0 <= y < self.map.get_height():
-            if self.map.get_at((int(x), int(y))) == (255, 255, 255):
-                return math.sqrt((x - pos[0]) ** 2 + (y - pos[1]) ** 2)
+            map_x = math.floor(x)
+            map_y = math.floor(y)
+
+            if self.map.get_at((map_x, map_y)) == (255, 255, 255):
+                # now that we know the intersection is in this square, we can calculate
+                # where the intersection occurs along the edge of the square and return
+                # the distance to that intersection
+                # return math.sqrt((x - pos[0]) ** 2 + (y - pos[1]) ** 2)
+                edges = [
+                    (map_x, map_y, map_x + 1, map_y),
+                    (map_x, map_y, map_x, map_y + 1),
+                    (map_x + 1, map_y, map_x + 1, map_y + 1),
+                    (map_x, map_y + 1, map_x + 1, map_y + 1),
+                ]
+
+                x1 = x
+                y1 = y
+
+                x2 = x - dx
+                y2 = y - dy
+                for edge in edges:
+                    intersection = self.line_intersection(x1, y1, x2, y2, *edge)
+                    if intersection:
+                        x, y = intersection
+                        return math.sqrt((x - pos[0]) ** 2 + (y - pos[1]) ** 2)
+
             x += dx
             y += dy
 
-        return False  # return infinity if no white pixel is found
+        # No intersection found, return infinity
+        return float("inf")
+
+    def line_intersection(self, ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
+        # calculate the intersection point of two lines
+        # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+        # (x1, y1) (x2, y2) is the first line
+        # (x3, y3) (x4, y4) is the second line
+
+        x1, y1, x2, y2 = ax1, ay1, ax2, ay2
+        x3, y3, x4, y4 = bx1, by1, bx2, by2
+
+        d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+        if d == 0:
+            return None
+
+        t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d
+
+        u = (-((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3))) / d
+
+        if 0 <= t <= 1 and 0 <= u <= 1:
+            return (x1 + t * (x2 - x1), y1 + t * (y2 - y1))
+        else:
+            return None
