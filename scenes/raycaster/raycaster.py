@@ -32,7 +32,7 @@ class RayCaster(Scene):
             self.log("Distance: Infinity")
 
     def update(self):
-        turn_factor = 0.02
+        turn_factor = 0.03
         speed_factor = 0.15
 
         # if the user presses escape show the menu
@@ -46,19 +46,37 @@ class RayCaster(Scene):
             self.camera.angle += turn_factor
 
         if self.game.pressed[pygame.K_UP]:
-            self.camera.pos = (
+            new_pos = (
                 self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
                 self.camera.pos[1] + math.sin(self.camera.angle) * speed_factor,
             )
+            if not self.level_map.wall_collision(new_pos):
+                self.camera.pos = new_pos
+
+        if self.game.pressed[pygame.K_DOWN]:
+            new_pos = (
+                self.camera.pos[0] - math.cos(self.camera.angle) * speed_factor,
+                self.camera.pos[1] - math.sin(self.camera.angle) * speed_factor,
+            )
+            if not self.level_map.wall_collision(new_pos):
+                self.camera.pos = new_pos
 
     def draw(self):
-        self.screen.fill((0, 0, 0))
+        # self.screen.fill((0, 0, 0))
+        # draw the top half of the screen sky blue
+        self.screen.fill((135, 206, 235))
+        # draw the bottom half of the screen ground green
+        pygame.draw.rect(
+            self.screen,
+            (0, 255, 0),
+            (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
+        )
         self.draw_walls()
         self.draw_map()
 
     def draw_walls(self):
         render_width = self.game.WIDTH
-        fov = 90
+        fov = 60
         left_start = fov // 2 - fov
         right_end = fov // 2
 
@@ -74,7 +92,7 @@ class RayCaster(Scene):
                 color = max(20, 255 - distance)
                 wall_color = (color, color, color)
 
-                distance *= math.cos(self.camera.angle - angle)
+                # distance *= math.cos(self.camera.angle - angle)
                 wall_height = map_range(distance, 0, render_width, render_width, 0)
 
                 pygame.draw.line(
@@ -115,6 +133,10 @@ class LevelMap:
 
         self.map = load_tpng(map_path)
 
+    def wall_collision(self, pos=(0, 0)) -> bool:
+        x, y = pos
+        return self.map.get_at((int(x), int(y))) == (255, 255, 255)
+
     def camera_start(self):
         # determine the x, y position of the camera by the red pixel (255, 0, 0)
 
@@ -129,6 +151,9 @@ class LevelMap:
         x, y = pos
         dx = math.cos(angle)
         dy = math.sin(angle)
+        # step_divider = 10
+        # dx /= step_divider
+        # dy /= step_divider
 
         while 0 <= x < self.map.get_width() and 0 <= y < self.map.get_height():
             if self.map.get_at((int(x), int(y))) == (255, 255, 255):
