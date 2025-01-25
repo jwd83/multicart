@@ -32,17 +32,60 @@ class RayCaster(Scene):
             self.log("Distance: Infinity")
 
     def update(self):
+        turn_factor = 0.02
+        speed_factor = 0.15
+
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
-        if pygame.K_LEFT in self.game.just_pressed:
-            self.camera.angle -= 0.01
+        if self.game.pressed[pygame.K_LEFT]:
+            self.camera.angle -= turn_factor
+
+        if self.game.pressed[pygame.K_RIGHT]:
+            self.camera.angle += turn_factor
+
+        if self.game.pressed[pygame.K_UP]:
+            self.camera.pos = (
+                self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
+                self.camera.pos[1] + math.sin(self.camera.angle) * speed_factor,
+            )
 
     def draw(self):
         self.screen.fill((0, 0, 0))
         # draw the map for reference
         self.screen.blit(self.level_map.map, (0, 0))
+
+        render_width = self.game.WIDTH
+        fov = 60
+        left_start = fov // 2 - fov
+        right_end = fov // 2
+
+        for i in range(render_width):
+            angle = map_range(i, 0, render_width, left_start, right_end)
+
+            # convert to radians
+            angle = math.radians(angle) + self.camera.angle
+            distance = self.level_map.wall_distance(self.camera.pos, angle)
+
+            if distance:
+                distance *= 7
+                color = max(20, 255 - distance)
+                wall_color = (color, color, color)
+
+                distance *= math.cos(self.camera.angle - angle)
+                wall_height = map_range(distance, 0, render_width, render_width, 0)
+
+                pygame.draw.line(
+                    self.screen,
+                    wall_color,
+                    (i, wall_height / 2),
+                    (i, self.game.HEIGHT - wall_height / 2),
+                )
+
+
+def map_range(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
 class Camera:
