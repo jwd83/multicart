@@ -65,7 +65,8 @@ class RayCaster(Scene):
         self.draw_map()
 
     def draw_walls(self):
-        render_width = self.game.WIDTH
+        render_width = self.game.WIDTH // 2
+        render_height = self.game.HEIGHT // 2
         fov = 60
         half_fov = fov // 2
         fov_rad = math.radians(fov)
@@ -139,10 +140,6 @@ class RayCaster(Scene):
                             intersection[0],
                             intersection[1],
                         )
-                        # distance = math.sqrt(
-                        #     (self.camera.pos[0] - intersection[0]) ** 2
-                        #     + (self.camera.pos[1] - intersection[1]) ** 2
-                        # )
                         distances.append(distance)
 
                 if len(distances) > 0:
@@ -150,9 +147,9 @@ class RayCaster(Scene):
 
             if len(distances) > 0:
                 min_distance = min(distances)
-                wall_height = (1 / min_distance) * self.game.HEIGHT
-                top = (self.game.HEIGHT // 2) - (wall_height // 2)
-                bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
+                wall_height = (1 / min_distance) * render_height
+                top = (render_height // 2) - (wall_height // 2)
+                bottom = (render_height // 2) + (wall_height // 2)
                 red_color = max(20, int(255 - min_distance * 8))
                 pygame.draw.line(
                     self.screen, (red_color, 0, 0), (i, top), (i, bottom), 1
@@ -214,7 +211,7 @@ class LevelMap:
         return (0, 0)  # default to 0, 0 if no red pixel is found
 
 
-@njit
+# @njit
 def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
     # calculate the intersection point of two lines
     # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
@@ -238,6 +235,6 @@ def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
         return None
 
 
-@njit
+# @njit
 def line_distance(x1, y1, x2, y2) -> float:
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
