@@ -203,24 +203,6 @@ class LevelMap:
 
         return (0, 0)  # default to 0, 0 if no red pixel is found
 
-    def box_line_intersection(self, box_x: int, box_y: int, x1, y1, x2, y2) -> float:
-        min_distance = float("inf")
-        edges = [
-            (box_x, box_y, box_x + 1, box_y),
-            (box_x, box_y, box_x, box_y + 1),
-            (box_x + 1, box_y, box_x + 1, box_y + 1),
-            (box_x, box_y + 1, box_x + 1, box_y + 1),
-        ]
-        for edge in edges:
-            intersection = self.line_intersection(x1, y1, x2, y2, *edge)
-            if intersection:
-                distance = math.sqrt(
-                    (x1 - intersection[0]) ** 2 + (y1 - intersection[1]) ** 2
-                )
-                min_distance = min(min_distance, distance)
-
-        return min_distance
-
     def line_intersection(self, ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
         # calculate the intersection point of two lines
         # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
