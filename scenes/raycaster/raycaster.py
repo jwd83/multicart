@@ -144,42 +144,84 @@ class LevelMap:
 
     def wall_distance(self, pos=(0, 0), angle=0) -> float | bool:
         x, y = pos
-
         dx = math.cos(angle)
         dy = math.sin(angle)
+        hx = hy = vx = vy = -1
+        distances = []
 
-        while 0 <= x < self.map.get_width() and 0 <= y < self.map.get_height():
-            map_x = math.floor(x)
-            map_y = math.floor(y)
+        # Check horizontal intersections
+        if dy != 0:
+            y_step = 1 if dy > 0 else -1
+            y_intercept = math.ceil(y) if dy > 0 else math.floor(y)
 
-            if self.map.get_at((map_x, map_y)) == (255, 255, 255):
-                # now that we know the intersection is in this square, we can calculate
-                # where the intersection occurs along the edge of the square and return
-                # the distance to that intersection
-                # return math.sqrt((x - pos[0]) ** 2 + (y - pos[1]) ** 2)
-                edges = [
-                    (map_x, map_y, map_x + 1, map_y),
-                    (map_x, map_y, map_x, map_y + 1),
-                    (map_x + 1, map_y, map_x + 1, map_y + 1),
-                    (map_x, map_y + 1, map_x + 1, map_y + 1),
-                ]
+            x_intercept = x + (y_intercept - y) / dy * dx
+            while (
+                0 <= x_intercept < self.map.get_width()
+                and 0 <= y_intercept < self.map.get_height()
+            ):
+                if self.map.get_at((int(x_intercept), int(y_intercept))) == (
+                    255,
+                    255,
+                    255,
+                ):
+                    hx = int(x_intercept)
+                    hy = int(y_intercept)
+                    hx1, hy1 = x, y
+                    hx2, hy2 = x_intercept, y_intercept
+                    break
 
-                x1 = x
-                y1 = y
+                y_intercept += y_step
+                x_intercept += y_step / dy * dx
 
-                x2 = x - dx
-                y2 = y - dy
-                for edge in edges:
-                    intersection = self.line_intersection(x1, y1, x2, y2, *edge)
-                    if intersection:
-                        x, y = intersection
-                        return math.sqrt((x - pos[0]) ** 2 + (y - pos[1]) ** 2)
+        # Check vertical intersections
+        if dx != 0:
+            x_step = 1 if dx > 0 else -1
+            x_intercept = math.ceil(x) if dx > 0 else math.floor(x)
 
-            x += dx
-            y += dy
+            y_intercept = y + (x_intercept - x) / dx * dy
+            while (
+                0 <= x_intercept < self.map.get_width()
+                and 0 <= y_intercept < self.map.get_height()
+            ):
+                if self.map.get_at((int(x_intercept), int(y_intercept))) == (
+                    255,
+                    255,
+                    255,
+                ):
+                    vx = int(x_intercept)
+                    vy = int(y_intercept)
+                    vx1, vy1 = x, y
+                    vx2, vy2 = x_intercept, y_intercept
+                    break
+                x_intercept += x_step
+                y_intercept += x_step / dx * dy
 
-        # No intersection found, return infinity
-        return float("inf")
+        if hx == -1 and vx == -1:
+            return float("inf")
+        if hx >= 0:
+            distances.append(self.box_line_intersection(hx, hy, hx1, hy1, hx2, hy2))
+        if vx >= 0:
+            distances.append(self.box_line_intersection(vx, vy, vx1, vy1, vx2, vy2))
+
+        return min(distances)
+
+    def box_line_intersection(self, box_x: int, box_y: int, x1, y1, x2, y2) -> float:
+        min_distance = float("inf")
+        edges = [
+            (box_x, box_y, box_x + 1, box_y),
+            (box_x, box_y, box_x, box_y + 1),
+            (box_x + 1, box_y, box_x + 1, box_y + 1),
+            (box_x, box_y + 1, box_x + 1, box_y + 1),
+        ]
+        for edge in edges:
+            intersection = self.line_intersection(x1, y1, x2, y2, *edge)
+            if intersection:
+                distance = math.sqrt(
+                    (x1 - intersection[0]) ** 2 + (y1 - intersection[1]) ** 2
+                )
+                min_distance = min(min_distance, distance)
+
+        return min_distance
 
     def line_intersection(self, ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
         # calculate the intersection point of two lines
