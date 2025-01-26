@@ -160,7 +160,7 @@ class RayCaster(Scene):
 
             if len(distances) > 0:
                 min_distance = min(distances)
-                wall_height = (1 / min_distance) * render_height
+                wall_height = min((1 / min_distance) * render_height, render_height)
                 top = (render_height // 2) - (wall_height // 2)
                 bottom = (render_height // 2) + (wall_height // 2)
                 red_color = max(20, int(255 - min_distance * 8))
@@ -215,22 +215,10 @@ class LevelMap:
                     self.pos_camera_start = (x, y)
 
     def wall_collision(self, pos=(0, 0)) -> bool:
-        x, y = pos
-        checks = [
-            (x, y),
-            (x - 1, y - 1),
-            (x, y - 1),
-            (x + 1, y - 1),
-            (x - 1, y),
-            (x + 1, y),
-            (x - 1, y + 1),
-            (x, y + 1),
-            (x + 1, y + 1),
-        ]
-        for check in checks:
-            if self.map[check[0], check[1]] == 1:
-                return True
-        return False
+
+        x = int(pos[0])
+        y = int(pos[1])
+        return self.map[x, y] == 1
 
 
 # @njit
