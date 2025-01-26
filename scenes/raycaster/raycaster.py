@@ -68,8 +68,93 @@ class RayCaster(Scene):
             (0, 255, 0),
             (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
         )
-        self.draw_walls()
+        self.draw_walls_two()
         self.draw_map()
+
+    def draw_walls_two(self):
+        render_width = self.game.WIDTH
+        fov = 60
+        half_fov = fov // 2
+        fov_rad = math.radians(fov)
+        fov_rad_half = math.radians(half_fov)
+
+        wall_color = (255, 255, 255)
+
+        for i in range(render_width):
+
+            render_width_percent = i / (render_width - 1)
+            render_rad = (
+                self.camera.angle - fov_rad_half + fov_rad * render_width_percent
+            )
+
+            ray_dx = math.cos(render_rad)
+            ray_dy = math.sin(render_rad)
+            ray_x = self.camera.pos[0]
+            ray_y = self.camera.pos[1]
+
+            intersections = []
+            distances = []
+
+            while True:
+                ray_x += ray_dx
+                ray_y += ray_dy
+
+                if ray_x < 0 or ray_x >= self.level_map.map.get_width():
+                    break
+
+                if ray_y < 0 or ray_y >= self.level_map.map.get_height():
+                    break
+
+                tiles = []
+                edges = set()
+
+                for x in range(-1, 2):
+                    for y in range(-1, 2):
+                        tile_x = int(ray_x + x)
+                        tile_y = int(ray_y + y)
+
+                        tile_pos = (tile_x, tile_y)
+
+                        if self.level_map.map.get_at(tile_pos) == wall_color:
+                            tiles.append(tile_pos)
+
+                if len(tiles) > 0:
+                    for tile in tiles:
+                        # top
+                        # left
+                        # right
+                        # bottom
+
+                        edges.add((tile[0], tile[1], tile[0] + 1, tile[1]))
+                        edges.add((tile[0], tile[1], tile[0], tile[1] + 1))
+                        edges.add((tile[0] + 1, tile[1], tile[0] + 1, tile[1] + 1))
+                        edges.add((tile[0], tile[1] + 1, tile[0] + 1, tile[1] + 1))
+
+                for edge in edges:
+                    intersection = self.level_map.line_intersection(
+                        ray_x,
+                        ray_y,
+                        self.camera.pos[0],
+                        self.camera.pos[1],
+                        *edge,
+                    )
+                    if intersection:
+                        distance = math.sqrt(
+                            (self.camera.pos[0] - intersection[0]) ** 2
+                            + (self.camera.pos[1] - intersection[1]) ** 2
+                        )
+                        intersections.append(intersection)
+                        distances.append(distance)
+
+                if len(distances) > 0:
+                    break
+
+            if len(distances) > 0:
+                min_distance = min(distances)
+                wall_height = (1 / min_distance) * self.game.HEIGHT
+                top = (self.game.HEIGHT // 2) - (wall_height // 2)
+                bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
+                pygame.draw.line(self.screen, (255, 0, 0), (i, top), (i, bottom), 1)
 
     def draw_walls(self):
         render_width = self.game.WIDTH
@@ -130,7 +215,21 @@ class LevelMap:
 
     def wall_collision(self, pos=(0, 0)) -> bool:
         x, y = pos
-        return self.map.get_at((int(x), int(y))) == (255, 255, 255)
+        checks = [
+            (x, y),
+            (x - 1, y - 1),
+            (x, y - 1),
+            (x + 1, y - 1),
+            (x - 1, y),
+            (x + 1, y),
+            (x - 1, y + 1),
+            (x, y + 1),
+            (x + 1, y + 1),
+        ]
+        for check in checks:
+            if self.map.get_at((int(check[0]), int(check[1]))) == (255, 255, 255):
+                return True
+        return False
 
     def camera_start(self):
         # determine the x, y position of the camera by the red pixel (255, 0, 0)
@@ -195,6 +294,18 @@ class LevelMap:
                     break
                 x_intercept += x_step
                 y_intercept += x_step / dx * dy
+
+        checks = [
+            (x, y),
+            (x - 1, y - 1),
+            (x, y - 1),
+            (x + 1, y - 1),
+            (x - 1, y),
+            (x + 1, y),
+            (x - 1, y + 1),
+            (x, y + 1),
+            (x + 1, y + 1),
+        ]
 
         if hx == -1 and vx == -1:
             return float("inf")
