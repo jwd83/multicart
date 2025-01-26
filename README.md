@@ -13,7 +13,7 @@ To build on Windows for web browsers use `build-web.bat`.
 # TODOs
 * Controller and local multiplayer interface
 * Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
-* 4jacks: convert board to numpy, improve minimax algorithm
+* 4jacks: convert board to numpy, improve minimax algorithm. make a simplified mode that doesn't have piece ejection.
 
 # Console
 
