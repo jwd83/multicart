@@ -12,7 +12,6 @@ class RayCaster(Scene):
         self.camera = Camera(self.level_map.camera_start())
         self.commands = {
             "camera": self.command_camera,
-            "distance": self.command_distance,
         }
 
     def command_camera(self):
@@ -20,13 +19,6 @@ class RayCaster(Scene):
         self.log(
             f"Camera Angle:    {self.camera.angle} ({math.degrees(self.camera.angle)})"
         )
-
-    def command_distance(self):
-        dist = self.level_map.wall_distance(self.camera.pos, self.camera.angle)
-        if dist:
-            self.log(f"Distance: {dist}")
-        else:
-            self.log("Distance: Infinity")
 
     def update(self):
         turn_factor = 0.03
