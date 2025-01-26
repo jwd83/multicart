@@ -68,10 +68,10 @@ class RayCaster(Scene):
             (0, 255, 0),
             (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
         )
-        self.draw_walls_two()
+        self.draw_walls()
         self.draw_map()
 
-    def draw_walls_two(self):
+    def draw_walls(self):
         render_width = self.game.WIDTH
         fov = 60
         half_fov = fov // 2
@@ -156,32 +156,6 @@ class RayCaster(Scene):
                 bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
                 pygame.draw.line(self.screen, (255, 0, 0), (i, top), (i, bottom), 1)
 
-    def draw_walls(self):
-        render_width = self.game.WIDTH
-        fov = 60
-        left_start = fov // 2 - fov
-        right_end = fov // 2
-        max_height = self.game.HEIGHT
-        min_height = 1
-
-        for i in range(render_width):
-
-            # convert to radians
-            angle = (
-                math.radians(map_range(i, 0, render_width, left_start, right_end))
-                + self.camera.angle
-            )
-            distance = self.level_map.wall_distance(self.camera.pos, angle)
-
-            if distance != float("inf"):
-
-                color = max(20, 255 - distance * 5)
-                wall_color = (color, 0, 0)
-                wall_height = (1 / (distance)) * max_height
-                top = (self.game.HEIGHT // 2) - (wall_height // 2)
-                bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
-                pygame.draw.line(self.screen, wall_color, (i, top), (i, bottom), 1)
-
     def draw_map(self):
         # draw the map for reference
         self.screen.blit(self.level_map.map, (0, 0))
@@ -191,10 +165,6 @@ class RayCaster(Scene):
         dx = math.cos(self.camera.angle) * 3
         dy = math.sin(self.camera.angle) * 3
         pygame.draw.line(self.screen, (255, 0, 0), (x, y), (x + dx, y + dy), 1)
-
-
-def map_range(x, in_min, in_max, out_min, out_max):
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
 class Camera:
