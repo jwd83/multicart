@@ -62,7 +62,7 @@ class RayCaster(Scene):
             (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
         )
         self.draw_walls()
-        self.draw_walls_plus()
+        # self.draw_walls_plus()
         self.draw_map()
 
     def draw_walls_plus(self):
@@ -123,7 +123,7 @@ class RayCaster(Scene):
 
                         tile_pos = (tile_x, tile_y)
 
-                        if self.level_map.map_data.get_at(tile_pos) == wall_color:
+                        if self.level_map.map[tile_pos[0], tile_pos[1]] == 1:
                             tiles.append(tile_pos)
 
                 if len(tiles) > 0:
@@ -228,7 +228,7 @@ class LevelMap:
             (x + 1, y + 1),
         ]
         for check in checks:
-            if self.map_data.get_at((int(check[0]), int(check[1]))) == (255, 255, 255):
+            if self.map[check[0], check[1]] == 1:
                 return True
         return False
 
