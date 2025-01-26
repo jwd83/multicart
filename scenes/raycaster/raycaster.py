@@ -3,6 +3,7 @@ from scene import Scene
 from utils import *
 import os
 import math
+from numba import njit, jit
 
 
 class RayCaster(Scene):
@@ -84,7 +85,6 @@ class RayCaster(Scene):
             ray_x = self.camera.pos[0]
             ray_y = self.camera.pos[1]
 
-            intersections = []
             distances = []
 
             while True:
@@ -123,7 +123,7 @@ class RayCaster(Scene):
                         edges.add((tile[0], tile[1] + 1, tile[0] + 1, tile[1] + 1))
 
                 for edge in edges:
-                    intersection = self.level_map.line_intersection(
+                    intersection = line_intersection(
                         ray_x,
                         ray_y,
                         self.camera.pos[0],
@@ -135,7 +135,6 @@ class RayCaster(Scene):
                             (self.camera.pos[0] - intersection[0]) ** 2
                             + (self.camera.pos[1] - intersection[1]) ** 2
                         )
-                        intersections.append(intersection)
                         distances.append(distance)
 
                 if len(distances) > 0:
@@ -203,24 +202,26 @@ class LevelMap:
 
         return (0, 0)  # default to 0, 0 if no red pixel is found
 
-    def line_intersection(self, ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
-        # calculate the intersection point of two lines
-        # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
-        # (x1, y1) (x2, y2) is the first line
-        # (x3, y3) (x4, y4) is the second line
 
-        x1, y1, x2, y2 = ax1, ay1, ax2, ay2
-        x3, y3, x4, y4 = bx1, by1, bx2, by2
+@njit
+def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
+    # calculate the intersection point of two lines
+    # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+    # (x1, y1) (x2, y2) is the first line
+    # (x3, y3) (x4, y4) is the second line
 
-        d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-        if d == 0:
-            return None
+    x1, y1, x2, y2 = ax1, ay1, ax2, ay2
+    x3, y3, x4, y4 = bx1, by1, bx2, by2
 
-        t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d
+    d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if d == 0:
+        return None
 
-        u = (-((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3))) / d
+    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d
 
-        if 0 <= t <= 1 and 0 <= u <= 1:
-            return (x1 + t * (x2 - x1), y1 + t * (y2 - y1))
-        else:
-            return None
+    u = (-((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3))) / d
+
+    if 0 <= t <= 1 and 0 <= u <= 1:
+        return (x1 + t * (x2 - x1), y1 + t * (y2 - y1))
+    else:
+        return None
