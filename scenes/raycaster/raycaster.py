@@ -70,6 +70,8 @@ class RayCaster(Scene):
         half_fov = fov // 2
         fov_rad = math.radians(fov)
         fov_rad_half = math.radians(half_fov)
+        map_width = self.level_map.map.get_width()
+        map_height = self.level_map.map.get_height()
 
         wall_color = (255, 255, 255)
 
@@ -91,10 +93,10 @@ class RayCaster(Scene):
                 ray_x += ray_dx
                 ray_y += ray_dy
 
-                if ray_x < 0 or ray_x >= self.level_map.map.get_width():
+                if ray_x < 0 or ray_x >= map_width:
                     break
 
-                if ray_y < 0 or ray_y >= self.level_map.map.get_height():
+                if ray_y < 0 or ray_y >= map_height:
                     break
 
                 tiles = []
@@ -131,10 +133,16 @@ class RayCaster(Scene):
                         *edge,
                     )
                     if intersection:
-                        distance = math.sqrt(
-                            (self.camera.pos[0] - intersection[0]) ** 2
-                            + (self.camera.pos[1] - intersection[1]) ** 2
+                        distance = line_distance(
+                            self.camera.pos[0],
+                            self.camera.pos[1],
+                            intersection[0],
+                            intersection[1],
                         )
+                        # distance = math.sqrt(
+                        #     (self.camera.pos[0] - intersection[0]) ** 2
+                        #     + (self.camera.pos[1] - intersection[1]) ** 2
+                        # )
                         distances.append(distance)
 
                 if len(distances) > 0:
@@ -228,3 +236,8 @@ def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
         return (x1 + t * (x2 - x1), y1 + t * (y2 - y1))
     else:
         return None
+
+
+@njit
+def line_distance(x1, y1, x2, y2) -> float:
+    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
