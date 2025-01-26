@@ -74,8 +74,8 @@ class RayCaster(Scene):
         half_fov = fov // 2
         fov_rad = math.radians(fov)
         fov_rad_half = math.radians(half_fov)
-        map_width = self.level_map.map_data.get_width()
-        map_height = self.level_map.map_data.get_height()
+        map_width = self.level_map.map_width
+        map_height = self.level_map.map_width
 
     def draw_walls(self):
         render_width = self.game.WIDTH
@@ -84,10 +84,8 @@ class RayCaster(Scene):
         half_fov = fov // 2
         fov_rad = math.radians(fov)
         fov_rad_half = math.radians(half_fov)
-        map_width = self.level_map.map_data.get_width()
-        map_height = self.level_map.map_data.get_height()
-
-        wall_color = (255, 255, 255)
+        map_width = self.level_map.map_width
+        map_height = self.level_map.map_width
 
         for i in range(render_width):
 
@@ -176,6 +174,8 @@ class RayCaster(Scene):
         x, y = self.camera.pos
         dx = math.cos(self.camera.angle) * 3
         dy = math.sin(self.camera.angle) * 3
+
+        pygame.draw.rect(self.screen, (0, 0, 255), (x - 1, y - 1, 3, 3))
         pygame.draw.line(self.screen, (255, 0, 0), (x, y), (x + dx, y + dy), 1)
 
 
