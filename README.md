@@ -11,9 +11,18 @@ To build on Windows for Windows, use `build-win.bat`.
 To build on Windows for web browsers use `build-web.bat`.
 
 # TODOs
+
+## General / Misc
+
 * Controller and local multiplayer interface
 * Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
 * 4jacks: convert board to numpy, improve minimax algorithm. make a simplified mode that doesn't have piece ejection.
+
+# Raycaster
+
+* Change the naive draw_walls implementation to use a quadrant based cross section of the
+possible tile path.
+* Change the raycaster to load walls from an image file into a 2d array.
 
 # Console
 
@@ -35,24 +44,25 @@ An adaption and implementation of the the public domain game from YouTuber
 ## Todos
 
 ~~- Finish DaFluffyPotato's course~~
-- Finish pallet swap
-- Joystick input
-- Alucard style movement trails
-- Port to web with [pygbag](https://pypi.org/project/pygbag/)
-- ~~Implement the new fall animation.~~
+
+* Finish pallet swap
+* Joystick input
+* Alucard style movement trails
+* Port to web with [pygbag](https://pypi.org/project/pygbag/)
+* ~~Implement the new fall animation.~~
 
 ## Adjustments & Additions
 
-- 16:9 aspect ratio
-- Metroid Style Space Jump
-- fall animation
+* 16:9 aspect ratio
+* Metroid Style Space Jump
+* fall animation
 
 ## Palette Swap
 
 New Colors
 
-- 0x0000dd ninja robe
-- 0x00008e ninja robe dark
+* 0x0000dd ninja robe
+* 0x00008e ninja robe dark
 
 # Swappy
 
@@ -72,8 +82,6 @@ perform the palette swap.
 ```
 python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv assets\jackninjas\images\tiles\snow
 ```
-
-
 
 # Credits
 
@@ -123,10 +131,13 @@ Various music tracks potentially.
 level up bonus and cute level up sounds
 
 ## PIXBAY ALIENIGHTMARE
+
 dying-guy
 
 ## PIXBAY moodmode
+
 potential music
 
 ## PIXBAY freesound_community
+
 knife throw

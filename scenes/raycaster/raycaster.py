@@ -1,16 +1,16 @@
-import pygame
 from scene import Scene
 from utils import *
-import os
 import math
-from numba import njit, jit
+import numpy as np
+import os
+import pygame
 
 
 class RayCaster(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.level_map = LevelMap(0)
-        self.camera = Camera(self.level_map.camera_start())
+        self.camera = Camera(self.level_map.pos_camera_start)
         self.commands = {
             "camera": self.command_camera,
         }
@@ -62,17 +62,30 @@ class RayCaster(Scene):
             (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
         )
         self.draw_walls()
+        self.draw_walls_plus()
         self.draw_map()
 
-    def draw_walls(self):
-        render_width = self.game.WIDTH // 2
-        render_height = self.game.HEIGHT // 2
+    def draw_walls_plus(self):
+
+        return
+        render_width = self.game.WIDTH
+        render_height = self.game.HEIGHT
         fov = 60
         half_fov = fov // 2
         fov_rad = math.radians(fov)
         fov_rad_half = math.radians(half_fov)
-        map_width = self.level_map.map.get_width()
-        map_height = self.level_map.map.get_height()
+        map_width = self.level_map.map_data.get_width()
+        map_height = self.level_map.map_data.get_height()
+
+    def draw_walls(self):
+        render_width = self.game.WIDTH
+        render_height = self.game.HEIGHT
+        fov = 60
+        half_fov = fov // 2
+        fov_rad = math.radians(fov)
+        fov_rad_half = math.radians(half_fov)
+        map_width = self.level_map.map_data.get_width()
+        map_height = self.level_map.map_data.get_height()
 
         wall_color = (255, 255, 255)
 
@@ -110,7 +123,7 @@ class RayCaster(Scene):
 
                         tile_pos = (tile_x, tile_y)
 
-                        if self.level_map.map.get_at(tile_pos) == wall_color:
+                        if self.level_map.map_data.get_at(tile_pos) == wall_color:
                             tiles.append(tile_pos)
 
                 if len(tiles) > 0:
@@ -157,7 +170,7 @@ class RayCaster(Scene):
 
     def draw_map(self):
         # draw the map for reference
-        self.screen.blit(self.level_map.map, (0, 0))
+        self.screen.blit(self.level_map.map_data, (0, 0))
 
         # draw a 3 px red line to represent the camera facing direction
         x, y = self.camera.pos
@@ -180,7 +193,26 @@ class LevelMap:
         if not os.path.exists("assets/" + map_path):
             raise FileNotFoundError(f"Map file {map_path} not found")
 
-        self.map = load_tpng(map_path)
+        self.pos_camera_start = (0, 0)
+
+        self.map_data = load_tpng(map_path)
+
+        self.map_height = self.map_data.get_height()
+        self.map_width = self.map_data.get_width()
+
+        self.map = np.zeros((self.map_width, self.map_height))
+
+        self.parse_map()
+
+    def parse_map(self):
+        self.map = np.zeros((self.map_width, self.map_height))
+        for x in range(self.map_width):
+            for y in range(self.map_height):
+                if self.map_data.get_at((x, y)) == (255, 255, 255):
+                    self.map[x, y] = 1
+
+                if self.map_data.get_at((x, y)) == (255, 0, 0):
+                    self.pos_camera_start = (x, y)
 
     def wall_collision(self, pos=(0, 0)) -> bool:
         x, y = pos
@@ -196,19 +228,9 @@ class LevelMap:
             (x + 1, y + 1),
         ]
         for check in checks:
-            if self.map.get_at((int(check[0]), int(check[1]))) == (255, 255, 255):
+            if self.map_data.get_at((int(check[0]), int(check[1]))) == (255, 255, 255):
                 return True
         return False
-
-    def camera_start(self):
-        # determine the x, y position of the camera by the red pixel (255, 0, 0)
-
-        for y in range(self.map.get_height()):
-            for x in range(self.map.get_width()):
-                if self.map.get_at((x, y)) == (255, 0, 0):
-                    return (x, y)
-
-        return (0, 0)  # default to 0, 0 if no red pixel is found
 
 
 # @njit
