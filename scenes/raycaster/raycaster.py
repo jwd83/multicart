@@ -145,7 +145,10 @@ class RayCaster(Scene):
                 wall_height = (1 / min_distance) * self.game.HEIGHT
                 top = (self.game.HEIGHT // 2) - (wall_height // 2)
                 bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
-                pygame.draw.line(self.screen, (255, 0, 0), (i, top), (i, bottom), 1)
+                red_color = max(20, int(255 - min_distance * 8))
+                pygame.draw.line(
+                    self.screen, (red_color, 0, 0), (i, top), (i, bottom), 1
+                )
 
     def draw_map(self):
         # draw the map for reference
