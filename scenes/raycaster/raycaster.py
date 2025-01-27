@@ -9,8 +9,8 @@ import pygame
 class RayCaster(Scene):
     def __init__(self, game):
         super().__init__(game)
-        self.level_map = LevelMap(0)
-        self.camera = Camera(self.level_map.pos_camera_start)
+        self.level = LevelMap(0)
+        self.camera = Camera(self.level.pos_camera_start)
         self.commands = {
             "camera": self.command_camera,
         }
@@ -40,7 +40,7 @@ class RayCaster(Scene):
                 self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
                 self.camera.pos[1] + math.sin(self.camera.angle) * speed_factor,
             )
-            if not self.level_map.wall_collision(new_pos):
+            if not self.level.wall_collision(new_pos):
                 self.camera.pos = new_pos
 
         if self.game.pressed[pygame.K_DOWN]:
@@ -48,7 +48,7 @@ class RayCaster(Scene):
                 self.camera.pos[0] - math.cos(self.camera.angle) * speed_factor,
                 self.camera.pos[1] - math.sin(self.camera.angle) * speed_factor,
             )
-            if not self.level_map.wall_collision(new_pos):
+            if not self.level.wall_collision(new_pos):
                 self.camera.pos = new_pos
 
     def draw(self):
@@ -112,22 +112,52 @@ class RayCaster(Scene):
             y2 += dy
             x2 += dx
 
-            if x2 < 0 or x2 >= self.level_map.map_width:
+            if x2 < 0 or x2 >= self.level.map_width:
                 break
 
-            if y2 < 0 or y2 >= self.level_map.map_height:
+            if y2 < 0 or y2 >= self.level.map_height:
                 break
 
-            # edges = gather_edges(x2, y2)
-            dist = edges_function(x1, y1, x2, y2)
+            edges = edges_function(x1, y1, x2, y2)
+            dist = self.intersect_edges(edges, x1, y1, x2, y2)
             if dist:
                 distance = dist
                 break
 
         return distance
 
+    def intersect_edges(self, edges, x1, y1, x2, y2) -> float:
+        distance = 9999
+        for edge in edges:
+            intersection = line_intersection(x1, y1, x2, y2, *edge)
+            if intersection:
+                dist = line_distance(x1, y1, intersection[0], intersection[1])
+                distance = min(distance, dist)
+        return distance
+
     def edges_ne(self, x1, y1, x2, y2) -> float:
-        pass
+        edges = set()
+
+        x = int(x2)
+        y = int(y2)
+
+        # add the bottom and left edges of the tile we landed in
+        if self.level.map[x, y] == 1:
+            # add the bottom and left edge
+            edges.add((x, y, x + 1, y))
+            edges.add((x, y, x, y + 1))
+
+        if self.level.map[x, y - 1] == 1:
+            # add the top and left edge of the tile below the tile we landed in
+            edges.add((x, y - 1, x + 1, y - 1))
+            edges.add((x, y - 1, x, y))
+
+        if self.level.map[x - 1, y] == 1:
+            # add the top and right edge of the tile to the left of the tile we landed in
+            edges.add((x - 1, y, x, y))
+            edges.add((x - 1, y, x - 1, y + 1))
+
+        return edges
 
     def edges_nw(self, x1, y1, x2, y2) -> float:
         pass
@@ -145,8 +175,8 @@ class RayCaster(Scene):
         half_fov = fov // 2
         fov_rad = math.radians(fov)
         fov_rad_half = math.radians(half_fov)
-        map_width = self.level_map.map_width
-        map_height = self.level_map.map_width
+        map_width = self.level.map_width
+        map_height = self.level.map_width
 
         for i in range(render_width):
 
@@ -182,7 +212,7 @@ class RayCaster(Scene):
 
                         tile_pos = (tile_x, tile_y)
 
-                        if self.level_map.map[tile_pos[0], tile_pos[1]] == 1:
+                        if self.level.map[tile_pos[0], tile_pos[1]] == 1:
                             tiles.append(tile_pos)
 
                 if len(tiles) > 0:
@@ -229,7 +259,7 @@ class RayCaster(Scene):
 
     def draw_map(self):
         # draw the map for reference
-        self.screen.blit(self.level_map.map_data, (0, 0))
+        self.screen.blit(self.level.map_data, (0, 0))
 
         # draw a 3 px red line to represent the camera facing direction
         x, y = self.camera.pos
