@@ -85,6 +85,7 @@ class RayCaster(Scene):
 
     def draw_slice(self, x, distance, color):
         wall_height = min((1 / distance) * self.game.HEIGHT, self.game.HEIGHT)
+        wall_height = self.constrain(wall_height, 5, self.game.HEIGHT)
         top = (self.game.HEIGHT // 2) - (wall_height // 2)
         bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
         pygame.draw.line(self.screen, color, (x, top), (x, bottom), 1)
@@ -96,16 +97,16 @@ class RayCaster(Scene):
         dx = math.cos(radians)
         dy = math.sin(radians)
 
-        intersect_function = None
+        edges_function = None
 
         if dx >= 0 and dy >= 0:
-            intersect_function = self.intersect_ne
+            edges_function = self.edges_ne
         elif dx >= 0 and dy < 0:
-            intersect_function = self.intersect_se
+            edges_function = self.edges_se
         elif dx < 0 and dy >= 0:
-            intersect_function = self.intersect_nw
+            edges_function = self.edges_nw
         else:
-            intersect_function = self.intersect_sw
+            edges_function = self.edges_sw
 
         while True:
             y2 += dy
@@ -117,23 +118,24 @@ class RayCaster(Scene):
             if y2 < 0 or y2 >= self.level_map.map_height:
                 break
 
-            dist = intersect_function(x1, y1, x2, y2)
+            # edges = gather_edges(x2, y2)
+            dist = edges_function(x1, y1, x2, y2)
             if dist:
                 distance = dist
                 break
 
         return distance
 
-    def intersect_ne(self, x1, y1, x2, y2) -> float:
+    def edges_ne(self, x1, y1, x2, y2) -> float:
         pass
 
-    def intersect_nw(self, x1, y1, x2, y2) -> float:
+    def edges_nw(self, x1, y1, x2, y2) -> float:
         pass
 
-    def intersect_sw(self, x1, y1, x2, y2) -> float:
+    def edges_sw(self, x1, y1, x2, y2) -> float:
         pass
 
-    def intersect_se(self, x1, y1, x2, y2) -> float:
+    def edges_se(self, x1, y1, x2, y2) -> float:
         pass
 
     def draw_walls(self):
