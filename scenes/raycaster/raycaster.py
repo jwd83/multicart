@@ -169,12 +169,6 @@ class RayCaster(Scene):
         d = (a[0] - 1, a[1])
         e = (a[0], a[1] + 1)
 
-        # northern tiles are located at a[1] - 1
-        # southern tiles are located at a[1]
-
-        # eastern tiles are located at at a[0]
-        # western tiles are located at a[0] - 1
-
         tile_ne = self.level.map[a[0], a[1] - 1] > 0
         tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
         tile_se = self.level.map[a[0], a[1]] > 0
@@ -211,12 +205,6 @@ class RayCaster(Scene):
         c = (a[0], a[1] - 1)
         d = (a[0] - 1, a[1])
         e = (a[0], a[1] + 1)
-
-        # northern tiles are located at a[1] - 1
-        # southern tiles are located at a[1]
-
-        # eastern tiles are located at at a[0]
-        # western tiles are located at a[0] - 1
 
         tile_ne = self.level.map[a[0], a[1] - 1] > 0
         tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
@@ -255,12 +243,6 @@ class RayCaster(Scene):
         d = (a[0] - 1, a[1])
         e = (a[0], a[1] + 1)
 
-        # northern tiles are located at a[1] - 1
-        # southern tiles are located at a[1]
-
-        # eastern tiles are located at at a[0]
-        # western tiles are located at a[0] - 1
-
         tile_ne = self.level.map[a[0], a[1] - 1] > 0
         tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
         tile_se = self.level.map[a[0], a[1]] > 0
@@ -298,12 +280,6 @@ class RayCaster(Scene):
         d = (a[0] - 1, a[1])
         e = (a[0], a[1] + 1)
 
-        # northern tiles are located at a[1] - 1
-        # southern tiles are located at a[1]
-
-        # eastern tiles are located at at a[0]
-        # western tiles are located at a[0] - 1
-
         tile_ne = self.level.map[a[0], a[1] - 1] > 0
         tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
         tile_se = self.level.map[a[0], a[1]] > 0
@@ -327,95 +303,6 @@ class RayCaster(Scene):
                 edges.append((*a, *e))
 
         return edges
-
-    def draw_walls(self):
-        render_width = self.game.WIDTH
-        render_height = self.game.HEIGHT
-        fov = 60
-        half_fov = fov // 2
-        fov_rad = math.radians(fov)
-        fov_rad_half = math.radians(half_fov)
-        map_width = self.level.map_width
-        map_height = self.level.map_width
-
-        for i in range(render_width):
-
-            render_width_percent = i / (render_width - 1)
-            render_rad = (
-                self.camera.angle - fov_rad_half + fov_rad * render_width_percent
-            )
-
-            ray_dx = math.cos(render_rad)
-            ray_dy = math.sin(render_rad)
-            ray_x = self.camera.pos[0]
-            ray_y = self.camera.pos[1]
-
-            distances = []
-
-            while True:
-                ray_x += ray_dx
-                ray_y += ray_dy
-
-                if ray_x < 0 or ray_x >= map_width:
-                    break
-
-                if ray_y < 0 or ray_y >= map_height:
-                    break
-
-                tiles = []
-                edges = set()
-
-                for x in range(-1, 2):
-                    for y in range(-1, 2):
-                        tile_x = int(ray_x + x)
-                        tile_y = int(ray_y + y)
-
-                        tile_pos = (tile_x, tile_y)
-
-                        if self.level.map[tile_pos[0], tile_pos[1]] == 1:
-                            tiles.append(tile_pos)
-
-                if len(tiles) > 0:
-                    for tile in tiles:
-                        # top
-                        # left
-                        # right
-                        # bottom
-
-                        edges.add((tile[0], tile[1], tile[0] + 1, tile[1]))
-                        edges.add((tile[0], tile[1], tile[0], tile[1] + 1))
-                        edges.add((tile[0] + 1, tile[1], tile[0] + 1, tile[1] + 1))
-                        edges.add((tile[0], tile[1] + 1, tile[0] + 1, tile[1] + 1))
-
-                for edge in edges:
-                    intersection = line_intersection(
-                        ray_x,
-                        ray_y,
-                        self.camera.pos[0],
-                        self.camera.pos[1],
-                        *edge,
-                    )
-                    if intersection:
-                        distance = line_distance(
-                            self.camera.pos[0],
-                            self.camera.pos[1],
-                            intersection[0],
-                            intersection[1],
-                        )
-                        distances.append(distance)
-
-                if len(distances) > 0:
-                    break
-
-            if len(distances) > 0:
-                min_distance = min(distances)
-                wall_height = min((1 / min_distance) * render_height, render_height)
-                top = (render_height // 2) - (wall_height // 2)
-                bottom = (render_height // 2) + (wall_height // 2)
-                red_color = max(20, int(255 - min_distance * 8))
-                pygame.draw.line(
-                    self.display, (red_color, 0, 0), (i, top), (i, bottom), 1
-                )
 
     def draw_map(self):
         # draw the map for reference
