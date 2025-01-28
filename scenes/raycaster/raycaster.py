@@ -61,8 +61,8 @@ class RayCaster(Scene):
             (0, 255, 0),
             (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
         )
-        self.draw_walls()
-        # self.draw_walls_plus()
+        # self.draw_walls()
+        self.draw_walls_plus()
         self.draw_map()
 
     def draw_walls_plus(self):
@@ -99,11 +99,11 @@ class RayCaster(Scene):
 
         edges_function = None
 
-        if dx >= 0 and dy >= 0:
+        if dx >= 0 and dy <= 0:
             edges_function = self.edges_ne
-        elif dx >= 0 and dy < 0:
+        elif dx >= 0 and dy > 0:
             edges_function = self.edges_se
-        elif dx < 0 and dy >= 0:
+        elif dx < 0 and dy <= 0:
             edges_function = self.edges_nw
         else:
             edges_function = self.edges_sw
@@ -127,52 +127,78 @@ class RayCaster(Scene):
         return distance
 
     def intersect_edges(self, edges, x1, y1, x2, y2) -> float:
-        distance = 9999
+        distance = None
+        if not edges:
+            return distance
         for edge in edges:
             intersection = line_intersection(x1, y1, x2, y2, *edge)
             if intersection:
                 dist = line_distance(x1, y1, intersection[0], intersection[1])
-                distance = min(distance, dist)
+                if distance is None:
+                    distance = dist
+                else:
+                    distance = min(distance, dist)
         return distance
 
     def edges_ne(self, x1, y1, x2, y2) -> float:
-        edges = set()
+        edges = []
 
         x = int(x2)
         y = int(y2)
 
         a = (x, y + 1)
-        b = (x, y)
-        c = (x + 1, y + 1)
-        d = (x, y + 2)
-        e = (x + 1, y + 2)
+        b = (x + 1, y + 1)
+        c = (x, y)
+        d = (x - 1, y + 1)
+        e = (x, y + 2)
 
-        # add the bottom and left edges of the tile we landed in
-        if self.level.map[x, y] == 1:
-            # add the bottom and left edge
-            edges.add((x, y, x + 1, y))
-            edges.add((x, y, x, y + 1))
+        tile_ne = self.level.map[x, y] > 0
+        tile_nw = self.level.map[x - 1, y] > 0
+        tile_se = self.level.map[x, y + 1] > 0
+        # tile_sw = self.level.map[x - 1, y + 1] > 0
 
-        if self.level.map[x, y - 1] == 1:
-            # add the top and left edge of the tile below the tile we landed in
-            edges.add((x, y - 1, x + 1, y - 1))
-            edges.add((x, y - 1, x, y))
-
-        if self.level.map[x - 1, y] == 1:
-            # add the top and right edge of the tile to the left of the tile we landed in
-            edges.add((x - 1, y, x, y))
-            edges.add((x - 1, y, x - 1, y + 1))
+        # calculate horizontal edge
+        if tile_ne and tile_nw:
+            edges.append((*b, *d))
+        else:
+            if tile_ne:
+                edges.append((*a, *b))
+            if tile_nw:
+                edges.append((*a, *d))
+        # calculate vertical edge
+        if tile_ne and tile_se:
+            edges.append((*c, *e))
+        else:
+            if tile_ne:
+                edges.append((*a, *c))
+            if tile_se:
+                edges.append((*a, *e))
 
         return edges
 
     def edges_nw(self, x1, y1, x2, y2) -> float:
-        pass
+        edges = []
+
+        x = int(x2)
+        y = int(y2)
+
+        return edges
 
     def edges_sw(self, x1, y1, x2, y2) -> float:
-        pass
+        edges = []
+
+        x = int(x2)
+        y = int(y2)
+
+        return edges
 
     def edges_se(self, x1, y1, x2, y2) -> float:
-        pass
+        edges = []
+
+        x = int(x2)
+        y = int(y2)
+
+        return edges
 
     def draw_walls(self):
         render_width = self.game.WIDTH
