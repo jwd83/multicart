@@ -140,22 +140,33 @@ class RayCaster(Scene):
                     distance = min(distance, dist)
         return distance
 
-    def edges_ne(self, x1, y1, x2, y2) -> float:
-        edges = []
+    def edges_ne(self, x1, y1, x2, y2):
 
         x = int(x2)
         y = int(y2)
 
         a = (x, y + 1)
-        b = (x + 1, y + 1)
-        c = (x, y)
-        d = (x - 1, y + 1)
-        e = (x, y + 2)
 
-        tile_ne = self.level.map[x, y] > 0
-        tile_nw = self.level.map[x - 1, y] > 0
-        tile_se = self.level.map[x, y + 1] > 0
-        # tile_sw = self.level.map[x - 1, y + 1] > 0
+        return self.edges_from_a(a)
+
+    def edges_from_a(self, a) -> float:
+        edges = []
+
+        b = (a[0] + 1, a[1])
+        c = (a[0], a[1] - 1)
+        d = (a[0] - 1, a[1])
+        e = (a[0], a[1] + 1)
+
+        # northern tiles are located at a[1] - 1
+        # southern tiles are located at a[1]
+
+        # eastern tiles are located at at a[0]
+        # western tiles are located at a[0] - 1
+
+        tile_ne = self.level.map[a[0], a[1] - 1] > 0
+        tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
+        tile_se = self.level.map[a[0], a[1]] > 0
+        tile_sw = self.level.map[a[0] - 1, a[1]] > 0
 
         # calculate horizontal edge
         if tile_ne and tile_nw:
