@@ -4,12 +4,13 @@ import math
 import numpy as np
 import os
 import pygame
+from numba import njit, jit
 
 
 class RayCaster(Scene):
     def __init__(self, game):
         super().__init__(game)
-        self.level = LevelMap(0)
+        self.level = LevelMap(1)
         self.camera = Camera(self.level.pos_camera_start)
         self.commands = {
             "camera": self.command_camera,
@@ -359,7 +360,7 @@ class LevelMap:
         return self.map[x, y] == 1
 
 
-# @njit
+@njit
 def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
     # calculate the intersection point of two lines
     # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
@@ -383,6 +384,6 @@ def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
         return None
 
 
-# @njit
+@njit
 def line_distance(x1, y1, x2, y2) -> float:
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
