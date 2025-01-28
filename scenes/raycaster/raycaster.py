@@ -141,6 +141,12 @@ class RayCaster(Scene):
         x = int(x2)
         y = int(y2)
 
+        a = (x, y + 1)
+        b = (x, y)
+        c = (x + 1, y + 1)
+        d = (x, y + 2)
+        e = (x + 1, y + 2)
+
         # add the bottom and left edges of the tile we landed in
         if self.level.map[x, y] == 1:
             # add the bottom and left edge
