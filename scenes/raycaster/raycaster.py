@@ -14,6 +14,11 @@ class RayCaster(Scene):
         self.commands = {
             "camera": self.command_camera,
         }
+        self.render_scale = 1
+        self.render_height = self.game.HEIGHT // self.render_scale
+        self.render_width = self.game.WIDTH // self.render_scale
+
+        self.display = self.make_surface((self.render_width, self.render_height))
 
     def command_camera(self):
         self.log(f"Camera Position: {self.camera.pos}")
@@ -24,6 +29,9 @@ class RayCaster(Scene):
     def update(self):
         turn_factor = 0.03
         speed_factor = 0.05
+
+        if self.game.pressed[pygame.K_LSHIFT]:
+            speed_factor = 0.1
 
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
@@ -52,18 +60,26 @@ class RayCaster(Scene):
                 self.camera.pos = new_pos
 
     def draw(self):
-        # self.screen.fill((0, 0, 0))
+        # self.display.fill((0, 0, 0))
         # draw the top half of the screen sky blue
-        self.screen.fill((135, 206, 235))
+        self.display.fill((135, 206, 235))
         # draw the bottom half of the screen ground green
         pygame.draw.rect(
-            self.screen,
+            self.display,
             (0, 255, 0),
-            (0, self.game.HEIGHT // 2, self.game.WIDTH, self.game.HEIGHT // 2),
+            (0, self.render_height // 2, self.render_width, self.render_height // 2),
         )
-        # self.draw_walls()
+
         self.draw_walls_plus()
         self.draw_map()
+
+        # scale the display to the game window size
+        if self.render_scale > 1:
+            self.screen.blit(
+                pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
+            )
+        else:
+            self.screen.blit(self.display, (0, 0))
 
     def draw_walls_plus(self):
 
@@ -77,18 +93,18 @@ class RayCaster(Scene):
         x = self.camera.pos[0]
         y = self.camera.pos[1]
 
-        for i in range(self.game.WIDTH):
-            render_x_pct = i / (self.game.WIDTH - 1)
+        for i in range(self.render_width):
+            render_x_pct = i / (self.render_width - 1)
             render_rad = cam_angle - fov_rad_half + fov_rad * render_x_pct
             distance = self.wall_distance(x, y, render_rad)
             self.draw_slice(i, distance, (max(20, int(255 - distance * 7)), 0, 0))
 
     def draw_slice(self, x, distance, color):
-        wall_height = min((1 / distance) * self.game.HEIGHT, self.game.HEIGHT)
-        wall_height = self.constrain(wall_height, 5, self.game.HEIGHT)
-        top = (self.game.HEIGHT // 2) - (wall_height // 2)
-        bottom = (self.game.HEIGHT // 2) + (wall_height // 2)
-        pygame.draw.line(self.screen, color, (x, top), (x, bottom), 1)
+        wall_height = min((1 / distance) * self.render_height, self.render_height)
+        wall_height = self.constrain(wall_height, 5, self.render_height)
+        top = (self.render_height // 2) - (wall_height // 2)
+        bottom = (self.render_height // 2) + (wall_height // 2)
+        pygame.draw.line(self.display, color, (x, top), (x, bottom), 1)
 
     def wall_distance(self, x, y, radians) -> float:
         distance = 9999
@@ -141,17 +157,13 @@ class RayCaster(Scene):
         return distance
 
     def edges_ne(self, x1, y1, x2, y2):
+        # working!
+        edges = []
 
         x = int(x2)
         y = int(y2)
 
         a = (x, y + 1)
-
-        return self.edges_from_a(a)
-
-    def edges_from_a(self, a) -> float:
-        edges = []
-
         b = (a[0] + 1, a[1])
         c = (a[0], a[1] - 1)
         d = (a[0] - 1, a[1])
@@ -188,26 +200,131 @@ class RayCaster(Scene):
         return edges
 
     def edges_nw(self, x1, y1, x2, y2) -> float:
+
         edges = []
 
         x = int(x2)
         y = int(y2)
+
+        a = (x + 1, y + 1)
+        b = (a[0] + 1, a[1])
+        c = (a[0], a[1] - 1)
+        d = (a[0] - 1, a[1])
+        e = (a[0], a[1] + 1)
+
+        # northern tiles are located at a[1] - 1
+        # southern tiles are located at a[1]
+
+        # eastern tiles are located at at a[0]
+        # western tiles are located at a[0] - 1
+
+        tile_ne = self.level.map[a[0], a[1] - 1] > 0
+        tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
+        tile_se = self.level.map[a[0], a[1]] > 0
+        tile_sw = self.level.map[a[0] - 1, a[1]] > 0
+
+        # calculate horizontal edge
+        if tile_ne and tile_nw:
+            edges.append((*b, *d))
+        else:
+            if tile_ne:
+                edges.append((*a, *b))
+            if tile_nw:
+                edges.append((*a, *d))
+        # calculate vertical edge
+        if tile_nw and tile_sw:
+            edges.append((*c, *e))
+        else:
+            if tile_nw:
+                edges.append((*a, *c))
+            if tile_sw:
+                edges.append((*a, *e))
 
         return edges
 
     def edges_sw(self, x1, y1, x2, y2) -> float:
+
         edges = []
 
         x = int(x2)
         y = int(y2)
+
+        a = (x + 1, y)
+        b = (a[0] + 1, a[1])
+        c = (a[0], a[1] - 1)
+        d = (a[0] - 1, a[1])
+        e = (a[0], a[1] + 1)
+
+        # northern tiles are located at a[1] - 1
+        # southern tiles are located at a[1]
+
+        # eastern tiles are located at at a[0]
+        # western tiles are located at a[0] - 1
+
+        tile_ne = self.level.map[a[0], a[1] - 1] > 0
+        tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
+        tile_se = self.level.map[a[0], a[1]] > 0
+        tile_sw = self.level.map[a[0] - 1, a[1]] > 0
+
+        # calculate horizontal edge
+        if tile_se and tile_sw:
+            edges.append((*b, *d))
+        else:
+            if tile_se:
+                edges.append((*a, *b))
+            if tile_sw:
+                edges.append((*a, *d))
+        # calculate vertical edge
+        if tile_nw and tile_sw:
+            edges.append((*c, *e))
+        else:
+            if tile_nw:
+                edges.append((*a, *c))
+            if tile_sw:
+                edges.append((*a, *e))
 
         return edges
 
     def edges_se(self, x1, y1, x2, y2) -> float:
+
         edges = []
 
         x = int(x2)
         y = int(y2)
+
+        a = (x, y)
+        b = (a[0] + 1, a[1])
+        c = (a[0], a[1] - 1)
+        d = (a[0] - 1, a[1])
+        e = (a[0], a[1] + 1)
+
+        # northern tiles are located at a[1] - 1
+        # southern tiles are located at a[1]
+
+        # eastern tiles are located at at a[0]
+        # western tiles are located at a[0] - 1
+
+        tile_ne = self.level.map[a[0], a[1] - 1] > 0
+        tile_nw = self.level.map[a[0] - 1, a[1] - 1] > 0
+        tile_se = self.level.map[a[0], a[1]] > 0
+        tile_sw = self.level.map[a[0] - 1, a[1]] > 0
+
+        # calculate horizontal edge
+        if tile_se and tile_sw:
+            edges.append((*b, *d))
+        else:
+            if tile_se:
+                edges.append((*a, *b))
+            if tile_sw:
+                edges.append((*a, *d))
+        # calculate vertical edge
+        if tile_ne and tile_se:
+            edges.append((*c, *e))
+        else:
+            if tile_ne:
+                edges.append((*a, *c))
+            if tile_se:
+                edges.append((*a, *e))
 
         return edges
 
@@ -297,20 +414,20 @@ class RayCaster(Scene):
                 bottom = (render_height // 2) + (wall_height // 2)
                 red_color = max(20, int(255 - min_distance * 8))
                 pygame.draw.line(
-                    self.screen, (red_color, 0, 0), (i, top), (i, bottom), 1
+                    self.display, (red_color, 0, 0), (i, top), (i, bottom), 1
                 )
 
     def draw_map(self):
         # draw the map for reference
-        self.screen.blit(self.level.map_data, (0, 0))
+        self.display.blit(self.level.map_data, (0, 0))
 
         # draw a 3 px red line to represent the camera facing direction
         x, y = self.camera.pos
         dx = math.cos(self.camera.angle) * 3
         dy = math.sin(self.camera.angle) * 3
 
-        pygame.draw.rect(self.screen, (0, 0, 255), (x - 1, y - 1, 3, 3))
-        pygame.draw.line(self.screen, (255, 0, 0), (x, y), (x + dx, y + dy), 1)
+        pygame.draw.rect(self.display, (0, 0, 255), (x - 1, y - 1, 3, 3))
+        pygame.draw.line(self.display, (255, 0, 0), (x, y), (x + dx, y + dy), 1)
 
 
 class Camera:
