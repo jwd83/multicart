@@ -207,25 +207,32 @@ class RayCaster(Scene):
             edges = edges_function(x1, y1, x2, y2)
             dist = self.intersect_edges(edges, x1, y1, x2, y2, i)
             if dist:
-                self.log(dist)
+                # self.log(dist)
                 distance = dist
                 break
 
         return distance
 
     def intersect_edges(self, edges, x1, y1, x2, y2, i):
-        min_dist = 99999.0
-        md_x = md_y = 0.0
+        min_dist = None
+
         if not edges:
             return min_dist
         for edge in edges:
+            new_dist = False
             intersection = line_intersection(x1, y1, x2, y2, *edge)
             if intersection:
                 dist = line_distance(x1, y1, intersection[0], intersection[1])
-                if min_dist < dist:
+                if dist and min_dist is None:
+                    new_dist = True
+                elif dist < min_dist:
+                    new_dist = True
+
+                if new_dist:
                     min_dist = dist
                     self.wall_points[i, 0] = intersection[0]
                     self.wall_points[i, 1] = intersection[1]
+
         return min_dist
 
     def edges_ne(self, x1, y1, x2, y2):
