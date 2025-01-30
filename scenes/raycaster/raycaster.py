@@ -5,11 +5,22 @@ import numpy as np
 import os
 import pygame
 from numba import njit, jit
+import os
+import pygame
+
+BASE_IMAGE_PATH = "assets/raycaster/"
+PI_2 = math.pi * 2
 
 
 class RayCaster(Scene):
     def __init__(self, game):
         super().__init__(game)
+
+        self.fov_degrees = 60
+        self.fov_degrees_half = self.fov_degrees // 2
+        self.fov_rad = math.radians(self.fov_degrees)
+        self.fov_rad_half = math.radians(self.fov_degrees_half)
+
         self.level = LevelMap(1)
         self.camera = Camera(self.level.pos_camera_start)
         self.commands = {
@@ -18,8 +29,13 @@ class RayCaster(Scene):
         self.render_scale = 1
         self.render_height = self.game.HEIGHT // self.render_scale
         self.render_width = self.game.WIDTH // self.render_scale
-
+        self.distances = np.zeros(self.render_width)
+        self.rads = np.zeros(self.render_width)
+        self.wall_points = np.zeros((self.render_width, 2))
         self.display = self.make_surface((self.render_width, self.render_height))
+        self.assets = {
+            "tree": load_image("textures/tree.png"),
+        }
 
     def command_camera(self):
         self.log(f"Camera Position: {self.camera.pos}")
@@ -38,11 +54,19 @@ class RayCaster(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
+        # turn left/right
         if self.game.pressed[pygame.K_LEFT]:
             self.camera.angle -= turn_factor
 
         if self.game.pressed[pygame.K_RIGHT]:
             self.camera.angle += turn_factor
+
+        # cap the angle to 2pi
+        if self.camera.angle > PI_2:
+            self.camera.angle -= PI_2
+
+        if self.camera.angle < 0:
+            self.camera.angle += PI_2
 
         if self.game.pressed[pygame.K_UP]:
             new_pos = (
@@ -71,7 +95,8 @@ class RayCaster(Scene):
             (0, self.render_height // 2, self.render_width, self.render_height // 2),
         )
 
-        self.draw_walls_plus()
+        self.draw_walls()
+        # self.draw_objects()
         self.draw_map()
 
         # scale the display to the game window size
@@ -82,12 +107,45 @@ class RayCaster(Scene):
         else:
             self.screen.blit(self.display, (0, 0))
 
-    def draw_walls_plus(self):
+    def draw_objects(self):
+        # make a list of objects in our fov
+        render_objects = []
+        for obj in self.level.level_objects:
+            angle = math.atan2(
+                obj.pos[1] - self.camera.pos[1], obj.pos[0] - self.camera.pos[0]
+            )
+            angle_diff = abs(self.camera.angle - angle)
+            # self.log(f"Angle: {angle}, Angle Diff: {angle_diff}")
+            if (
+                abs(angle_diff) < self.fov_rad_half
+                or abs(angle_diff) > PI_2 - self.fov_rad_half
+            ):
+                distance = line_distance(*self.camera.pos, *obj.pos)
+                render_objects.append((distance, angle, obj))
 
-        fov = 60
-        half_fov = fov // 2
-        fov_rad = math.radians(fov)
-        fov_rad_half = math.radians(half_fov)
+        # sort the objects by distance  so we can render them in the correct order
+        render_objects.sort(key=lambda x: x[0])
+
+        x1 = self.camera.pos[0]
+        y1 = self.camera.pos[1]
+
+        for i in range(self.render_width):
+            x2 = self.wall_points[i, 0]
+            y2 = self.wall_points[i, 1]
+
+            for obj in render_objects:
+                # check if the object is in front of the wall for this column
+                edges = self.tile_edges(int(obj[2].pos[0]), int(obj[2].pos[1]))
+                dist = self.intersect_edges(edges, x1, y1, x2, y2, i)
+                if dist < self.distances[i]:
+                    pass
+                    # self.draw_slice(
+                    #     i,
+                    #     self.distances[i],
+                    #     (max(20, 0, int(255 - self.distances[i] * 7)), 0),
+                    # )
+
+    def draw_walls(self):
 
         cam_angle = self.camera.angle
 
@@ -96,9 +154,12 @@ class RayCaster(Scene):
 
         for i in range(self.render_width):
             render_x_pct = i / (self.render_width - 1)
-            render_rad = cam_angle - fov_rad_half + fov_rad * render_x_pct
-            distance = self.wall_distance(x, y, render_rad)
-            self.draw_slice(i, distance, (max(20, int(255 - distance * 7)), 0, 0))
+            render_rad = cam_angle - self.fov_rad_half + self.fov_rad * render_x_pct
+            self.rads[i] = render_rad
+            self.distances[i] = self.wall_distance(x, y, render_rad, i)
+            self.draw_slice(
+                i, self.distances[i], (max(20, int(255 - self.distances[i] * 7)), 0, 0)
+            )
 
     def draw_slice(self, x, distance, color):
         wall_height = min((1 / distance) * self.render_height, self.render_height)
@@ -107,7 +168,15 @@ class RayCaster(Scene):
         bottom = (self.render_height // 2) + (wall_height // 2)
         pygame.draw.line(self.display, color, (x, top), (x, bottom), 1)
 
-    def wall_distance(self, x, y, radians) -> float:
+    def tile_edges(self, x, y):
+        edges = []
+        edges.append((x, y, x + 1, y))  # top
+        edges.append((x + 1, y, x + 1, y + 1))  # right
+        edges.append((x, y + 1, x + 1, y + 1))  # bottom
+        edges.append((x, y, x, y + 1))  # left
+        return edges
+
+    def wall_distance(self, x, y, radians, i) -> float:
         distance = 9999
         x1 = x2 = x
         y1 = y2 = y
@@ -136,26 +205,28 @@ class RayCaster(Scene):
                 break
 
             edges = edges_function(x1, y1, x2, y2)
-            dist = self.intersect_edges(edges, x1, y1, x2, y2)
+            dist = self.intersect_edges(edges, x1, y1, x2, y2, i)
             if dist:
+                self.log(dist)
                 distance = dist
                 break
 
         return distance
 
-    def intersect_edges(self, edges, x1, y1, x2, y2) -> float:
-        distance = None
+    def intersect_edges(self, edges, x1, y1, x2, y2, i):
+        min_dist = 99999.0
+        md_x = md_y = 0.0
         if not edges:
-            return distance
+            return min_dist
         for edge in edges:
             intersection = line_intersection(x1, y1, x2, y2, *edge)
             if intersection:
                 dist = line_distance(x1, y1, intersection[0], intersection[1])
-                if distance is None:
-                    distance = dist
-                else:
-                    distance = min(distance, dist)
-        return distance
+                if min_dist < dist:
+                    min_dist = dist
+                    self.wall_points[i, 0] = intersection[0]
+                    self.wall_points[i, 1] = intersection[1]
+        return min_dist
 
     def edges_ne(self, x1, y1, x2, y2):
         # working!
@@ -333,6 +404,7 @@ class LevelMap:
             raise FileNotFoundError(f"Map file {map_path} not found")
 
         self.pos_camera_start = (0, 0)
+        self.level_objects = []
 
         self.map_data = load_tpng(map_path)
 
@@ -353,6 +425,9 @@ class LevelMap:
                 if self.map_data.get_at((x, y)) == (255, 0, 0):
                     self.pos_camera_start = (x, y)
 
+                if self.map_data.get_at((x, y)) == (0, 255, 0):
+                    self.level_objects.append(LevelObject((x, y), "tree"))
+
     def wall_collision(self, pos=(0, 0)) -> bool:
 
         x = int(pos[0])
@@ -360,8 +435,13 @@ class LevelMap:
         return self.map[x, y] == 1
 
 
-@njit
-def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
+class LevelObject:
+    def __init__(self, pos=(0, 0), type="tree"):
+        self.pos = pos
+        self.type = type
+
+
+def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2):
     # calculate the intersection point of two lines
     # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     # (x1, y1) (x2, y2) is the first line
@@ -384,6 +464,24 @@ def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> float:
         return None
 
 
-@njit
 def line_distance(x1, y1, x2, y2) -> float:
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+
+# load a single image
+def load_image(path):
+    img = pygame.image.load(BASE_IMAGE_PATH + path).convert()
+    img.set_colorkey((0, 0, 0))
+    return img
+
+
+# load all images in a directory
+def load_images(path):
+    images = []
+
+    for img_name in sorted(
+        os.listdir(BASE_IMAGE_PATH + path)
+    ):  # sorted is used for OS interoperability
+        images.append(load_image(path + "/" + img_name))
+
+    return images
