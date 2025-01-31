@@ -35,6 +35,7 @@ class RayCaster(Scene):
         self.display = self.make_surface((self.render_width, self.render_height))
         self.assets = {
             "tree": load_image("textures/tree.png"),
+            "bricks": load_image("textures/bricks.png"),
         }
 
     def command_camera(self):
