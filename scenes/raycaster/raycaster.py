@@ -32,6 +32,7 @@ class RayCaster(Scene):
         self.distances = np.zeros(self.render_width)
         self.rads = np.zeros(self.render_width)
         self.wall_points = np.zeros((self.render_width, 2))
+        self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
         self.assets = {
             "tree": load_image("textures/tree.png"),
@@ -164,14 +165,20 @@ class RayCaster(Scene):
     def draw_slice(self, x):
         distance = self.distances[x]
 
-        bricks = self.assets["bricks"]
+        # determine which texture to use
+        # if the wall we intersected was type 1 use bricks
+        # if the wall is type 2 use the flag
+
+        wall_texture = self.assets["bricks"]
+        if self.wall_textures[x] == 2:
+            wall_texture = self.assets["flag"]
 
         # determine the position of the slice we need to draw
         wp_x = self.wall_points[x, 0]
         wp_y = self.wall_points[x, 1]
         texture_x = abs(wp_x - int(wp_x)) + abs(wp_y - int(wp_y))
         texture_x = self.constrain(texture_x, 0, 1)
-        texture_x = int(texture_x * bricks.get_width() - 1)
+        texture_x = int(texture_x * wall_texture.get_width() - 1)
 
         wall_height = (1 / distance) * self.render_height
         wall_height = self.constrain(wall_height, 5, self.render_height * 4)
@@ -179,7 +186,7 @@ class RayCaster(Scene):
 
         self.display.blit(
             pygame.transform.scale(
-                bricks.subsurface(texture_x, 0, 1, bricks.get_height()),
+                wall_texture.subsurface(texture_x, 0, 1, wall_texture.get_height()),
                 (1, int(wall_height)),
             ),
             (x, top),
@@ -250,6 +257,16 @@ class RayCaster(Scene):
                     self.wall_points[i, 0] = intersection[0]
                     self.wall_points[i, 1] = intersection[1]
 
+                    # extend the wall point by 0.001 along it's
+                    # angle and then sample the texture of the
+                    # wall at that point
+                    x = intersection[0] + math.cos(self.rads[i]) * 0.001
+                    y = intersection[1] + math.sin(self.rads[i]) * 0.001
+                    x = math.floor(x)
+                    y = math.floor(y)
+                    texture = self.level.map[x, y]
+
+                    self.wall_textures[i] = texture
         return min_dist
 
     def edges_ne(self, x1, y1, x2, y2):
