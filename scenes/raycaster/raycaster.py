@@ -26,6 +26,7 @@ class RayCaster(Scene):
         self.commands = {
             "camera": self.command_camera,
         }
+        self.move_start = 0
         self.render_scale = 1
         self.render_height = self.game.HEIGHT // self.render_scale
         self.render_width = self.game.WIDTH // self.render_scale
@@ -38,6 +39,7 @@ class RayCaster(Scene):
             "tree": load_image("textures/tree.png"),
             "bricks": load_image("textures/bricks.png"),
             "flag": load_image("textures/flag.png"),
+            "pistol": load_image("textures/pistol.png"),
         }
 
     def command_camera(self):
@@ -71,6 +73,9 @@ class RayCaster(Scene):
         if self.camera.angle < 0:
             self.camera.angle += PI_2
 
+        if pygame.K_UP in self.game.just_pressed:
+            self.move_start = self.elapsed()
+
         if self.game.pressed[pygame.K_UP]:
             new_pos = (
                 self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
@@ -101,6 +106,7 @@ class RayCaster(Scene):
         self.draw_walls()
         # self.draw_objects()
         self.draw_map()
+        self.draw_weapon()
 
         # scale the display to the game window size
         if self.render_scale > 1:
@@ -109,6 +115,15 @@ class RayCaster(Scene):
             )
         else:
             self.screen.blit(self.display, (0, 0))
+
+    def draw_weapon(self):
+        x = self.render_width // 2 - self.assets["pistol"].get_width() // 2 + 4
+        y = self.render_height - self.assets["pistol"].get_height()
+
+        if self.game.pressed[pygame.K_UP]:
+            y += 3 + 3 * math.sin((self.elapsed() - self.move_start) * 10)
+
+        self.display.blit(self.assets["pistol"], (x, y))
 
     def draw_objects(self):
         # make a list of objects in our fov
