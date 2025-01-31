@@ -92,7 +92,7 @@ class RayCaster(Scene):
         # draw the bottom half of the screen ground green
         pygame.draw.rect(
             self.display,
-            (0, 255, 0),
+            (160, 160, 165),
             (0, self.render_height // 2, self.render_width, self.render_height // 2),
         )
 
@@ -158,16 +158,31 @@ class RayCaster(Scene):
             render_rad = cam_angle - self.fov_rad_half + self.fov_rad * render_x_pct
             self.rads[i] = render_rad
             self.distances[i] = self.wall_distance(x, y, render_rad, i)
-            self.draw_slice(
-                i, self.distances[i], (max(20, int(255 - self.distances[i] * 7)), 0, 0)
-            )
+            self.draw_slice(i)
 
-    def draw_slice(self, x, distance, color):
+    def draw_slice(self, x):
+        distance = self.distances[x]
+
+        bricks = self.assets["bricks"]
+
+        # determine the position of the slice we need to draw
+        wp_x = self.wall_points[x, 0]
+        wp_y = self.wall_points[x, 1]
+        texture_x = abs(wp_x - int(wp_x)) + abs(wp_y - int(wp_y))
+        texture_x = self.constrain(texture_x, 0, 1)
+        texture_x = int(texture_x * bricks.get_width() - 1)
+
         wall_height = min((1 / distance) * self.render_height, self.render_height)
         wall_height = self.constrain(wall_height, 5, self.render_height)
         top = (self.render_height // 2) - (wall_height // 2)
-        bottom = (self.render_height // 2) + (wall_height // 2)
-        pygame.draw.line(self.display, color, (x, top), (x, bottom), 1)
+
+        self.display.blit(
+            pygame.transform.scale(
+                bricks.subsurface(texture_x, 0, 1, bricks.get_height()),
+                (1, int(wall_height)),
+            ),
+            (x, top),
+        )
 
     def tile_edges(self, x, y):
         edges = []
