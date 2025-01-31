@@ -36,6 +36,7 @@ class RayCaster(Scene):
         self.assets = {
             "tree": load_image("textures/tree.png"),
             "bricks": load_image("textures/bricks.png"),
+            "flag": load_image("textures/flag.png"),
         }
 
     def command_camera(self):
@@ -49,7 +50,7 @@ class RayCaster(Scene):
         speed_factor = 0.05
 
         if self.game.pressed[pygame.K_LSHIFT]:
-            speed_factor = 0.1
+            speed_factor *= 2
 
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
@@ -172,8 +173,8 @@ class RayCaster(Scene):
         texture_x = self.constrain(texture_x, 0, 1)
         texture_x = int(texture_x * bricks.get_width() - 1)
 
-        wall_height = min((1 / distance) * self.render_height, self.render_height)
-        wall_height = self.constrain(wall_height, 5, self.render_height)
+        wall_height = (1 / distance) * self.render_height
+        wall_height = self.constrain(wall_height, 5, self.render_height * 4)
         top = (self.render_height // 2) - (wall_height // 2)
 
         self.display.blit(
@@ -442,20 +443,29 @@ class LevelMap:
         self.map = np.zeros((self.map_width, self.map_height))
         for x in range(self.map_width):
             for y in range(self.map_height):
-                if self.map_data.get_at((x, y)) == (255, 255, 255):
+                pixel_color = self.map_data.get_at((x, y))
+
+                # white is a red brick wall
+                if pixel_color == (255, 255, 255):
                     self.map[x, y] = 1
 
-                if self.map_data.get_at((x, y)) == (255, 0, 0):
+                # blue is the flag wall
+                elif pixel_color == (0, 0, 255):
+                    self.map[x, y] = 2
+
+                # red is player starting position
+                elif pixel_color == (255, 0, 0):
                     self.pos_camera_start = (x, y)
 
-                if self.map_data.get_at((x, y)) == (0, 255, 0):
+                # green is a tree
+                elif pixel_color == (0, 255, 0):
                     self.level_objects.append(LevelObject((x, y), "tree"))
 
     def wall_collision(self, pos=(0, 0)) -> bool:
 
         x = int(pos[0])
         y = int(pos[1])
-        return self.map[x, y] == 1
+        return self.map[x, y] > 0
 
 
 class LevelObject:
