@@ -117,11 +117,24 @@ class RayCaster(Scene):
             self.screen.blit(self.display, (0, 0))
 
     def draw_weapon(self):
-        x = self.render_width // 2 - self.assets["pistol"].get_width() // 2 + 4
+        x = self.render_width // 3 * 2
+
         y = self.render_height - self.assets["pistol"].get_height()
 
         if self.game.pressed[pygame.K_UP]:
-            y += 3 + 3 * math.sin((self.elapsed() - self.move_start) * 10)
+
+            traversal = 3
+            speed = 10
+
+            if self.game.pressed[pygame.K_LSHIFT]:
+                traversal = 5
+                speed = 15
+
+            shift = traversal + traversal * math.sin(
+                (self.elapsed() - self.move_start) * speed
+            )
+
+            y += shift
 
         self.display.blit(self.assets["pistol"], (x, y))
 
