@@ -42,6 +42,20 @@ class RayCaster(Scene):
             "pistol": load_image("textures/pistol.png"),
         }
 
+    def convert_radians_to_slice(self, radians):
+
+        # for i in range(self.render_width):
+        #     render_x_pct = i / (self.render_width - 1)
+        #     render_rad = cam_angle - self.fov_rad_half + self.fov_rad * render_x_pct
+        #     self.rads[i] = render_rad
+        #     self.distances[i] = self.wall_distance(x, y, render_rad, i)
+
+        a = radians - self.camera.angle + self.fov_rad_half
+        b = self.render_width - 1
+        c = self.fov_rad
+        i = int((a * b) / c)
+        return i % self.render_width
+
     def command_camera(self):
         self.log(f"Camera Position: {self.camera.pos}")
         self.log(
@@ -104,7 +118,7 @@ class RayCaster(Scene):
         )
 
         self.draw_walls()
-        # self.draw_objects()
+        self.draw_objects()
         self.draw_map()
         self.draw_weapon()
 
@@ -142,39 +156,36 @@ class RayCaster(Scene):
         # make a list of objects in our fov
         render_objects = []
         for obj in self.level.level_objects:
-            angle = math.atan2(
+            rads = math.atan2(
                 obj.pos[1] - self.camera.pos[1], obj.pos[0] - self.camera.pos[0]
             )
-            angle_diff = abs(self.camera.angle - angle)
+            rd = abs(radian_diff(self.camera.angle, rads))
             # self.log(f"Angle: {angle}, Angle Diff: {angle_diff}")
-            if (
-                abs(angle_diff) < self.fov_rad_half
-                or abs(angle_diff) > PI_2 - self.fov_rad_half
-            ):
+            if abs(rd) < self.fov_rad_half or abs(rd) > PI_2 - self.fov_rad_half:
                 distance = line_distance(*self.camera.pos, *obj.pos)
-                render_objects.append((distance, angle, obj))
+
+                # check the distance to the wall at this angle
+                # to see if it's the object is closer than the wall
+                # first compute which slice the object is in
+                x = self.convert_radians_to_slice(rads)
+
+                if distance < self.distances[x]:
+                    render_objects.append((distance, rads, obj))
 
         # sort the objects by distance  so we can render them in the correct order
-        render_objects.sort(key=lambda x: x[0])
+        render_objects.sort(key=lambda x: x[0], reverse=True)
 
-        x1 = self.camera.pos[0]
-        y1 = self.camera.pos[1]
-
-        for i in range(self.render_width):
-            x2 = self.wall_points[i, 0]
-            y2 = self.wall_points[i, 1]
-
-            for obj in render_objects:
-                # check if the object is in front of the wall for this column
-                edges = self.tile_edges(int(obj[2].pos[0]), int(obj[2].pos[1]))
-                dist = self.intersect_edges(edges, x1, y1, x2, y2, i)
-                if dist < self.distances[i]:
-                    pass
-                    # self.draw_slice(
-                    #     i,
-                    #     self.distances[i],
-                    #     (max(20, 0, int(255 - self.distances[i] * 7)), 0),
-                    # )
+        # blit the object to the display in the correct order
+        for obj in render_objects:
+            obj = obj[2]
+            x = self.convert_radians_to_slice(
+                math.atan2(
+                    obj.pos[1] - self.camera.pos[1], obj.pos[0] - self.camera.pos[0]
+                )
+            )
+            y = self.render_height // 2
+            y -= self.assets["tree"].get_height() // 2
+            self.display.blit(self.assets["tree"], (x, y))
 
     def draw_walls(self):
 
@@ -563,3 +574,9 @@ def load_images(path):
         images.append(load_image(path + "/" + img_name))
 
     return images
+
+
+# a method that will return the difference in radians between two angles
+# in radians
+def radian_diff(a, b):
+    return (a - b + math.pi) % (2 * math.pi) - math.pi
