@@ -204,22 +204,26 @@ class RayCaster(Scene):
                 x = self.convert_radians_to_slice(rads)
 
                 if distance < self.distances[x]:
-                    render_objects.append((distance, rads, obj))
+                    render_objects.append((distance, rads, x, obj))
 
         # sort the objects by distance  so we can render them in the correct order
         render_objects.sort(key=lambda x: x[0], reverse=True)
 
         # blit the object to the display in the correct order
-        for obj in render_objects:
-            obj = obj[2]
-            x = self.convert_radians_to_slice(
-                math.atan2(
-                    obj.pos[1] - self.camera.pos[1], obj.pos[0] - self.camera.pos[0]
-                )
+        for o in render_objects:
+            d = o[0]
+            r = o[1]
+            x = o[2]
+            obj = o[3]
+            scale = 1 / (d / 2)
+            scaled = self.assets[obj.type]
+            scaled = pygame.transform.scale(
+                scaled,
+                (int(scaled.get_width() * scale), int(scaled.get_height() * scale)),
             )
-            y = self.render_height // 2
-            y -= self.assets["tree"].get_height() // 2
-            self.display.blit(self.assets["tree"], (x, y))
+
+            top = (self.render_height // 2) + (scaled.get_height())
+            self.display.blit(scaled, (x, top))
 
     def draw_walls(self):
 
