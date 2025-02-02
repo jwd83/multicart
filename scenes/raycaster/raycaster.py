@@ -36,11 +36,15 @@ class RayCaster(Scene):
         self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
         self.assets = {
-            "tree": load_image("textures/tree.png"),
             "bricks": load_image("textures/bricks.png"),
             "flag": load_image("textures/flag.png"),
             "pistol": load_image("textures/pistol.png"),
+            "rifle": load_image("textures/rifle.png"),
+            "tree": load_image("textures/tree.png"),
         }
+        self.inventory = ["pistol", "rifle"]
+        self.ammo = 99
+        self.weapon = "rifle"
 
     def convert_radians_to_slice(self, radians):
 
@@ -131,6 +135,36 @@ class RayCaster(Scene):
             self.screen.blit(self.display, (0, 0))
 
     def draw_weapon(self):
+        if self.weapon == "pistol":
+            self.draw_pistol()
+        elif self.weapon == "rifle":
+            self.draw_rifle()
+
+    def draw_rifle(self):
+
+        x = self.render_width // 2 - self.assets["rifle"].get_width() // 2
+
+        y = self.render_height - self.assets["rifle"].get_height()
+
+        if self.game.pressed[pygame.K_UP]:
+
+            traversal = 3
+            speed = 10
+
+            if self.game.pressed[pygame.K_LSHIFT]:
+                traversal = 5
+                speed = 15
+
+            shift = traversal + traversal * math.sin(
+                (self.elapsed() - self.move_start) * speed
+            )
+
+            y += shift
+
+        self.display.blit(self.assets["rifle"], (x, y))
+
+    def draw_pistol(self):
+
         x = self.render_width // 3 * 2
 
         y = self.render_height - self.assets["pistol"].get_height()
