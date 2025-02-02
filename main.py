@@ -8,10 +8,16 @@ def help():
 Usage: python main.py <command> [args]
 
 Commands:
-help                    Show this help message
-scene new               Make a new scene
-scene run <scene_name>  Run the game with the specified scene
-scene list              List all the scenes
+>> General
+help                            Show this help message
+
+>> Scene Commands
+scene new                       Make a new scene
+scene run <scene_name>          Run the game with the specified scene
+scene list                      List all the scenes
+
+>> Sprite Commands
+dice <image.png> <width> <height> <output_folder>
 """
     )
 
@@ -70,6 +76,11 @@ def scene_new():
         f.write(f"\nfrom {import_path} import {name} # auto-generated")
 
 
+def dice():
+    print("Slice and dice a sprite sheet you say? I'm on it!")
+    sys.exit(0)
+
+
 def main():
     # check if we got any command line arguments
     if len(sys.argv) <= 1:
@@ -80,6 +91,8 @@ def main():
         help()
     elif sys.argv[1] == "scene":
         scene()
+    elif sys.argv[1] == "dice":
+        dice()
     else:
         print("Unrecognized command")
 
