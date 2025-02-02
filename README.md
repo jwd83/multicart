@@ -102,6 +102,9 @@ Bat Animation: Free for commercial use and to modify by Caz
 
 ## OpenGameArt
 
+### Toad Monster by HorrorMovieRei
+https://opengameart.org/content/toad-monster
+
 Various assets
 
 ## OpenAI, Dall-E & ChatGPT
