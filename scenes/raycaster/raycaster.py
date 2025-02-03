@@ -41,6 +41,7 @@ class RayCaster(Scene):
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
             "tree": load_image("textures/tree.png"),
+            "wood": load_image("textures/wood.png"),
         }
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
@@ -249,7 +250,8 @@ class RayCaster(Scene):
         wall_texture = self.assets["bricks"]
         if self.wall_textures[x] == 2:
             wall_texture = self.assets["flag"]
-
+        elif self.wall_textures[x] == 3:
+            wall_texture = self.assets["wood"]
         # determine the position of the slice we need to draw
         wp_x = self.wall_points[x, 0]
         wp_y = self.wall_points[x, 1]
@@ -546,6 +548,10 @@ class LevelMap:
                 # blue is the flag wall
                 elif pixel_color == (0, 0, 255):
                     self.map[x, y] = 2
+
+                # brown is the wood wall (185, 122, 87)
+                elif pixel_color == (185, 122, 87):
+                    self.map[x, y] = 3
 
                 # red is player starting position
                 elif pixel_color == (255, 0, 0):
