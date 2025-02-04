@@ -6,6 +6,11 @@ import math
 import settings
 
 
+# a function to constrain a value n between n_min and n_max inclusive
+def constrain(n, n_min, n_max):
+    return max(min(n_max, n), n_min)
+
+
 # a function to map ranges between two values
 def interpolate(in_value, in_min, in_max, out_min, out_max):
     # check for division by zero
