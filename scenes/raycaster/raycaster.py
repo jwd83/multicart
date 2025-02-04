@@ -567,14 +567,16 @@ class LevelMap:
                     self.monster_spawners.append((x, y, "toad"))
 
     def spawn_monsters(self, amount=1):
-        new_monsters = []
-        spawn_count = min(amount, len(self.monster_spawners))
+
+        # spawn from 1 to the amount of spawners
+        spawn_count = constrain(amount, 1, len(self.monster_spawners))
+
         avail_spawns = self.monster_spawners.copy()
 
         for _ in range(spawn_count):
             random_spawn = random.choice(avail_spawns)
             avail_spawns.remove(random_spawn)
-            new_monsters.append(random_spawn)
+            self.monsters.append(Monster(pos=random_spawn[:2], type=random_spawn[2]))
 
     def wall_collision(self, pos=(0, 0)) -> bool:
 
