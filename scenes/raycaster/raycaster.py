@@ -525,7 +525,8 @@ class LevelMap:
 
         self.pos_camera_start = (0, 0)
         self.level_objects = []
-
+        self.monster_spawners = []
+        self.monsters = []
         self.map_data = load_tpng(map_path)
 
         self.map_height = self.map_data.get_height()
@@ -561,6 +562,20 @@ class LevelMap:
                 elif pixel_color == (0, 255, 0):
                     self.level_objects.append(LevelObject((x, y), "tree"))
 
+                # orange is a monster spawner
+                elif pixel_color == (255, 127, 39):
+                    self.monster_spawners.append((x, y, "toad"))
+
+    def spawn_monsters(self, amount=1):
+        new_monsters = []
+        spawn_count = min(amount, len(self.monster_spawners))
+        avail_spawns = self.monster_spawners.copy()
+
+        for _ in range(spawn_count):
+            random_spawn = random.choice(avail_spawns)
+            avail_spawns.remove(random_spawn)
+            new_monsters.append(random_spawn)
+
     def wall_collision(self, pos=(0, 0)) -> bool:
 
         x = int(pos[0])
@@ -572,6 +587,13 @@ class LevelObject:
     def __init__(self, pos=(0, 0), type="tree"):
         self.pos = pos
         self.type = type
+
+
+class Monster:
+    def __init__(self, pos=(0, 0), type="toad"):
+        self.pos = pos
+        self.type = type
+        self.state = "walk"
 
 
 def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2):
