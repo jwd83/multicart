@@ -1,3 +1,12 @@
+"""
+todo:
+
+* bring the animatedsprite and animation classes in to load the walk animation for the toad monster
+* path finding for the toad monster class to locate the player
+
+
+"""
+
 from scene import Scene
 from utils import *
 import math
