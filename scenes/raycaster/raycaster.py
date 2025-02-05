@@ -50,6 +50,7 @@ class RayCaster(Scene):
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
             "tree": load_image("textures/tree.png"),
+            "tree-big": load_image("textures/tree-big.png"),
             "wood": load_image("textures/wood.png"),
         }
         self.inventory = ["pistol", "rifle"]
