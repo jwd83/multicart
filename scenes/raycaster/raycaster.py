@@ -3,7 +3,7 @@ todo:
 
 * bring the animatedsprite and animation classes in to load the walk animation for the toad monster
 * path finding for the toad monster class to locate the player
-
+* draw objects needs to clip out of view portions of the object. determine left and right edges of the object to clip the sprite to
 
 """
 
@@ -233,7 +233,9 @@ class RayCaster(Scene):
             )
 
             top = (self.render_height // 2) + (scaled.get_height())
-            self.display.blit(scaled, (x, top))
+            left_offset = scaled.get_width() // 2
+            left = x - left_offset
+            self.display.blit(scaled, (left, top))
 
     def draw_walls(self):
 
