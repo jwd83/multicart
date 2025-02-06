@@ -234,9 +234,12 @@ class RayCaster(Scene):
             )
 
             top = (self.render_height // 2) + (scaled.get_height())
+            bottom = top + scaled.get_height()
+            middle = x
             left_offset = scaled.get_width() // 2
             left = x - left_offset
             self.display.blit(scaled, (left, top))
+            self.display.set_at((middle, bottom), (255, 0, 0))
 
     def draw_walls(self):
 
