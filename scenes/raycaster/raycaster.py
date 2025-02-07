@@ -16,6 +16,7 @@ import pygame
 from numba import njit, jit
 import os
 import pygame
+from classes import *
 
 BASE_IMAGE_PATH = "assets/raycaster/"
 PI_2 = math.pi * 2
@@ -593,6 +594,10 @@ class LevelMap:
                     self.level_objects.append(
                         LevelObject((x + 0.5, y + 0.5), "chandelier")
                     )
+
+                else:
+                    print("Unknown color", pixel_color)
+                    pass
 
     def spawn_monsters(self, amount=1):
 
