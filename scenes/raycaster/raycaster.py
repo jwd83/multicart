@@ -35,6 +35,8 @@ class RayCaster(Scene):
         self.camera = Camera(self.level.pos_camera_start)
         self.commands = {
             "camera": self.command_camera,
+            "monsters": self.command_monsters,
+            "spawn": self.command_spawn,
         }
         self.move_start = 0
         self.render_scale = 1
@@ -59,6 +61,14 @@ class RayCaster(Scene):
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
         self.weapon = "rifle"
+
+    def command_monsters(self):
+        self.log(f"Monsters: {len(self.level.monsters)}")
+        for monster in self.level.monsters:
+            self.log(f"Monster: {monster.pos}")
+
+    def command_spawn(self):
+        self.level.spawn_monsters(1)
 
     def convert_radians_to_slice(self, radians):
 
@@ -609,7 +619,10 @@ class LevelMap:
         for _ in range(spawn_count):
             random_spawn = random.choice(avail_spawns)
             avail_spawns.remove(random_spawn)
-            self.monsters.append(Monster(pos=random_spawn[:2], type=random_spawn[2]))
+            mob = Monster(pos=random_spawn[:2], type=random_spawn[2])
+            # increment the pos by 0.5, 0.5 to center it in the tile it is spawned in
+            mob.pos = (mob.pos[0] + 0.5, mob.pos[1] + 0.5)
+            self.monsters.append(mob)
 
     def wall_collision(self, pos=(0, 0)) -> bool:
 
