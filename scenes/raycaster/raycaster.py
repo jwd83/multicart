@@ -46,6 +46,7 @@ class RayCaster(Scene):
         self.display = self.make_surface((self.render_width, self.render_height))
         self.assets = {
             "bricks": load_image("textures/bricks.png"),
+            "chandelier": load_image("textures/chandelier.png"),
             "flag": load_image("textures/flag.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
@@ -122,13 +123,10 @@ class RayCaster(Scene):
                 self.camera.pos = new_pos
 
     def draw(self):
-        # self.display.fill((0, 0, 0))
-        # draw the top half of the screen sky blue
-        self.display.fill((135, 206, 235))
-        # draw the bottom half of the screen ground green
+        self.display.fill((160, 160, 165))
         pygame.draw.rect(
             self.display,
-            (160, 160, 165),
+            (120, 120, 120),
             (0, self.render_height // 2, self.render_width, self.render_height // 2),
         )
 
@@ -233,13 +231,21 @@ class RayCaster(Scene):
                 (int(scaled.get_width() * scale), int(scaled.get_height() * scale)),
             )
 
-            top = (self.render_height // 2) + (scaled.get_height())
-            bottom = top + scaled.get_height()
-            middle = x
-            left_offset = scaled.get_width() // 2
-            left = x - left_offset
+            wall_height = (1 / d) * self.render_height
+            wall_height = self.constrain(wall_height, 5, self.render_height * 4)
+            wh_top = (self.render_height // 2) - (wall_height // 2)
+            wh_bottom = (self.render_height // 2) + (wall_height // 2)
+            left = x - scaled.get_width() // 2
+            top = wh_bottom - scaled.get_height()
+            # draw the object at bottom of the wall
+            if obj.type == "chandelier":
+                top = wh_top
             self.display.blit(scaled, (left, top))
-            self.display.set_at((middle, bottom), (255, 0, 0))
+            self.display.blit(scaled, (left, top))
+
+            # uncomment the line below to draw a green pixel
+            # where the bottom center of the sprite was determined to be
+            # self.display.set_at((x, wh_bottom), (0, 255, 0))
 
     def draw_walls(self):
 
@@ -575,11 +581,17 @@ class LevelMap:
 
                 # green is a tree
                 elif pixel_color == (0, 255, 0):
-                    self.level_objects.append(LevelObject((x, y), "tree"))
+                    self.level_objects.append(LevelObject((x + 0.5, y + 0.5), "tree"))
 
                 # orange is a monster spawner
                 elif pixel_color == (255, 127, 39):
                     self.monster_spawners.append((x, y, "toad"))
+
+                # yellow is a chandelier
+                elif pixel_color == (255, 242, 0):
+                    self.level_objects.append(
+                        LevelObject((x + 0.5, y + 0.5), "chandelier")
+                    )
 
     def spawn_monsters(self, amount=1):
 
