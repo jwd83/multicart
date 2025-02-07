@@ -45,14 +45,15 @@ class RayCaster(Scene):
         self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
         self.assets = {
-            "bricks": load_image("textures/bricks.png"),
+            "bricks": load_image("textures/bricks-bg-tiles.png"),
             "chandelier": load_image("textures/chandelier.png"),
             "flag": load_image("textures/flag.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
+            "staggered": load_image("textures/staggered.png"),
             "tree": load_image("textures/tree.png"),
             "tree-big": load_image("textures/tree-big.png"),
-            "wood": load_image("textures/wood.png"),
+            "wood": load_image("textures/wood-bg-tiles.png"),
         }
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
