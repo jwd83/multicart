@@ -124,7 +124,10 @@ class RayCaster(Scene):
                 monster.pos[1] + math.sin(angle) * monster_speed,
             )
             if not self.level.wall_collision(new_pos):
-                monster.pos = new_pos
+                if not self.level.monster_collisions(
+                    new_pos, radius=0.5, ignore=[monster]
+                ):
+                    monster.pos = new_pos
 
     def animate_monsters(self):
         for monster in self.level.monsters:
@@ -679,13 +682,36 @@ class LevelMap:
             )
             # increment the pos by 0.5, 0.5 to center it in the tile it is spawned in
             mob.pos = (mob.pos[0] + 0.5, mob.pos[1] + 0.5)
-            self.monsters.append(mob)
+
+            # check that this does not spawn within a tile of an existing monster
+            if not self.monster_collisions(mob.pos, ignore=[mob]):
+
+                self.monsters.append(mob)
 
     def wall_collision(self, pos=(0, 0)) -> bool:
 
         x = int(pos[0])
         y = int(pos[1])
         return self.map[x, y] > 0
+
+    def monster_collisions(
+        self, pos=(0, 0), radius: float = 1.0, ignore: None | list = None
+    ) -> bool:
+
+        if ignore is None:
+            ignore = []
+
+        for monster in self.monsters:
+            if monster in ignore:
+                continue
+
+            distance = math.sqrt(
+                (pos[0] - monster.pos[0]) ** 2 + (pos[1] - monster.pos[1]) ** 2
+            )
+            if distance < radius:
+                return True
+
+        return False
 
 
 class LevelObject:
