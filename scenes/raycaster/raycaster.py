@@ -63,7 +63,7 @@ class RayCaster(Scene):
         }
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
-        self.weapon = "rifle"
+        self.weapon = "pistol"
 
     def command_monsters(self):
         self.log(f"Monsters: {len(self.level.monsters)}")
@@ -95,10 +95,40 @@ class RayCaster(Scene):
 
     def update(self):
         self.update_player()
-        self.update_monsters()
+        self.move_monsters()
+        self.animate_monsters()
 
-    def update_monsters(self):
+    def move_monsters(self):
+        monster_speed = 0.03
+
         for monster in self.level.monsters:
+            # move the monster toward the player
+
+            # if the monster is less than 0.5 units away from the player then dont move
+            # them any closer
+            distance_to_player = math.sqrt(
+                (self.camera.pos[0] - monster.pos[0]) ** 2
+                + (self.camera.pos[1] - monster.pos[1]) ** 2
+            )
+            if distance_to_player < 0.5:
+                continue
+
+            # get the angle to the player
+            angle = math.atan2(
+                self.camera.pos[1] - monster.pos[1], self.camera.pos[0] - monster.pos[0]
+            )
+
+            # move the monster toward the player
+            new_pos = (
+                monster.pos[0] + math.cos(angle) * monster_speed,
+                monster.pos[1] + math.sin(angle) * monster_speed,
+            )
+            if not self.level.wall_collision(new_pos):
+                monster.pos = new_pos
+
+    def animate_monsters(self):
+        for monster in self.level.monsters:
+
             monster.animation.update()
 
     def update_player(self):
