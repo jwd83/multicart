@@ -58,11 +58,13 @@ class RayCaster(Scene):
                 load_images_alpha("animations/toad/walk"), img_dur=10
             ),
             "tree": load_image("textures/tree.png"),
+            "telepad": load_image("textures/telepad.png"),
             "tree-big": load_image("textures/tree-big.png"),
             "wood": load_image("textures/wood-bg-tiles.png"),
         }
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
+        self.spawn_rate = 60
         self.weapon = "pistol"
 
     def command_monsters(self):
@@ -95,8 +97,15 @@ class RayCaster(Scene):
 
     def update(self):
         self.update_player()
+        self.spawn_monsters()
         self.move_monsters()
         self.animate_monsters()
+
+    def spawn_monsters(self):
+        if self.game.frame_count() % self.spawn_rate == 0:
+            if random.choice([True, False, False, False]):
+                self.play_sound("jsfxr-qb-lines-4")
+                self.level.spawn_monsters(1)
 
     def move_monsters(self):
         monster_speed = 0.03
@@ -652,6 +661,9 @@ class LevelMap:
 
                 # orange is a monster spawner
                 elif pixel_color == (255, 127, 39):
+                    self.level_objects.append(
+                        LevelObject((x + 0.5, y + 0.5), "telepad", self.scene)
+                    )
                     self.monster_spawners.append((x, y, "toad", self.scene))
 
                 # yellow is a chandelier
