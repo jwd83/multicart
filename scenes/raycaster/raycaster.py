@@ -31,7 +31,7 @@ class RayCaster(Scene):
         self.fov_rad = math.radians(self.fov_degrees)
         self.fov_rad_half = math.radians(self.fov_degrees_half)
 
-        self.level = LevelMap(1)
+        self.level = LevelMap(1, self)
         self.camera = Camera(self.level.pos_camera_start)
         self.commands = {
             "camera": self.command_camera,
@@ -54,6 +54,9 @@ class RayCaster(Scene):
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
             "staggered": load_image("textures/staggered.png"),
+            "toad/walk": Animation(
+                load_images_alpha("animations/toad/walk"), img_dur=10
+            ),
             "tree": load_image("textures/tree.png"),
             "tree-big": load_image("textures/tree-big.png"),
             "wood": load_image("textures/wood-bg-tiles.png"),
@@ -91,6 +94,14 @@ class RayCaster(Scene):
         )
 
     def update(self):
+        self.update_player()
+        self.update_monsters()
+
+    def update_monsters(self):
+        for monster in self.level.monsters:
+            monster.animation.update()
+
+    def update_player(self):
         turn_factor = 0.03
         speed_factor = 0.05
 
@@ -210,7 +221,12 @@ class RayCaster(Scene):
     def draw_objects(self):
         # make a list of objects in our fov
         render_objects = []
-        for obj in self.level.level_objects:
+
+        # combine level objects and monsters into one list to check
+
+        combined = self.level.level_objects + self.level.monsters
+
+        for obj in combined:
             rads = math.atan2(
                 obj.pos[1] - self.camera.pos[1], obj.pos[0] - self.camera.pos[0]
             )
@@ -237,10 +253,14 @@ class RayCaster(Scene):
             x = o[2]
             obj = o[3]
             scale = 1 / (d / 2)
-            scaled = self.assets[obj.type]
+            obj_img = obj.img()
+
             scaled = pygame.transform.scale(
-                scaled,
-                (int(scaled.get_width() * scale), int(scaled.get_height() * scale)),
+                obj_img,
+                (
+                    int(obj_img.get_width() * scale),
+                    int(obj_img.get_height() * scale),
+                ),
             )
 
             wall_height = (1 / d) * self.render_height
@@ -252,7 +272,6 @@ class RayCaster(Scene):
             # draw the object at bottom of the wall
             if obj.type == "chandelier":
                 top = wh_top
-            self.display.blit(scaled, (left, top))
             self.display.blit(scaled, (left, top))
 
             # uncomment the line below to draw a green pixel
@@ -549,7 +568,8 @@ class Camera:
 
 
 class LevelMap:
-    def __init__(self, level_number):
+    def __init__(self, level_number, scene):
+        self.scene = scene
         map_path = f"raycaster/maps/{level_number}.png"
 
         # check if the map file exists
@@ -593,16 +613,18 @@ class LevelMap:
 
                 # green is a tree
                 elif pixel_color == (0, 255, 0):
-                    self.level_objects.append(LevelObject((x + 0.5, y + 0.5), "tree"))
+                    self.level_objects.append(
+                        LevelObject((x + 0.5, y + 0.5), "tree", self.scene)
+                    )
 
                 # orange is a monster spawner
                 elif pixel_color == (255, 127, 39):
-                    self.monster_spawners.append((x, y, "toad"))
+                    self.monster_spawners.append((x, y, "toad", self.scene))
 
                 # yellow is a chandelier
                 elif pixel_color == (255, 242, 0):
                     self.level_objects.append(
-                        LevelObject((x + 0.5, y + 0.5), "chandelier")
+                        LevelObject((x + 0.5, y + 0.5), "chandelier", self.scene)
                     )
 
                 else:
@@ -619,7 +641,12 @@ class LevelMap:
         for _ in range(spawn_count):
             random_spawn = random.choice(avail_spawns)
             avail_spawns.remove(random_spawn)
-            mob = Monster(pos=random_spawn[:2], type=random_spawn[2])
+            mob = Monster(
+                pos=random_spawn[:2],
+                type=random_spawn[2],
+                action="walk",
+                scene=self.scene,
+            )
             # increment the pos by 0.5, 0.5 to center it in the tile it is spawned in
             mob.pos = (mob.pos[0] + 0.5, mob.pos[1] + 0.5)
             self.monsters.append(mob)
@@ -632,16 +659,39 @@ class LevelMap:
 
 
 class LevelObject:
-    def __init__(self, pos=(0, 0), type="tree"):
+    def __init__(self, pos=(0, 0), type="tree", scene: Scene = None):
+        self.scene = scene
         self.pos = pos
         self.type = type
+
+    def img(self):
+        return self.scene.assets[self.type]
 
 
 class Monster:
-    def __init__(self, pos=(0, 0), type="toad"):
+    def __init__(
+        self, pos=(0, 0), type="toad", action: str = "walk", scene: Scene = None
+    ):
+        # set default values for the monster
+        self.action = ""  # TODO: look at making action private
+        self.animation = None
+
+        # store the variables and references
+        self.scene = scene
         self.pos = pos
         self.type = type
-        self.state = "walk"
+
+        # set the action for the monster
+        self.set_action(action)
+
+    def img(self):
+        return self.animation.img()
+
+    def set_action(self, action: str):
+        if self.action != action:
+            self.action = action
+            self.animation = self.scene.assets[f"{self.type}/{self.action}"].copy()
+            self.animation.reset()
 
 
 def line_intersection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2):
@@ -686,6 +736,24 @@ def load_images(path):
         os.listdir(BASE_IMAGE_PATH + path)
     ):  # sorted is used for OS interoperability
         images.append(load_image(path + "/" + img_name))
+
+    return images
+
+
+# load a single image
+def load_image_alpha(path):
+    img = pygame.image.load(BASE_IMAGE_PATH + path).convert_alpha()
+    return img
+
+
+# load all images in a directory
+def load_images_alpha(path):
+    images = []
+
+    for img_name in sorted(
+        os.listdir(BASE_IMAGE_PATH + path)
+    ):  # sorted is used for OS interoperability
+        images.append(load_image_alpha(path + "/" + img_name))
 
     return images
 
