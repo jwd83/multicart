@@ -155,10 +155,10 @@ class RayCaster(Scene):
             self.game.scene_push = "Menu"
 
         # turn left/right
-        if self.game.pressed[pygame.K_LEFT]:
+        if self.game.pressed[pygame.K_LEFT] or self.game.pressed[pygame.K_a]:
             self.camera.angle -= turn_factor
 
-        if self.game.pressed[pygame.K_RIGHT]:
+        if self.game.pressed[pygame.K_RIGHT] or self.game.pressed[pygame.K_d]:
             self.camera.angle += turn_factor
 
         # cap the angle to 2pi
@@ -171,7 +171,29 @@ class RayCaster(Scene):
         if pygame.K_UP in self.game.just_pressed:
             self.move_start = self.elapsed()
 
-        if self.game.pressed[pygame.K_UP]:
+        if self.game.pressed[pygame.K_q]:
+            # q = strafe left
+            new_pos = (
+                self.camera.pos[0]
+                + math.cos(self.camera.angle - math.pi * 0.5) * speed_factor,
+                self.camera.pos[1]
+                + math.sin(self.camera.angle - math.pi * 0.5) * speed_factor,
+            )
+            if not self.level.wall_collision(new_pos):
+                self.camera.pos = new_pos
+
+        if self.game.pressed[pygame.K_e]:
+            # e = strafe right
+            new_pos = (
+                self.camera.pos[0]
+                + math.cos(self.camera.angle + math.pi * 0.5) * speed_factor,
+                self.camera.pos[1]
+                + math.sin(self.camera.angle + math.pi * 0.5) * speed_factor,
+            )
+            if not self.level.wall_collision(new_pos):
+                self.camera.pos = new_pos
+
+        if self.game.pressed[pygame.K_UP] or self.game.pressed[pygame.K_w]:
             new_pos = (
                 self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
                 self.camera.pos[1] + math.sin(self.camera.angle) * speed_factor,
@@ -179,7 +201,7 @@ class RayCaster(Scene):
             if not self.level.wall_collision(new_pos):
                 self.camera.pos = new_pos
 
-        if self.game.pressed[pygame.K_DOWN]:
+        if self.game.pressed[pygame.K_DOWN] or self.game.pressed[pygame.K_s]:
             new_pos = (
                 self.camera.pos[0] - math.cos(self.camera.angle) * speed_factor,
                 self.camera.pos[1] - math.sin(self.camera.angle) * speed_factor,
