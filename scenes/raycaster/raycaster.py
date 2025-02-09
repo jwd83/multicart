@@ -143,16 +143,8 @@ class RayCaster(Scene):
 
             monster.animation.update()
 
-    def update_player(self):
+    def turn_player(self):
         turn_factor = 0.03
-        speed_factor = 0.05
-
-        if self.game.pressed[pygame.K_LSHIFT]:
-            speed_factor *= 2
-
-        # if the user presses escape show the menu
-        if pygame.K_ESCAPE in self.game.just_pressed:
-            self.game.scene_push = "Menu"
 
         # turn left/right
         if self.game.pressed[pygame.K_LEFT] or self.game.pressed[pygame.K_a]:
@@ -168,52 +160,76 @@ class RayCaster(Scene):
         if self.camera.angle < 0:
             self.camera.angle += PI_2
 
+    def move_player(self):
+
+        speed_factor = 0.05
+        if self.game.pressed[pygame.K_LSHIFT]:
+            speed_factor *= 2
+
         if pygame.K_UP in self.game.just_pressed:
             self.move_start = self.elapsed()
 
         if self.game.pressed[pygame.K_q]:
             # q = strafe left
-            new_pos = (
-                self.camera.pos[0]
-                + math.cos(self.camera.angle - math.pi * 0.5) * speed_factor,
-                self.camera.pos[1]
-                + math.sin(self.camera.angle - math.pi * 0.5) * speed_factor,
+            self.relocate_player(
+                (
+                    self.camera.pos[0]
+                    + math.cos(self.camera.angle - math.pi * 0.5) * speed_factor,
+                    self.camera.pos[1]
+                    + math.sin(self.camera.angle - math.pi * 0.5) * speed_factor,
+                )
             )
-            if not self.level.wall_collision(new_pos):
-                self.camera.pos = new_pos
 
         if self.game.pressed[pygame.K_e]:
             # e = strafe right
-            new_pos = (
-                self.camera.pos[0]
-                + math.cos(self.camera.angle + math.pi * 0.5) * speed_factor,
-                self.camera.pos[1]
-                + math.sin(self.camera.angle + math.pi * 0.5) * speed_factor,
+            self.relocate_player(
+                (
+                    self.camera.pos[0]
+                    + math.cos(self.camera.angle + math.pi * 0.5) * speed_factor,
+                    self.camera.pos[1]
+                    + math.sin(self.camera.angle + math.pi * 0.5) * speed_factor,
+                )
             )
-            if not self.level.wall_collision(new_pos):
-                self.camera.pos = new_pos
 
         if self.game.pressed[pygame.K_UP] or self.game.pressed[pygame.K_w]:
-            new_pos = (
-                self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
-                self.camera.pos[1] + math.sin(self.camera.angle) * speed_factor,
+            self.relocate_player(
+                (
+                    self.camera.pos[0] + math.cos(self.camera.angle) * speed_factor,
+                    self.camera.pos[1] + math.sin(self.camera.angle) * speed_factor,
+                )
             )
-            if not self.level.wall_collision(new_pos):
-                self.camera.pos = new_pos
-
         if self.game.pressed[pygame.K_DOWN] or self.game.pressed[pygame.K_s]:
-            new_pos = (
-                self.camera.pos[0] - math.cos(self.camera.angle) * speed_factor,
-                self.camera.pos[1] - math.sin(self.camera.angle) * speed_factor,
+            self.relocate_player(
+                (
+                    self.camera.pos[0] - math.cos(self.camera.angle) * speed_factor,
+                    self.camera.pos[1] - math.sin(self.camera.angle) * speed_factor,
+                )
             )
-            if not self.level.wall_collision(new_pos):
-                self.camera.pos = new_pos
+
+    def relocate_player(self, new_pos):
+        if not self.level.wall_collision(new_pos):
+            self.camera.pos = new_pos
+        elif not self.level.wall_collision((new_pos[0], self.camera.pos[1])):
+            self.camera.pos = (new_pos[0], self.camera.pos[1])
+        elif not self.level.wall_collision((self.camera.pos[0], new_pos[1])):
+            self.camera.pos = (self.camera.pos[0], new_pos[1])
+
+    def update_player(self):
+
+        # if the user presses escape show the menu
+        if pygame.K_ESCAPE in self.game.just_pressed:
+            self.game.scene_push = "Menu"
+
+        self.turn_player()
+        self.move_player()
 
     def draw(self):
-        self.display.fill((160, 160, 165))
+        floor_color = (120, 120, 120)
+        ceiling_color = (160, 160, 165)
+        self.display.fill(ceiling_color)
         pygame.draw.rect(
             self.display,
-            (120, 120, 120),
+            floor_color,
             (0, self.render_height // 2, self.render_width, self.render_height // 2),
         )
 
@@ -304,7 +320,7 @@ class RayCaster(Scene):
                 # first compute which slice the object is in
                 x = self.convert_radians_to_slice(rads)
 
-                if distance < self.distances[x]:
+                if distance < self.distances[x] and distance > 0.25:
                     render_objects.append((distance, rads, x, obj))
 
         # sort the objects by distance  so we can render them in the correct order
@@ -694,6 +710,9 @@ class LevelMap:
                         LevelObject((x + 0.5, y + 0.5), "chandelier", self.scene)
                     )
 
+                elif pixel_color == (0, 0, 0):
+                    # empty space
+                    pass
                 else:
                     print("Unknown color", pixel_color)
                     pass
