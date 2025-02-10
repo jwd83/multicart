@@ -1,5 +1,7 @@
 """
 todo:
+* a crosshair in the center of the screen
+* mouse movement
 * player shoot, muzzle flare and sound. if monster hit remove from level monsters and put a toad death in level objects to store where the body was killed.
 * maybe after walls and floors are drawn do a pool of blood pass on any dead monsters before rendering objects for some extra gore
 * bring the animatedsprite and animation classes in to load the walk animation for the toad monster
@@ -69,7 +71,7 @@ class RayCaster(Scene):
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
         self.spawn_rate = 60
-        self.weapon = "pistol"
+        self.weapon = "rifle"
 
     def command_monsters(self):
         self.log(f"Monsters: {len(self.level.monsters)}")
