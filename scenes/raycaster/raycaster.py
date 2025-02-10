@@ -243,6 +243,10 @@ class RayCaster(Scene):
         self.draw_objects()
         self.draw_map()
         self.draw_weapon()
+        self.draw_crosshairs()
+        self.rescale_display()
+
+    def rescale_display(self):
 
         # scale the display to the game window size
         if self.render_scale > 1:
@@ -251,6 +255,39 @@ class RayCaster(Scene):
             )
         else:
             self.screen.blit(self.display, (0, 0))
+
+    def draw_crosshairs(self):
+        # draw a thick black crosshair and a red crosshair inside it
+        self.draw_crosshair(size=10, color=(0, 0, 0), thickness=3)
+        # draw the red crosshair
+        self.draw_crosshair()
+
+    def draw_crosshair(self, size=8, color=(255, 100, 90), thickness=1):
+
+        # draw a crosshair in the center of the screen
+
+        pygame.draw.line(
+            self.display,
+            color,
+            (self.render_width // 2 - size, self.render_height // 2),
+            (self.render_width // 2 + size, self.render_height // 2),
+            thickness,
+        )
+        pygame.draw.line(
+            self.display,
+            color,
+            (self.render_width // 2, self.render_height // 2 - size),
+            (self.render_width // 2, self.render_height // 2 + size),
+            thickness,
+        )
+
+        pygame.draw.circle(
+            self.display,
+            color,
+            (self.render_width // 2, self.render_height // 2),
+            size,
+            thickness,
+        )
 
     def draw_weapon(self):
         if self.weapon == "pistol":
