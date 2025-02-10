@@ -1,6 +1,7 @@
 """
 todo:
-
+* player shoot, muzzle flare and sound. if monster hit remove from level monsters and put a toad death in level objects to store where the body was killed.
+* maybe after walls and floors are drawn do a pool of blood pass on any dead monsters before rendering objects for some extra gore
 * bring the animatedsprite and animation classes in to load the walk animation for the toad monster
 * path finding for the toad monster class to locate the player
 * draw objects needs to clip out of view portions of the object. determine left and right edges of the object to clip the sprite to
@@ -56,6 +57,9 @@ class RayCaster(Scene):
             "staggered": load_image("textures/staggered.png"),
             "toad/walk": Animation(
                 load_images_alpha("animations/toad/walk"), img_dur=10
+            ),
+            "toad/die": Animation(
+                load_images_alpha("animations/toad/die"), img_dur=10, loop=False
             ),
             "tree": load_image("textures/tree.png"),
             "telepad": load_image("textures/telepad.png"),
