@@ -1,6 +1,6 @@
 """
 todo:
-* a crosshair in the center of the screen
+
 * mouse movement
 * player shoot, muzzle flare and sound. if monster hit remove from level monsters and put a toad death in level objects to store where the body was killed.
 * maybe after walls and floors are drawn do a pool of blood pass on any dead monsters before rendering objects for some extra gore
