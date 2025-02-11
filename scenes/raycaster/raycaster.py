@@ -2,7 +2,6 @@
 todo:
 
 * mouse movement
-* player shoot, muzzle flare and sound. if monster hit remove from level monsters and put a toad death in level objects to store where the body was killed.
 * maybe after walls and floors are drawn do a pool of blood pass on any dead monsters before rendering objects for some extra gore
 * bring the animatedsprite and animation classes in to load the walk animation for the toad monster
 * path finding for the toad monster class to locate the player
