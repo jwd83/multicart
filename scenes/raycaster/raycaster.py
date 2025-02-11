@@ -281,6 +281,8 @@ class RayCaster(Scene):
             thickness,
         )
 
+        # draw the outer circle
+
         pygame.draw.circle(
             self.display,
             color,
