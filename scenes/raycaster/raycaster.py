@@ -35,6 +35,7 @@ class RayCaster(Scene):
             "flag": load_image("textures/flag.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
+            "rifle-shoot": load_image("textures/rifle-shoot.png"),
             "staggered": load_image("textures/staggered.png"),
             "toad/walk": Animation(
                 load_images_alpha("animations/toad/walk"), img_dur=10
@@ -73,6 +74,8 @@ class RayCaster(Scene):
         self.ammo = 99
         self.spawn_rate = 60
         self.weapon = "rifle"
+        self.weapon_fire_rate = 10
+        self.weapon_fire_show = 3
         self.shoot_cooldown = 0
 
     def command_monsters(self):
@@ -240,7 +243,7 @@ class RayCaster(Scene):
             return
 
         if self.game.pressed[pygame.K_SPACE]:
-            self.shoot_cooldown = 20
+            self.shoot_cooldown = 10
             self.shoot()
 
     def shoot(self):
@@ -280,6 +283,9 @@ class RayCaster(Scene):
                 self.level.level_objects.append(
                     LevelObject(pos=monster.pos, type="toad/die", scene=self)
                 )
+
+                # choose 1 of 4 death sounds to play
+                self.play_sound(random.choice(["death1", "death2", "death3", "death4"]))
 
     def draw(self):
         floor_color = (120, 120, 120)
@@ -353,9 +359,13 @@ class RayCaster(Scene):
 
     def draw_rifle(self):
 
-        x = self.render_width // 2 - self.assets["rifle"].get_width() // 2
+        asset = self.assets["rifle"]
+        if self.shoot_cooldown > 7:
+            asset = self.assets["rifle-shoot"]
 
-        y = self.render_height - self.assets["rifle"].get_height()
+        x = self.render_width // 2 - asset.get_width() // 2
+
+        y = self.render_height - asset.get_height()
 
         if self.game.pressed[pygame.K_UP]:
 
@@ -372,7 +382,7 @@ class RayCaster(Scene):
 
             y += shift
 
-        self.display.blit(self.assets["rifle"], (x, y))
+        self.display.blit(asset, (x, y))
 
     def draw_pistol(self):
 

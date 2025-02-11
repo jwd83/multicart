@@ -15,6 +15,7 @@ class Game:
         # initialize pygame
         pygame.init()
         pygame.mixer.init()
+        pygame.mixer.set_num_channels(64)
         pygame.joystick.init()
 
         self.debug_scene = None
