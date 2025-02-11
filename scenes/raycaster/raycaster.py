@@ -4,7 +4,7 @@ todo:
 * mouse movement
 * maybe after walls and floors are drawn do a pool of blood pass on any dead monsters before rendering objects for some extra gore
 * bring the animatedsprite and animation classes in to load the walk animation for the toad monster
-* path finding for the toad monster class to locate the player
+* better path finding for the toad monster class to locate the player
 * draw objects needs to clip out of view portions of the object. determine left and right edges of the object to clip the sprite to
 
 """
