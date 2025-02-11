@@ -73,7 +73,7 @@ class RayCaster(Scene):
         self.ammo = 99
         self.spawn_rate = 60
         self.weapon = "rifle"
-        self.weapon_spread = 0.1
+        self.weapon_spread = 0.125
         self.weapon_fire_rate = 10
         self.weapon_fire_show = 3
         self.shoot_cooldown = 0
@@ -84,7 +84,8 @@ class RayCaster(Scene):
             self.log(f"Monster: {monster.pos}")
 
     def command_spawn(self):
-        self.level.spawn_monsters(1)
+
+        self.level.spawn_monsters(len(self.level.monster_spawners))
 
     def convert_radians_to_slice(self, radians):
 
@@ -259,7 +260,6 @@ class RayCaster(Scene):
         x = self.render_width // 2
         wall_point = self.wall_points[x]
         line = (self.camera.pos[0], self.camera.pos[1], wall_point[0], wall_point[1])
-        self.log(f"Line: {line}")
 
         lx1 = self.camera.pos[0]
         ly1 = self.camera.pos[1]
@@ -273,8 +273,6 @@ class RayCaster(Scene):
             py = monster.pos[1]
 
             d = distance_point_to_line(lx1, ly1, lx2, ly2, px, py)
-
-            self.log(f"Distance: {d}")
 
             if d < self.weapon_spread:
 
@@ -420,7 +418,6 @@ class RayCaster(Scene):
                 obj.pos[1] - self.camera.pos[1], obj.pos[0] - self.camera.pos[0]
             )
             rd = abs(radian_diff(self.camera.angle, rads))
-            # self.log(f"Angle: {angle}, Angle Diff: {angle_diff}")
             if abs(rd) < self.fov_rad_half or abs(rd) > PI_2 - self.fov_rad_half:
                 distance = line_distance(*self.camera.pos, *obj.pos)
 
@@ -551,7 +548,6 @@ class RayCaster(Scene):
             edges = edges_function(x1, y1, x2, y2)
             dist = self.intersect_edges(edges, x1, y1, x2, y2, i)
             if dist:
-                # self.log(dist)
                 distance = dist
                 break
 
