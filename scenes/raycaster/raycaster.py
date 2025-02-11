@@ -240,21 +240,46 @@ class RayCaster(Scene):
             return
 
         if self.game.pressed[pygame.K_SPACE]:
-            self.shoot_cooldown = 10
+            self.shoot_cooldown = 20
             self.shoot()
 
     def shoot(self):
+        # play shooting sound
+        self.play_sound("shoot")
+
         check_monsters = self.level.monsters.copy()
+
+        # grab the middle of the screen wall slice and create a line
+        # from the player to that point. Check if that line intersects
+        # with any monsters and if it does kill said monster
+
+        x = self.render_width // 2
+        wall_point = self.wall_points[x]
+        line = (self.camera.pos[0], self.camera.pos[1], wall_point[0], wall_point[1])
+        self.log(f"Line: {line}")
+
+        lx1 = self.camera.pos[0]
+        ly1 = self.camera.pos[1]
+
+        lx2 = wall_point[0]
+        ly2 = wall_point[1]
 
         for monster in check_monsters:
 
-            # remove the monster and add a toad/die object to the level objects
+            px = monster.pos[0]
+            py = monster.pos[1]
 
-            self.level.monsters.remove(monster)
+            d = distance_point_to_line(lx1, ly1, lx2, ly2, px, py)
 
-            self.level.level_objects.append(
-                LevelObject(pos=monster.pos, type="toad/die", scene=self)
-            )
+            self.log(f"Distance: {d}")
+
+            if d < 0.25:
+
+                self.level.monsters.remove(monster)
+
+                self.level.level_objects.append(
+                    LevelObject(pos=monster.pos, type="toad/die", scene=self)
+                )
 
     def draw(self):
         floor_color = (120, 120, 120)

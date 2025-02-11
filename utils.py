@@ -6,6 +6,26 @@ import math
 import settings
 
 
+def distance_point_to_line(lx1, ly1, lx2, ly2, px, py):
+
+    p1_0, p1_1 = lx1, ly1
+    p2_0, p2_1 = lx2, ly2
+    p3_0, p3_1 = px, py
+
+    p2_0_minus_p1_0, p2_1_minus_p1_1, p3_0_minus_p1_0, p3_1_minus_p1_1 = (
+        p2_0 - p1_0,
+        p2_1 - p1_1,
+        p3_0 - p1_0,
+        p3_1 - p1_1,
+    )
+
+    closest_distance = (
+        p2_0_minus_p1_0 * p3_1_minus_p1_1 - p3_0_minus_p1_0 * p2_1_minus_p1_1
+    ) / math.sqrt(p2_0_minus_p1_0 * p2_0_minus_p1_0 + p2_1_minus_p1_1 * p2_1_minus_p1_1)
+
+    return abs(closest_distance)
+
+
 # a function to constrain a value n between n_min and n_max inclusive
 def constrain(n, n_min, n_max):
     return max(min(n_max, n), n_min)
