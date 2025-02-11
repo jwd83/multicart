@@ -29,6 +29,25 @@ class RayCaster(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        self.assets = {
+            "bricks": load_image("textures/bricks-bg-tiles.png"),
+            "chandelier": load_image("textures/chandelier.png"),
+            "flag": load_image("textures/flag.png"),
+            "pistol": load_image("textures/pistol.png"),
+            "rifle": load_image("textures/rifle.png"),
+            "staggered": load_image("textures/staggered.png"),
+            "toad/walk": Animation(
+                load_images_alpha("animations/toad/walk"), img_dur=10
+            ),
+            "toad/die": Animation(
+                load_images_alpha("animations/toad/die"), img_dur=10, loop=False
+            ),
+            "tree": load_image("textures/tree.png"),
+            "telepad": load_image("textures/telepad.png"),
+            "tree-big": load_image("textures/tree-big.png"),
+            "wood": load_image("textures/wood-bg-tiles.png"),
+        }
+
         self.fov_degrees = 60
         self.fov_degrees_half = self.fov_degrees // 2
         self.fov_rad = math.radians(self.fov_degrees)
@@ -50,28 +69,11 @@ class RayCaster(Scene):
         self.wall_points = np.zeros((self.render_width, 2))
         self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
-        self.assets = {
-            "bricks": load_image("textures/bricks-bg-tiles.png"),
-            "chandelier": load_image("textures/chandelier.png"),
-            "flag": load_image("textures/flag.png"),
-            "pistol": load_image("textures/pistol.png"),
-            "rifle": load_image("textures/rifle.png"),
-            "staggered": load_image("textures/staggered.png"),
-            "toad/walk": Animation(
-                load_images_alpha("animations/toad/walk"), img_dur=10
-            ),
-            "toad/die": Animation(
-                load_images_alpha("animations/toad/die"), img_dur=10, loop=False
-            ),
-            "tree": load_image("textures/tree.png"),
-            "telepad": load_image("textures/telepad.png"),
-            "tree-big": load_image("textures/tree-big.png"),
-            "wood": load_image("textures/wood-bg-tiles.png"),
-        }
         self.inventory = ["pistol", "rifle"]
         self.ammo = 99
         self.spawn_rate = 60
         self.weapon = "rifle"
+        self.shoot_cooldown = 0
 
     def command_monsters(self):
         self.log(f"Monsters: {len(self.level.monsters)}")
@@ -228,6 +230,31 @@ class RayCaster(Scene):
 
         self.turn_player()
         self.move_player()
+        self.shoot_player()
+
+    def shoot_player(self):
+        # decrement shoot cooldown if it's on cooldown
+
+        if self.shoot_cooldown > 0:
+            self.shoot_cooldown -= 1
+            return
+
+        if self.game.pressed[pygame.K_SPACE]:
+            self.shoot_cooldown = 10
+            self.shoot()
+
+    def shoot(self):
+        check_monsters = self.level.monsters.copy()
+
+        for monster in check_monsters:
+
+            # remove the monster and add a toad/die object to the level objects
+
+            self.level.monsters.remove(monster)
+
+            self.level.level_objects.append(
+                LevelObject(pos=monster.pos, type="toad/die", scene=self)
+            )
 
     def draw(self):
         floor_color = (120, 120, 120)
@@ -263,6 +290,8 @@ class RayCaster(Scene):
         self.draw_crosshair()
 
     def draw_crosshair(self, size=8, color=(255, 100, 90), thickness=1):
+
+        size = size // self.render_scale
 
         # draw a crosshair in the center of the screen
 
@@ -817,9 +846,21 @@ class LevelObject:
         self.scene = scene
         self.pos = pos
         self.type = type
+        self._animated = False
+        self.animation = None
+        # check if the asset type is an Animation
+        if isinstance(self.scene.assets[self.type], Animation):
+            self._animated = True
+            self.animation = self.scene.assets[self.type].copy()
+            self.animation.reset()
 
     def img(self):
-        return self.scene.assets[self.type]
+
+        if not self._animated:
+            return self.scene.assets[self.type]
+        else:
+            self.animation.update()
+            return self.animation.img()
 
 
 class Monster:
