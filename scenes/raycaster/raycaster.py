@@ -73,6 +73,7 @@ class RayCaster(Scene):
         self.ammo = 99
         self.spawn_rate = 60
         self.weapon = "rifle"
+        self.weapon_spread = 0.1
         self.weapon_fire_rate = 10
         self.weapon_fire_show = 3
         self.shoot_cooldown = 0
@@ -275,7 +276,7 @@ class RayCaster(Scene):
 
             self.log(f"Distance: {d}")
 
-            if d < 0.25:
+            if d < self.weapon_spread:
 
                 self.level.monsters.remove(monster)
 
