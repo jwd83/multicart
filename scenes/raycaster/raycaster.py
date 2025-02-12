@@ -162,10 +162,10 @@ class RayCaster(Scene):
         turn_factor = 0.03
 
         # turn left/right
-        if self.game.pressed[pygame.K_LEFT] or self.game.pressed[pygame.K_a]:
+        if self.game.pressed[pygame.K_LEFT] or self.game.pressed[pygame.K_q]:
             self.camera.angle -= turn_factor
 
-        if self.game.pressed[pygame.K_RIGHT] or self.game.pressed[pygame.K_d]:
+        if self.game.pressed[pygame.K_RIGHT] or self.game.pressed[pygame.K_e]:
             self.camera.angle += turn_factor
 
     def turn_player(self):
@@ -187,14 +187,11 @@ class RayCaster(Scene):
 
     def move_player(self):
 
-        speed_factor = 0.05
+        speed_factor = 0.1
         if self.game.pressed[pygame.K_LSHIFT]:
-            speed_factor *= 2
+            speed_factor /= 2
 
-        if pygame.K_UP in self.game.just_pressed:
-            self.move_start = self.elapsed()
-
-        if self.game.pressed[pygame.K_q]:
+        if self.game.pressed[pygame.K_a]:
             # q = strafe left
             self.relocate_player(
                 (
@@ -205,7 +202,7 @@ class RayCaster(Scene):
                 )
             )
 
-        if self.game.pressed[pygame.K_e]:
+        if self.game.pressed[pygame.K_d]:
             # e = strafe right
             self.relocate_player(
                 (
@@ -245,8 +242,22 @@ class RayCaster(Scene):
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
+        # copy the position and angle of the camera
+        old_pos = self.camera.pos
+        old_angle = self.camera.angle
+
         self.turn_player()
         self.move_player()
+
+        # if the player is not moving clear move start
+        if old_pos == self.camera.pos and old_angle == self.camera.angle:
+            self.move_start = 0
+        else:
+            # if the player is already moving don't overwrite move start
+            if self.move_start == 0:
+                # the player was not previously moving but now is so set the move start
+                self.move_start = self.elapsed()
+
         self.shoot_player()
 
     def shoot_player(self):
@@ -256,7 +267,7 @@ class RayCaster(Scene):
             self.shoot_cooldown -= 1
             return
 
-        if self.game.pressed[pygame.K_SPACE]:
+        if self.game.pressed[pygame.K_SPACE] or pygame.mouse.get_pressed()[0]:
             self.shoot_cooldown = 10
             self.shoot()
 
@@ -272,7 +283,6 @@ class RayCaster(Scene):
 
         x = self.render_width // 2
         wall_point = self.wall_points[x]
-        line = (self.camera.pos[0], self.camera.pos[1], wall_point[0], wall_point[1])
 
         lx1 = self.camera.pos[0]
         ly1 = self.camera.pos[1]
@@ -378,14 +388,14 @@ class RayCaster(Scene):
 
         y = self.render_height - asset.get_height()
 
-        if self.game.pressed[pygame.K_UP]:
+        if self.move_start:
 
-            traversal = 3
-            speed = 10
+            traversal = 5
+            speed = 15
 
             if self.game.pressed[pygame.K_LSHIFT]:
-                traversal = 5
-                speed = 15
+                traversal = 3
+                speed = 10
 
             shift = traversal + traversal * math.sin(
                 (self.elapsed() - self.move_start) * speed
@@ -401,14 +411,13 @@ class RayCaster(Scene):
 
         y = self.render_height - self.assets["pistol"].get_height()
 
-        if self.game.pressed[pygame.K_UP]:
-
-            traversal = 3
-            speed = 10
+        if self.move_start:
+            traversal = 5
+            speed = 15
 
             if self.game.pressed[pygame.K_LSHIFT]:
-                traversal = 5
-                speed = 15
+                traversal = 3
+                speed = 10
 
             shift = traversal + traversal * math.sin(
                 (self.elapsed() - self.move_start) * speed
