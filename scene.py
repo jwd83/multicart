@@ -53,6 +53,7 @@ class Scene:
         # store the reference to the game object and add the type annotation
         # for type hinting in our editor. This is not necessary for the code to run.
         self.game: g.Game = game
+        self.mouse_lock = False
         self.active = True
         self.screen: pygame.Surface = game.screen
         self.start = time.time()

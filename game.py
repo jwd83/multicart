@@ -68,15 +68,11 @@ class Game:
 
         # load all sounds in assets/sounds as sound effects
         for sound in os.listdir("assets/sounds"):
-            load_sound = False
             if (
                 sound.endswith(".wav")
                 or sound.endswith(".ogg")
                 or sound.endswith(".mp3")
             ):
-                load_sound = True
-
-            if load_sound:
                 sound_name = sound.split(".")[0]
                 self.sfx[sound_name] = pygame.mixer.Sound("assets/sounds/" + sound)
 
@@ -160,6 +156,10 @@ class Game:
             for scene in self.scene:
                 scene.active = False
             self.scene[-1].active = True
+
+            # check the mouse_lock property of the top scene.
+            # If it is true, lock the mouse to the window if we
+            # have focus
 
             # process update for the top scene in the stack
             self.scene[-1].update()
