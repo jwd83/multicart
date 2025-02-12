@@ -162,12 +162,17 @@ class Game:
             # have focus
             if self.scene[-1].mouse_lock:
                 if pygame.mouse.get_focused():
-                    pygame.mouse.set_visible(False)
-                    pygame.event.set_grab(True)
+                    if pygame.mouse.get_visible():
+                        pygame.mouse.set_visible(False)
+                        pygame.event.set_grab(True)
                 else:
+                    if not pygame.mouse.get_visible():
+                        pygame.mouse.set_visible(True)
+                        pygame.event.set_grab(False)
+            else:
+                if not pygame.mouse.get_visible():
                     pygame.mouse.set_visible(True)
                     pygame.event.set_grab(False)
-
             # process update for the top scene in the stack
             self.scene[-1].update()
 
