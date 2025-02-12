@@ -37,10 +37,10 @@ class RayCaster(Scene):
             "rifle-shoot": load_image("textures/rifle-shoot.png"),
             "staggered": load_image("textures/staggered.png"),
             "toad/walk": Animation(
-                load_images_alpha("animations/toad/walk"), img_dur=10
+                load_images("animations/toad/walk", alpha=True), img_dur=10
             ),
             "toad/die": Animation(
-                load_images_alpha("animations/toad/die"), img_dur=10, loop=False
+                load_images("animations/toad/die", alpha=True), img_dur=10, loop=False
             ),
             "tree": load_image("textures/tree.png"),
             "telepad": load_image("textures/telepad.png"),
@@ -969,39 +969,25 @@ def line_distance(x1, y1, x2, y2) -> float:
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
-# load a single image
-def load_image(path):
-    img = pygame.image.load(BASE_IMAGE_PATH + path).convert()
-    img.set_colorkey((0, 0, 0))
+def load_image(path, colorkey=(0, 0, 0), alpha=False):
+    full_path = BASE_IMAGE_PATH + path
+    if alpha:
+        img = pygame.image.load(full_path).convert_alpha()
+    else:
+        img = pygame.image.load(full_path).convert()
+        img.set_colorkey(colorkey)
+
     return img
 
 
 # load all images in a directory
-def load_images(path):
+def load_images(path, colorkey=(0, 0, 0), alpha=False):
     images = []
 
     for img_name in sorted(
         os.listdir(BASE_IMAGE_PATH + path)
     ):  # sorted is used for OS interoperability
-        images.append(load_image(path + "/" + img_name))
-
-    return images
-
-
-# load a single image
-def load_image_alpha(path):
-    img = pygame.image.load(BASE_IMAGE_PATH + path).convert_alpha()
-    return img
-
-
-# load all images in a directory
-def load_images_alpha(path):
-    images = []
-
-    for img_name in sorted(
-        os.listdir(BASE_IMAGE_PATH + path)
-    ):  # sorted is used for OS interoperability
-        images.append(load_image_alpha(path + "/" + img_name))
+        images.append(load_image(path + "/" + img_name, colorkey, alpha))
 
     return images
 
