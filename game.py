@@ -160,6 +160,13 @@ class Game:
             # check the mouse_lock property of the top scene.
             # If it is true, lock the mouse to the window if we
             # have focus
+            if self.scene[-1].mouse_lock:
+                if pygame.mouse.get_focused():
+                    pygame.mouse.set_visible(False)
+                    pygame.event.set_grab(True)
+                else:
+                    pygame.mouse.set_visible(True)
+                    pygame.event.set_grab(False)
 
             # process update for the top scene in the stack
             self.scene[-1].update()

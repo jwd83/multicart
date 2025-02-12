@@ -48,6 +48,8 @@ class RayCaster(Scene):
             "wood": load_image("textures/wood-bg-tiles.png"),
         }
 
+        self.mouse_lock = True
+
         self.fov_degrees = 60
         self.fov_degrees_half = self.fov_degrees // 2
         self.fov_rad = math.radians(self.fov_degrees)
@@ -155,7 +157,8 @@ class RayCaster(Scene):
 
             monster.animation.update()
 
-    def turn_player(self):
+    def keyboard_steer(self):
+
         turn_factor = 0.03
 
         # turn left/right
@@ -165,12 +168,22 @@ class RayCaster(Scene):
         if self.game.pressed[pygame.K_RIGHT] or self.game.pressed[pygame.K_d]:
             self.camera.angle += turn_factor
 
+    def turn_player(self):
+        self.keyboard_steer()
+        self.mouse_steer()
+
         # cap the angle to 2pi
-        if self.camera.angle > PI_2:
+        while self.camera.angle > PI_2:
             self.camera.angle -= PI_2
 
-        if self.camera.angle < 0:
+        while self.camera.angle < 0:
             self.camera.angle += PI_2
+
+    def mouse_steer(self):
+        if self.mouse_lock:
+            # get the mouse movement
+            mx, my = pygame.mouse.get_rel()
+            self.camera.angle += mx * 0.003
 
     def move_player(self):
 
