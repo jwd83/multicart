@@ -74,7 +74,7 @@ class RayCaster(Scene):
         self.spawn_rate = 60
         self.weapon = "rifle"
         self.weapon_spread = 0.125
-        self.weapon_fire_rate = 10
+        self.weapon_fire_rate = 7
         self.weapon_fire_show = 3
         self.shoot_cooldown = 0
 
@@ -267,17 +267,31 @@ class RayCaster(Scene):
 
         if self.game.pressed[pygame.K_SPACE] or pygame.mouse.get_pressed()[0]:
             self.shoot_cooldown = 10
-            self.shoot()
+            self.shoot_projectile()
 
-    def shoot(self):
-        # play shooting sound
+    def shoot_projectile(self):
         self.play_sound("shoot")
 
-        check_monsters = self.level.monsters.copy()
+        check_monsters = []
 
-        # grab the middle of the screen wall slice and create a line
-        # from the player to that point. Check if that line intersects
-        # with any monsters and if it does kill said monster
+        for mob in self.level.monsters:
+            rads = math.atan2(
+                mob.pos[1] - self.camera.pos[1], mob.pos[0] - self.camera.pos[0]
+            )
+            rd = abs(radian_diff(self.camera.angle, rads))
+            if abs(rd) < self.fov_rad_half or abs(rd) > PI_2 - self.fov_rad_half:
+                distance = line_distance(*self.camera.pos, *mob.pos)
+
+                # check the distance to the wall at this angle
+                # to see if it's the object is closer than the wall
+                # first compute which slice the object is in
+                x = self.convert_radians_to_slice(rads)
+
+                if distance < self.distances[x] and distance > 0.25:
+                    check_monsters.append((distance, rads, x, mob))
+
+        # sort the objects by distance  so we can render them in the correct order
+        check_monsters.sort(key=lambda x: x[0])
 
         x = self.render_width // 2
         wall_point = self.wall_points[x]
@@ -288,7 +302,8 @@ class RayCaster(Scene):
         lx2 = wall_point[0]
         ly2 = wall_point[1]
 
-        for monster in check_monsters:
+        for o in check_monsters:
+            monster = o[3]
 
             px = monster.pos[0]
             py = monster.pos[1]
@@ -305,6 +320,8 @@ class RayCaster(Scene):
 
                 # choose 1 of 4 death sounds to play
                 self.play_sound(random.choice(["death1", "death2", "death3", "death4"]))
+
+                break  # only hit 1 monster, no more piercing
 
     def draw(self):
         floor_color = (120, 120, 120)
