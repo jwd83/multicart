@@ -70,7 +70,7 @@ class RayCaster(Scene):
         self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
         self.inventory = ["pistol", "rifle"]
-        self.ammo = 99
+        self.ammo = 5
         self.spawn_rate = 60
         self.weapon = "rifle"
         self.weapon_spread = 0.125
@@ -265,7 +265,11 @@ class RayCaster(Scene):
             self.shoot_cooldown -= 1
             return
 
+        if self.ammo <= 0:
+            return
+
         if self.game.pressed[pygame.K_SPACE] or pygame.mouse.get_pressed()[0]:
+            self.ammo -= 1
             self.shoot_cooldown = 10
             self.shoot_projectile()
 
