@@ -100,6 +100,9 @@ Various assets
 Bat Animation: Free for commercial use and to modify by Caz
 <https://caz-creates-games.itch.io/bat>
 
+Pixel Medieval Chandelier by nyknck
+<https://nyknck.itch.io/pixel-medieval-chandelier>
+
 ## OpenGameArt
 
 ### Toad Monster by HorrorMovieRei
