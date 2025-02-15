@@ -52,6 +52,9 @@ class RayCaster(Scene):
             "wood": load_image("textures/wood-bg-tiles.png"),
         }
 
+        self.texts = {}
+        self.create_text_fields()
+
         self.mouse_lock = True
 
         self.fov_degrees = 60
@@ -69,13 +72,14 @@ class RayCaster(Scene):
         }
         self.move_start = 0
         self.render_scale = 1
-        self.render_height = self.game.HEIGHT // self.render_scale
         self.render_width = self.game.WIDTH // self.render_scale
+        self.render_height = self.game.HEIGHT // self.render_scale
         self.distances = np.zeros(self.render_width)
         self.rads = np.zeros(self.render_width)
         self.wall_points = np.zeros((self.render_width, 2))
         self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
+        self.display_scaled = self.make_surface((self.game.WIDTH, self.game.HEIGHT))
         self.inventory = ["pistol", "rifle"]
         self.ammo = 5
         self.spawn_rate = 60
@@ -84,6 +88,11 @@ class RayCaster(Scene):
         self.weapon_fire_rate = 7
         self.weapon_fire_show = 3
         self.shoot_cooldown = 0
+
+    def create_text_fields(self):
+        self.texts["ammo"] = self.Text(
+            "0", (self.game.WIDTH - 10, self.game.HEIGHT - 10), "bottomright"
+        )
 
     def command_ammo(self):
         self.ammo = 99
@@ -353,17 +362,38 @@ class RayCaster(Scene):
         self.draw_map()
         self.draw_weapon()
         self.draw_crosshairs()
+        self.draw_ui()
         self.rescale_display()
+        self.render_frame()
+        self.update_texts()
+        self.TextDraw()
+
+    def update_texts(self):
+        self.texts["ammo"].text = f"{self.ammo}"
+
+    def render_frame(self):
+        self.screen.blit(self.display_scaled, (0, 0))
+
+    def draw_ui(self):
+        self.draw_fps()
+
+    def draw_ammo(self):
+        # self.make
+        pass
+
+    def draw_fps(self):
+        pass
 
     def rescale_display(self):
 
         # scale the display to the game window size
         if self.render_scale > 1:
-            self.screen.blit(
-                pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
+            self.display_scaled.blit(
+                pygame.transform.scale(self.display, self.display_scaled.get_size()),
+                (0, 0),
             )
         else:
-            self.screen.blit(self.display, (0, 0))
+            self.display_scaled.blit(self.display, (0, 0))
 
     def draw_crosshairs(self):
         # draw a thick black crosshair and a red crosshair inside it
