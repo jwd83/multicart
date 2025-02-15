@@ -5,6 +5,7 @@ todo:
 * better path finding for the toad monster class to locate the player
 * draw objects needs to clip out of view portions of the object. determine left and right edges of the object to clip the sprite to
 * only monsters in the view port should be able to be hit by the player's shots
+* maybe call the rifle a "grease gun"
 """
 
 from scene import Scene
@@ -290,7 +291,7 @@ class RayCaster(Scene):
 
         if self.game.pressed[pygame.K_SPACE] or pygame.mouse.get_pressed()[0]:
             self.ammo -= 1
-            self.shoot_cooldown = 10
+            self.shoot_cooldown = self.weapon_fire_rate
             self.shoot_projectile()
 
     def shoot_projectile(self):
@@ -441,7 +442,7 @@ class RayCaster(Scene):
     def draw_rifle(self):
 
         asset = self.assets["rifle"]
-        if self.shoot_cooldown > 7:
+        if self.shoot_cooldown > self.weapon_fire_show:
             asset = self.assets["rifle-shoot"]
 
         x = self.render_width // 2 - asset.get_width() // 2
