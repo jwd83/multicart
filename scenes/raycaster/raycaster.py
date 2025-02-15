@@ -28,7 +28,13 @@ class RayCaster(Scene):
 
         self.assets = {
             "bricks": load_image("textures/bricks-bg-tiles.png"),
-            "chandelier": load_image("textures/chandelier.png"),
+            "chandelier-old": load_image("textures/chandelier.png"),
+            "chandelier": Animation(
+                load_images(
+                    "animations/pixel-medieval-chandelier", alpha=True, scale=2
+                ),
+                img_dur=20,
+            ),
             "flag": load_image("textures/flag.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
@@ -56,6 +62,7 @@ class RayCaster(Scene):
         self.level = LevelMap(1, self)
         self.camera = Camera(self.level.pos_camera_start)
         self.commands = {
+            "ammo": self.command_ammo,
             "camera": self.command_camera,
             "monsters": self.command_monsters,
             "spawn": self.command_spawn,
@@ -77,6 +84,10 @@ class RayCaster(Scene):
         self.weapon_fire_rate = 7
         self.weapon_fire_show = 3
         self.shoot_cooldown = 0
+
+    def command_ammo(self):
+        self.ammo = 99
+        self.log(f"Ammo: {self.ammo}")
 
     def command_monsters(self):
         self.log(f"Monsters: {len(self.level.monsters)}")
@@ -988,7 +999,7 @@ def line_distance(x1, y1, x2, y2) -> float:
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
-def load_image(path, colorkey=(0, 0, 0), alpha=False):
+def load_image(path, colorkey=(0, 0, 0), alpha=False, scale=1):
     full_path = BASE_IMAGE_PATH + path
     if alpha:
         img = pygame.image.load(full_path).convert_alpha()
@@ -996,17 +1007,22 @@ def load_image(path, colorkey=(0, 0, 0), alpha=False):
         img = pygame.image.load(full_path).convert()
         img.set_colorkey(colorkey)
 
+    if scale != 1:
+        img = pygame.transform.scale(
+            img, (int(img.get_width() * scale), int(img.get_height() * scale))
+        )
+
     return img
 
 
 # load all images in a directory
-def load_images(path, colorkey=(0, 0, 0), alpha=False):
+def load_images(path, colorkey=(0, 0, 0), alpha=False, scale=1):
     images = []
 
     for img_name in sorted(
         os.listdir(BASE_IMAGE_PATH + path)
     ):  # sorted is used for OS interoperability
-        images.append(load_image(path + "/" + img_name, colorkey, alpha))
+        images.append(load_image(path + "/" + img_name, colorkey, alpha, scale))
 
     return images
 
