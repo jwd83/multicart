@@ -9,6 +9,7 @@ class Menu(Scene):
         super().__init__(game)
 
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
+        self.mouse = self.load_png("pointer-outlined.png")
         self.selected = 0
 
         self.create_text()

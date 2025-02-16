@@ -147,3 +147,8 @@ potential music
 ## PIXBAY freesound_community
 
 knife throw
+
+## My own assets
+Various...
+pointer.png
+pointer-outlined.png
