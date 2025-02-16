@@ -12,6 +12,8 @@ class GameSelect(Scene):
 
         # menu setup
         self.background, _ = self.load_png("dall-e-chess-space.png")
+        self.mouse, _ = self.load_png("pointer-outlined.png")
+        self.mouse_hide = True
 
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
         self.standard_font_size = 40
@@ -105,3 +107,6 @@ class GameSelect(Scene):
 
         self.blit_centered(self.text_multicart, self.screen, (0.5, 0.1))
         self.blit_centered(self.text_choose, self.screen, (0.5, 0.2))
+
+        # draw the mouse
+        self.screen.blit(self.mouse, pygame.mouse.get_pos())

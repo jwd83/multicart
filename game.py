@@ -157,9 +157,15 @@ class Game:
                 scene.active = False
             self.scene[-1].active = True
 
+            # if mouse_lock then we hide and set grab true
+            # else if mouse_hide then we hide and set grab false
+            # else we show and set grab false
+
             # check the mouse_lock property of the top scene.
             # If it is true, lock the mouse to the window if we
             # have focus
+
+            # check if the current scene is using mouse lock
             if self.scene[-1].mouse_lock:
                 if pygame.mouse.get_focused():
                     if pygame.mouse.get_visible():
@@ -170,9 +176,18 @@ class Game:
                         pygame.mouse.set_visible(True)
                         pygame.event.set_grab(False)
             else:
-                if not pygame.mouse.get_visible():
-                    pygame.mouse.set_visible(True)
-                    pygame.event.set_grab(False)
+                # the current scene was NOT using mouse lock, check if it's using mouse hide
+                if self.scene[-1].mouse_hide:
+
+                    # the current scene is using mouse hide, hide the mouse if it's visible
+                    if pygame.mouse.get_visible():
+                        pygame.mouse.set_visible(False)
+                        pygame.event.set_grab(False)
+                else:
+                    # the current scene is not using mouse lock or hide, show the mouse if it's hidden
+                    if not pygame.mouse.get_visible():
+                        pygame.mouse.set_visible(True)
+                        pygame.event.set_grab(False)
             # process update for the top scene in the stack
             self.scene[-1].update()
 

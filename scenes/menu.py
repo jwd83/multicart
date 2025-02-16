@@ -8,8 +8,10 @@ class Menu(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        self.mouse_hide = True
+        self.mpos = pygame.mouse.get_pos()
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
-        self.mouse = self.load_png("pointer-outlined.png")
+        self.mouse, _ = self.load_png("pointer-outlined.png")
         self.selected = 0
 
         self.create_text()
@@ -89,6 +91,8 @@ class Menu(Scene):
             self.play_sound("click")
 
     def draw(self):
+        self.mpos = pygame.mouse.get_pos()
+
         self.draw_box(
             (40, 50), (settings.RESOLUTION[0] - 120, settings.RESOLUTION[1] - 70)
         )
@@ -112,3 +116,6 @@ class Menu(Scene):
             self.img_cursor,
             (50, 105 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 6),
         )
+
+        # draw the mouse cursor
+        self.screen.blit(self.mouse, self.mpos)
