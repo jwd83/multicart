@@ -153,3 +153,4 @@ Various...
 pointer.png
 pointer-outlined.png
 pointer-outlined-small.png
+icon-ammo.png

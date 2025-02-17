@@ -37,6 +37,7 @@ class RayCaster(Scene):
                 img_dur=20,
             ),
             "flag": load_image("textures/flag.png"),
+            "icon-ammo": load_image("textures/icon-ammo.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
             "rifle-shoot": load_image("textures/rifle-shoot.png"),
@@ -92,7 +93,7 @@ class RayCaster(Scene):
 
     def create_text_fields(self):
         self.texts["ammo"] = self.Text(
-            "0", (self.game.WIDTH - 10, self.game.HEIGHT - 10), "bottomright"
+            "0", (self.game.WIDTH - 10 - 32, self.game.HEIGHT - 10), "bottomright"
         )
 
     def command_ammo(self):
@@ -363,8 +364,8 @@ class RayCaster(Scene):
         self.draw_map()
         self.draw_weapon()
         self.draw_crosshairs()
-        self.draw_ui()
         self.rescale_display()
+        self.draw_ui()
         self.render_frame()
         self.update_texts()
         self.draw_text()
@@ -376,11 +377,14 @@ class RayCaster(Scene):
         self.screen.blit(self.display_scaled, (0, 0))
 
     def draw_ui(self):
-        self.draw_fps()
 
-    def draw_ammo(self):
-        # self.make
-        pass
+        self.draw_fps()
+        self.draw_ammo_icon()
+
+    def draw_ammo_icon(self):
+        self.display_scaled.blit(
+            self.assets["icon-ammo"], (self.game.WIDTH - 42, self.game.HEIGHT - 42)
+        )
 
     def draw_fps(self):
         pass
@@ -898,9 +902,14 @@ class LevelMap:
                         LevelObject((x + 0.5, y + 0.5), "chandelier", self.scene)
                     )
 
+                elif pixel_color == (255, 174, 201):  # mspaint "rose"
+                    # todo - add powerup spawner
+                    pass
+
                 elif pixel_color == (0, 0, 0):
                     # empty space
                     pass
+
                 else:
                     print("Unknown color", pixel_color)
                     pass
