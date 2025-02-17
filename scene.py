@@ -71,6 +71,12 @@ class Scene:
         self.commands = {
             "test": self.default_command,
         }  # console command dictionary of callable functions
+        self.mouse_cursor, _ = self.load_png("pointer-outlined-small.png")
+
+    def draw_mouse(self):
+
+        # draw the mouse
+        self.screen.blit(self.mouse_cursor, pygame.mouse.get_pos())
 
     def default_command(self, argument: str | None = None) -> None:
         if argument is not None:

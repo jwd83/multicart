@@ -152,3 +152,4 @@ knife throw
 Various...
 pointer.png
 pointer-outlined.png
+pointer-outlined-small.png

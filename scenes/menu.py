@@ -11,7 +11,6 @@ class Menu(Scene):
         self.mouse_hide = True
         self.mpos = pygame.mouse.get_pos()
         self.img_cursor, _ = self.load_png("opengameart-hand_cursor0000.png")
-        self.mouse, _ = self.load_png("pointer-outlined.png")
         self.selected = 0
 
         self.create_text()
@@ -117,5 +116,4 @@ class Menu(Scene):
             (50, 105 + self.selected * y_spacing + math.sin(self.elapsed() * 4) * 6),
         )
 
-        # draw the mouse cursor
-        self.screen.blit(self.mouse, self.mpos)
+        self.draw_mouse()
