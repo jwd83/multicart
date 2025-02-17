@@ -65,6 +65,17 @@ class Deck:
     def cards_remaining(self):
         return len(self.cards)
 
+    def juice(self):
+        # add a little extra juice to the deck
+        extras = [Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING]
+        for extra in extras:
+            self.cards.append(Card(Suit.HEARTS, extra))
+            self.cards.append(Card(Suit.DIAMONDS, extra))
+            self.cards.append(Card(Suit.CLUBS, extra))
+            self.cards.append(Card(Suit.SPADES, extra))
+
+        self.shuffle()
+
     def draw(self):
 
         card_out = None

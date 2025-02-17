@@ -96,4 +96,6 @@ class Button:
                 offset.y -= 1
 
         self.screen.blit(self.image, offset)
+        if action:
+            self.scene.play_sound("jsfxr-drop1")
         return action

@@ -39,6 +39,8 @@ class JackBlackJack(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        self.mouse_hide = True
+
         self.deck = bj.Deck()
         self.hand_player = bj.Hand()
         self.hand_dealer = bj.Hand()
@@ -131,6 +133,15 @@ class JackBlackJack(Scene):
                 fontSize=button_font_size_large,
                 bg_color=(100, 240, 100),
             ),
+            "juice deck": Button(
+                screen=self.screen,
+                scene=self,
+                pos=(left_col, low_row * 2),
+                size=(button_width * 2, button_height),
+                content="Juice Deck",
+                fontSize=button_font_size,
+                bg_color=(240, 100, 100),
+            ),
         }
 
     def update_texts(self):
@@ -138,14 +149,14 @@ class JackBlackJack(Scene):
         # check if texts have been defined
         if "dealer" in self.texts:
             if self.state == GameState.WAIT_NEXT_HAND:
-                self.texts["dealer"].text = f"dealer has {self.hand_dealer.value()}"
+                self.texts["dealer"].text = f"{self.hand_dealer.value()}"
             else:
                 self.texts["dealer"].text = ""
 
             if self.hand_player.value() != 0:
-                self.texts["player"].text = f"player has {self.hand_player.value()}"
+                self.texts["player"].text = f"{self.hand_player.value()}"
             else:
-                self.texts["player"].text = f""
+                self.texts["player"].text = ""
 
             self.texts["balance"].text = f"balance: {self.balance}"
             self.texts["bet"].text = f"bet: {self.bet}"
@@ -163,6 +174,14 @@ class JackBlackJack(Scene):
 
             self.standard_font_size = 20
 
+            self.texts["bet"] = self.Text(f"bet: ?", (0, 0))
+            self.texts["balance"] = self.Text(f"balance: 0", (0, 30))
+
+            self.texts["winner"] = self.Text(f"", (left_pos, y_base + y_step * 7))
+            self.texts["count"] = self.Text(f"", (0, 328))
+
+            self.standard_font_size = 60
+
             self.texts["dealer"] = self.Text(
                 " ",
                 (0, 75),
@@ -172,11 +191,7 @@ class JackBlackJack(Scene):
                 (0, 305),
             )
 
-            self.texts["bet"] = self.Text(f"bet: ?", (0, 0))
-            self.texts["balance"] = self.Text(f"balance: 0", (0, 30))
-
-            self.texts["winner"] = self.Text(f"", (left_pos, y_base + y_step * 7))
-            self.texts["count"] = self.Text(f"", (0, 328))
+            self.standard_font_size = 20
 
     def new_game(self):
 
@@ -276,6 +291,8 @@ class JackBlackJack(Scene):
                         self.texts["winner"].text = "Tie!"
 
         if self.state == GameState.PLAYER_WIN:
+            self.play_sound("cute-level-up-3-189853")
+
             # check if the player had blackjack for 3:2 payout
             if self.hand_player.hand_strength() == 40:
                 self.balance += int(self.bet * 1.5)
@@ -382,6 +399,10 @@ class JackBlackJack(Scene):
         if self.state == GameState.WAIT_NEXT_HAND:
             next_hand: bool = self.buttons["next hand"].draw()
 
+        if self.buttons["juice deck"].draw():
+            # add a full set of 10,j,q,k for each suit into the deck then shuffle it
+            self.deck.juice()
+
         self.TextDraw()
 
         if self.state == GameState.DEALING:
@@ -460,3 +481,5 @@ class JackBlackJack(Scene):
             if next_hand:
                 self.texts["winner"].text = ""
                 self.state = GameState.NEW_HAND
+
+        self.draw_mouse()
