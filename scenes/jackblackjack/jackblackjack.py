@@ -403,7 +403,7 @@ class JackBlackJack(Scene):
             # add a full set of 10,j,q,k for each suit into the deck then shuffle it
             self.deck.juice()
 
-        self.TextDraw()
+        self.draw_text()
 
         if self.state == GameState.DEALING:
             if self.deal_start + 0.25 > self.elapsed():

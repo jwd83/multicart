@@ -367,7 +367,7 @@ class RayCaster(Scene):
         self.rescale_display()
         self.render_frame()
         self.update_texts()
-        self.TextDraw()
+        self.draw_text()
 
     def update_texts(self):
         self.texts["ammo"].text = f"{self.ammo}"

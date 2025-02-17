@@ -88,7 +88,7 @@ class Scene:
         self.log("passed an argument. If an argument is passed, it will")
         self.log("be echoed back to you in the Hello message.")
 
-    def TextDraw(self):
+    def draw_text(self):
         self.__all_text.draw(self.screen)
 
     def Text(self, text: str, pos: tuple, anchor: str = "topleft") -> FastText:

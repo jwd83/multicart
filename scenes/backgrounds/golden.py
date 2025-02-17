@@ -65,7 +65,7 @@ class Golden(Scene):
         self.turn_step += 0.0001
         self.text_step.text = f"{self.turn_step}"
 
-        self.TextDraw()
+        self.draw_text()
 
     def distance(self, p1, p2):
         return np.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)

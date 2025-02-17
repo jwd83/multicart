@@ -19,4 +19,4 @@ class JackNinjasInventory(Scene):
 
     def draw(self):
         # self.screen.fill((0, 0, 0))
-        self.TextDraw()
+        self.draw_text()

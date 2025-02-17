@@ -636,7 +636,7 @@ class QuadBlox(Scene):
 
         # for text in self.texts.values():
         #     text.draw()
-        self.TextDraw()
+        self.draw_text()
 
     def draw_player_board(self):
         self.draw_board(self.player_board)

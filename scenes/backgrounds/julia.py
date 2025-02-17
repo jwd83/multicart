@@ -81,7 +81,7 @@ class Julia(Scene):
         # Draw the surface on the screen
         draw_julia_set(self.screen, self.julia_set)
 
-        # self.TextDraw()
+        # self.draw_text()
 
 
 def draw_julia_set(screen, julia_set):
