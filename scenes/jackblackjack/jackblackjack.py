@@ -304,10 +304,12 @@ class JackBlackJack(Scene):
             self.state = GameState.WAIT_NEXT_HAND
 
         if self.state == GameState.DEALER_WIN:
+            self.play_sound("game-over-arcade-6435")
             self.balance -= self.bet
             self.state = GameState.WAIT_NEXT_HAND
 
         if self.state == GameState.TIE:
+            self.play_sound("error-126627")
             self.state = GameState.WAIT_NEXT_HAND
 
     def update(self):
