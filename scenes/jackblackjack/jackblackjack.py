@@ -48,10 +48,10 @@ class JackBlackJack(Scene):
         self.game_board = load_tpng("jackblackjack/game-board.png")
         self.card_front = load_tpng("jackblackjack/card-blank-border.png")
         self.card_back = load_tpng("jackblackjack/card-back.png")
-        self.suit_spades = load_tpng("jackblackjack/spades.png")
-        self.suit_hearts = load_tpng("jackblackjack/hearts.png")
-        self.suit_clubs = load_tpng("jackblackjack/clubs.png")
-        self.suit_diamonds = load_tpng("jackblackjack/diamonds.png")
+        self.suit_spades = load_tpng("jackblackjack/suit-spades.png")
+        self.suit_hearts = load_tpng("jackblackjack/suit-hearts.png")
+        self.suit_clubs = load_tpng("jackblackjack/suit-clubs.png")
+        self.suit_diamonds = load_tpng("jackblackjack/suit-diamonds.png")
 
         self.new_game()
 

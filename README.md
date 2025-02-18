@@ -18,32 +18,29 @@ To build on Windows for web browsers use `build-web.bat`.
 * Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
 * 4jacks: convert board to numpy, improve minimax algorithm. make a simplified mode that doesn't have piece ejection.
 
-# Raycaster
+## Raycaster
 
 * Change the naive draw_walls implementation to use a quadrant based cross section of the
 possible tile path.
 * Change the raycaster to load walls from an image file into a 2d array.
 
-# Console
+## Console
 
 * Instead of just the scene under the console having its callbacks added to the console, instead add the callbacks of every scene to the console so long as it does not conflict with the name of a callback in the scene above it. This way, the console can be used to control any active scene via callbacks.
 
-# QuadBlocks Game Server
+## QuadBlocks Game Server
 
 Game server is currently being tested on railway ~~and fly.io~~
 
 Looks like railway has a free tier that will work for now with a postgres instance for the leaderboard.
 
-# Jack Ninjas
+## Jack Ninjas
 
 An adaption and implementation of the the public domain game from YouTuber
 [DaFluffyPotato](https://www.youtube.com/@DaFluffyPotato) for my nephew Jack.
 
 <https://www.youtube.com/watch?v=2gABYM5M0ww>
 
-## Todos
-
-~~- Finish DaFluffyPotato's course~~
 
 * Finish pallet swap
 * Joystick input
@@ -51,13 +48,9 @@ An adaption and implementation of the the public domain game from YouTuber
 * Port to web with [pygbag](https://pypi.org/project/pygbag/)
 * ~~Implement the new fall animation.~~
 
-## Adjustments & Additions
-
 * 16:9 aspect ratio
 * Metroid Style Space Jump
 * fall animation
-
-## Palette Swap
 
 New Colors
 
@@ -131,26 +124,33 @@ Free Music - Korobeiniki
 
 Various music tracks potentially.
 
-## floraphonic
+## PIXBAY
+
+### PIXBAY:floraphonic
 
 <https://pixabay.com/users/floraphonic-38928062/>
 level up bonus and cute level up sounds
+### PIXBAY:ALIENIGHTMARE
 
-## PIXBAY ALIENIGHTMARE
+* dying-guy
 
-dying-guy
+### PIXBAY:freesound_community
 
-## PIXBAY moodmode
+* knife throw
+* game-over-arcade-6435.mp3
+* 080205_life-lost-game-over-89697.mp3
+
+### PIXBAY:moodmode
 
 potential music
 
-## PIXBAY freesound_community
-
-knife throw
-
 ## My own assets
-Various...
-pointer.png
-pointer-outlined.png
-pointer-outlined-small.png
-icon-ammo.png
+* pointer.png
+* pointer-outlined.png
+* pointer-outlined-small.png
+* icon-ammo.png
+* suit-clubs.png
+* suit-diamonds.png
+* suit-hearts.png
+* suit-spades.png
+* Various assets...
