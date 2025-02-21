@@ -14,6 +14,7 @@ To build on Windows for web browsers use `build-web.bat`.
 
 ## General / Misc
 
+* fixed with font. better font system
 * Controller and local multiplayer interface
 * Recreate roy carnassus? via galactica started. maybe scrap it for a pirate ship game? jackpirates?
 * 4jacks: convert board to numpy, improve minimax algorithm. make a simplified mode that doesn't have piece ejection.
@@ -40,7 +41,6 @@ An adaption and implementation of the the public domain game from YouTuber
 [DaFluffyPotato](https://www.youtube.com/@DaFluffyPotato) for my nephew Jack.
 
 <https://www.youtube.com/watch?v=2gABYM5M0ww>
-
 
 * Finish pallet swap
 * Joystick input
@@ -99,7 +99,7 @@ Pixel Medieval Chandelier by nyknck
 ## OpenGameArt
 
 ### Toad Monster by HorrorMovieRei
-https://opengameart.org/content/toad-monster
+<https://opengameart.org/content/toad-monster>
 
 Various assets
 
@@ -130,6 +130,7 @@ Various music tracks potentially.
 
 <https://pixabay.com/users/floraphonic-38928062/>
 level up bonus and cute level up sounds
+
 ### PIXBAY:ALIENIGHTMARE
 
 * dying-guy
@@ -149,6 +150,7 @@ level up bonus and cute level up sounds
 potential music
 
 ## My own assets
+
 * pointer.png
 * pointer-outlined.png
 * pointer-outlined-small.png
