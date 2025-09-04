@@ -8,5 +8,6 @@ dependencies = [
     "numpy>=2.3.2",
     "pillow>=11.3.0",
     "pygame-ce>=2.5.5",
+    "pyinstaller>=6.15.0",
     "requests>=2.32.5",
 ]
