@@ -4,7 +4,6 @@ from utils import *
 import numpy as np
 import math
 import settings
-from numba import jit, njit
 import threading
 
 # Adapted from the following code:
@@ -94,7 +93,7 @@ def draw_julia_set(screen, julia_set):
     screen.blit(surface, (0, 0))
 
 
-@njit
+# @njit
 def generate_julia(h, w, f, cx):
 
     re_min = -2.0

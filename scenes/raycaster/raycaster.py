@@ -14,9 +14,6 @@ import math
 import numpy as np
 import os
 import pygame
-from numba import njit, jit
-import os
-import pygame
 from classes import *
 
 BASE_IMAGE_PATH = "assets/raycaster/"
