@@ -25,6 +25,7 @@ class GameSelect(Scene):
             "JackNinjasTitle": "Jack Ninjas",
             "JackNinjasEditor": "Jack Ninjas Editor",
             "JackBlackJackTitle": "Blackjack",
+            "Solitaire": "Solitaire",
             "QuadMenu": "QuadBlox",
             "FourJacksTitle": "Four Jacks",
             "JackWizards": "Jack Wizards",

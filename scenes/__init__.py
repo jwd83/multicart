@@ -37,3 +37,5 @@ from .viagalactica.viatitle import ViaTitle
 from scenes.debug import Debug
 from scenes.logo import Logo
 from scenes.menu import Menu
+
+from .solitaire.solitaire import Solitaire # auto-generated
