@@ -163,11 +163,23 @@ class RayCaster(Scene):
                 monster.pos[0] + math.cos(angle) * monster_speed,
                 monster.pos[1] + math.sin(angle) * monster_speed,
             )
+
+            # try to move to the new position with wall sliding
             if not self.level.wall_collision(new_pos):
                 if not self.level.monster_collisions(
                     new_pos, radius=0.5, ignore=[monster]
                 ):
                     monster.pos = new_pos
+            elif not self.level.wall_collision((new_pos[0], monster.pos[1])):
+                if not self.level.monster_collisions(
+                    (new_pos[0], monster.pos[1]), radius=0.5, ignore=[monster]
+                ):
+                    monster.pos = (new_pos[0], monster.pos[1])
+            elif not self.level.wall_collision((monster.pos[0], new_pos[1])):
+                if not self.level.monster_collisions(
+                    (monster.pos[0], new_pos[1]), radius=0.5, ignore=[monster]
+                ):
+                    monster.pos = (monster.pos[0], new_pos[1])
 
     def animate_monsters(self):
         for monster in self.level.monsters:
