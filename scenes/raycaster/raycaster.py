@@ -522,7 +522,11 @@ class RayCaster(Scene):
             r = o[1]
             x = o[2]
             obj = o[3]
-            scale = 1 / (d / 2)
+
+            # correct for fisheye effect
+            corrected_distance = d * math.cos(r - self.camera.angle)
+
+            scale = 1 / (corrected_distance / 2)
             obj_img = obj.img()
 
             scaled = pygame.transform.scale(
@@ -533,7 +537,7 @@ class RayCaster(Scene):
                 ),
             )
 
-            wall_height = (1 / d) * self.render_height
+            wall_height = (1 / corrected_distance) * self.render_height
             wall_height = self.constrain(wall_height, 5, self.render_height * 4)
             wh_top = (self.render_height // 2) - (wall_height // 2)
             wh_bottom = (self.render_height // 2) + (wall_height // 2)
@@ -565,6 +569,10 @@ class RayCaster(Scene):
     def draw_slice(self, x):
         distance = self.distances[x]
 
+        # correct for fisheye effect by adjusting distance based on angle from center
+        ray_angle = self.rads[x]
+        corrected_distance = distance * math.cos(ray_angle - self.camera.angle)
+
         # determine which texture to use
         # if the wall we intersected was type 1 use bricks
         # if the wall is type 2 use the flag
@@ -581,7 +589,7 @@ class RayCaster(Scene):
         texture_x = self.constrain(texture_x, 0, 1)
         texture_x = int(texture_x * wall_texture.get_width() - 1)
 
-        wall_height = (1 / distance) * self.render_height
+        wall_height = (1 / corrected_distance) * self.render_height
         wall_height = self.constrain(wall_height, 5, self.render_height * 4)
         top = (self.render_height // 2) - (wall_height // 2)
 
