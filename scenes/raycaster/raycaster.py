@@ -80,7 +80,7 @@ class RayCaster(Scene):
         self.display = self.make_surface((self.render_width, self.render_height))
         self.display_scaled = self.make_surface((self.game.WIDTH, self.game.HEIGHT))
         self.inventory = ["pistol", "rifle"]
-        self.ammo = 5
+        self.ammo = 99
         self.spawn_rate = 60
         self.weapon = "rifle"
         self.weapon_spread = 0.125
