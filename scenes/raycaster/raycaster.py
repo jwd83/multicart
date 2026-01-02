@@ -80,7 +80,7 @@ class RayCaster(Scene):
         self.display = self.make_surface((self.render_width, self.render_height))
         self.display_scaled = self.make_surface((self.game.WIDTH, self.game.HEIGHT))
         self.inventory = ["pistol", "rifle"]
-        self.ammo = 99
+        self.ammo = 30
         self.spawn_rate = 60
         self.weapon = "rifle"
         self.weapon_spread = 0.125
@@ -94,7 +94,7 @@ class RayCaster(Scene):
         )
 
     def command_ammo(self):
-        self.ammo = 99
+        self.ammo = 30
         self.log(f"Ammo: {self.ammo}")
 
     def command_monsters(self):
@@ -270,6 +270,10 @@ class RayCaster(Scene):
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
+
+        # if the user presses r reload ammo to 30
+        if pygame.K_r in self.game.just_pressed:
+            self.ammo = 30
 
         # copy the position and angle of the camera
         old_pos = self.camera.pos
