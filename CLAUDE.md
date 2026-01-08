@@ -1,6 +1,6 @@
-# WARP.md
+# CLAUDE.md
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+This file provides guidance to Claude Code when working with code in this repository.
 
 ## Project Overview
 
@@ -126,7 +126,3 @@ The QuadBlox multiplayer game includes a FastAPI server that can be deployed to 
 - PostgreSQL database required for leaderboards
 - Environment variable `DATABASE` for connection string
 - Environment variable `PORT` for server port (defaults to 8000)
-
-## Asset Credits
-
-The project includes assets from multiple sources including DaFluffyPotato, Kenney.nl, itch.io creators, OpenGameArt, and AI-generated content. See README.md for full attribution.
