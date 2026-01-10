@@ -46,6 +46,19 @@ class Solitaire(Scene):
     def __init__(self, game):
         super().__init__(game)
 
+        # Mode selection state
+        self.mode_selected = False
+        self.menu_selection = 0  # 0 = Easy, 1 = Normal
+        self.draw_count = 1  # Cards to draw from stock (1=easy, 3=normal)
+        self.mouse_hide = True  # Hide OS cursor, use custom one
+
+        # Pre-render menu text
+        self.standard_font_size = 40
+        self.text_title = self.standard_text("Solitaire")
+        self.standard_font_size = 20
+        self.text_easy = self.standard_text("Easy (draw 1)")
+        self.text_normal = self.standard_text("Normal (draw 3)")
+
         # Game state
         self.deck = self.create_deck()
         self.stock = []
@@ -66,28 +79,38 @@ class Solitaire(Scene):
         self.card_spacing = 20
         self.tableau_y_offset = 20
 
-        # Pre-render card text for better performance and crispness
+        # Pre-render card text and load suit images
         self.card_font = "assets/fonts/upheavtt.ttf"
-        self.card_text_cache = {}
-        self._cache_card_text()
+        self.rank_text_cache = {}
+        self.suit_images = {}
+        self._cache_card_assets()
 
-        self.setup_game()
-
-    def _cache_card_text(self):
-        """Pre-render all card text surfaces for crisp rendering."""
+    def _cache_card_assets(self):
+        """Pre-render rank text and load suit images."""
         ranks = {1: "A", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7",
                  8: "8", 9: "9", 10: "10", 11: "J", 12: "Q", 13: "K"}
-        suits = {0: "H", 1: "D", 2: "C", 3: "S"}  # Hearts, Diamonds, Clubs, Spades
         suit_colors = {0: (200, 0, 0), 1: (200, 0, 0), 2: (0, 0, 0), 3: (0, 0, 0)}
 
+        # Cache rank text for each suit color
         font = pygame.font.Font(self.card_font, 20)
         for rank_num, rank_str in ranks.items():
-            for suit_num, suit_str in suits.items():
-                text = f"{rank_str}{suit_str}"
-                color = suit_colors[suit_num]
-                # Render without anti-aliasing for pixel-crisp text
-                surface = font.render(text, False, color)
-                self.card_text_cache[(rank_num, suit_num)] = surface
+            for suit_num, color in suit_colors.items():
+                surface = font.render(rank_str, False, color)
+                self.rank_text_cache[(rank_num, suit_num)] = surface
+
+        # Load suit images (normal and small for corner)
+        suit_files = {
+            0: "assets/cards/suit-hearts.png",
+            1: "assets/cards/suit-diamonds.png",
+            2: "assets/cards/suit-clubs.png",
+            3: "assets/cards/suit-spades.png"
+        }
+        for suit_num, filepath in suit_files.items():
+            img = pygame.image.load(filepath).convert_alpha()
+            self.suit_images[suit_num] = img
+            # Create smaller version for top-right corner
+            small_size = (img.get_width() // 2, img.get_height() // 2)
+            self.suit_images[(suit_num, 'small')] = pygame.transform.scale(img, small_size)
         
     def create_deck(self):
         """Create a standard 52-card deck"""
@@ -304,8 +327,8 @@ class Solitaire(Scene):
     def handle_stock_click(self):
         """Handle clicking on stock pile"""
         if self.stock:
-            # Move 3 cards from stock to waste (or fewer if less available)
-            cards_to_move = min(3, len(self.stock))
+            # Move cards from stock to waste based on difficulty
+            cards_to_move = min(self.draw_count, len(self.stock))
             for _ in range(cards_to_move):
                 card = self.stock.pop()
                 card.face_up = True
@@ -352,14 +375,51 @@ class Solitaire(Scene):
         self.won = False
         self.setup_game()
 
+    def update_mode_select(self):
+        """Handle input for mode selection screen"""
+        # Keyboard navigation
+        if pygame.K_DOWN in self.game.just_pressed or pygame.K_UP in self.game.just_pressed:
+            self.menu_selection = 1 - self.menu_selection  # Toggle between 0 and 1
+            self.play_sound("click")
+
+        # Keyboard selection
+        if pygame.K_RETURN in self.game.just_pressed:
+            self.select_mode(self.menu_selection)
+
+        # Mouse selection
+        mouse_pos = pygame.mouse.get_pos()
+        easy_rect = pygame.Rect(200, 150, 240, 30)
+        normal_rect = pygame.Rect(200, 190, 240, 30)
+
+        if easy_rect.collidepoint(mouse_pos):
+            self.menu_selection = 0
+        elif normal_rect.collidepoint(mouse_pos):
+            self.menu_selection = 1
+
+        if 1 in self.game.just_mouse_down:
+            if easy_rect.collidepoint(mouse_pos) or normal_rect.collidepoint(mouse_pos):
+                self.select_mode(self.menu_selection)
+
+    def select_mode(self, mode):
+        """Start game with selected mode"""
+        self.draw_count = 1 if mode == 0 else 3
+        self.mode_selected = True
+        self.play_sound("jsxfr-select")
+        self.restart_game()
+
     def update(self):
         # if the user presses escape show the menu
         if pygame.K_ESCAPE in self.game.just_pressed:
             self.game.scene_push = "Menu"
 
-        # Press R to restart game
+        # Mode selection screen
+        if not self.mode_selected:
+            self.update_mode_select()
+            return
+
+        # Press R to restart game (returns to mode select)
         if pygame.K_r in self.game.just_pressed:
-            self.restart_game()
+            self.mode_selected = False
             return
 
         # Don't allow moves after winning
@@ -421,9 +481,37 @@ class Solitaire(Scene):
             self.won = True
             self.log("Congratulations! You won!")
 
+    def draw_mode_select(self):
+        """Draw the mode selection screen"""
+        # Title
+        self.blit_centered(self.text_title, self.screen, (0.5, 0.25))
+
+        # Menu options
+        y_easy = 150
+        y_normal = 190
+        x_text = 220
+
+        # Highlight selected option
+        if self.menu_selection == 0:
+            self.text_easy.set_alpha(255)
+            self.text_normal.set_alpha(150)
+        else:
+            self.text_easy.set_alpha(150)
+            self.text_normal.set_alpha(255)
+
+        self.screen.blit(self.text_easy, (x_text, y_easy))
+        self.screen.blit(self.text_normal, (x_text, y_normal))
+
+        self.draw_mouse()
+
     def draw(self):
         # Green felt background
         self.screen.fill((0, 100, 0))
+
+        # Show mode selection screen
+        if not self.mode_selected:
+            self.draw_mode_select()
+            return
 
         # Draw empty pile outlines
         empty_color = (0, 80, 0)
@@ -515,7 +603,9 @@ class Solitaire(Scene):
         if self.won:
             win_text = self.standard_text("YOU WIN! Press R to play again")
             self.blit_centered(win_text, self.screen, (0.5, 0.9))
-            
+
+        self.draw_mouse()
+
     def draw_card(self, card):
         """Draw a single card"""
         if card.face_up:
@@ -523,10 +613,23 @@ class Solitaire(Scene):
             pygame.draw.rect(self.screen, (255, 255, 255), card.rect)
             pygame.draw.rect(self.screen, (0, 0, 0), card.rect, 2)
 
-            # Draw cached rank and suit text
-            text_surface = self.card_text_cache.get((card.rank, card.suit))
-            if text_surface:
-                self.screen.blit(text_surface, (card.rect.x + 4, card.rect.y + 3))
+            # Draw rank text
+            rank_surface = self.rank_text_cache.get((card.rank, card.suit))
+            if rank_surface:
+                self.screen.blit(rank_surface, (card.rect.x + 4, card.rect.y + 2))
+
+            # Draw suit image centered on card
+            suit_img = self.suit_images.get(card.suit)
+            if suit_img:
+                x = card.rect.centerx - suit_img.get_width() // 2
+                y = card.rect.centery - suit_img.get_height() // 2 + 5
+                self.screen.blit(suit_img, (x, y))
+
+            # Draw small suit in top-right corner
+            small_suit = self.suit_images.get((card.suit, 'small'))
+            if small_suit:
+                x = card.rect.right - small_suit.get_width() - 3
+                self.screen.blit(small_suit, (x, card.rect.y + 3))
             
         else:
             # Face down - blue back
