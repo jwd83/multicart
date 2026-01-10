@@ -145,13 +145,13 @@ class Solitaire(Scene):
         for i, card in enumerate(self.stock):
             card.rect.x = stock_x
             card.rect.y = stock_y
-            
-        # Waste pile position  
+
+        # Waste pile position
         waste_x, waste_y = stock_x + self.card_width + 10, 20
         for i, card in enumerate(self.waste):
             card.rect.x = waste_x + min(i * 2, 20)  # Slight fan effect
             card.rect.y = waste_y
-            
+
         # Foundation piles
         foundation_start_x = 320
         for pile_idx, pile in enumerate(self.foundations):
@@ -159,15 +159,27 @@ class Solitaire(Scene):
             for i, card in enumerate(pile):
                 card.rect.x = pile_x
                 card.rect.y = 20
-                
-        # Tableau columns
+
+        # Tableau columns - dynamic offset based on longest column
         tableau_start_x = 20
         tableau_start_y = 120
+        screen_height = 360
+        max_column_len = max((len(col) for col in self.tableau), default=1)
+
+        # Calculate offset to fit longest column on screen
+        # Available space: screen_height - tableau_start_y - card_height (for last card)
+        available_space = screen_height - tableau_start_y - self.card_height + 15
+        if max_column_len > 1:
+            dynamic_offset = min(self.tableau_y_offset, available_space // (max_column_len - 1))
+            dynamic_offset = max(12, dynamic_offset)  # Minimum 12px to stay readable
+        else:
+            dynamic_offset = self.tableau_y_offset
+
         for col_idx, column in enumerate(self.tableau):
             col_x = tableau_start_x + col_idx * (self.card_width + 10)
             for row_idx, card in enumerate(column):
                 card.rect.x = col_x
-                card.rect.y = tableau_start_y + row_idx * self.tableau_y_offset
+                card.rect.y = tableau_start_y + row_idx * dynamic_offset
                 
     def get_card_at_pos(self, pos):
         """Get the topmost card at given position"""
