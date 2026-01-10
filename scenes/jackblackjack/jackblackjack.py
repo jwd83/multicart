@@ -64,6 +64,9 @@ class JackBlackJack(Scene):
         self.bet: int = 10
         self.balance: int = 250
 
+        self.hitting = False
+        self.hit_start = 0
+
         button_width = 160
         button_height = 40
         button_font_size = 20
@@ -451,15 +454,46 @@ class JackBlackJack(Scene):
                     (card_2 + max(0, remaining - 0.2) * 2200, player_top),
                 )
 
-        if self.state == GameState.PLAYER_TURN:
+        # Draw hit animation
+        if self.hitting:
+            card_spacing = 80
+            player_top = 210
+            progress = self.elapsed() - self.hit_start
+            animation_duration = 0.75
 
-            if hit:
+            if progress < animation_duration:
+                # Calculate start position (from deck)
+                start_pos = (
+                    640 - 80 - (self.deck.cards_remaining() // 10) // 3,
+                    50 - (self.deck.cards_remaining() // 10),
+                )
+
+                # Calculate end position (next card in player hand)
+                end_x = 50 + len(self.hand_player.cards) * card_spacing
+                end_y = player_top
+
+                # Interpolate position
+                t = progress / animation_duration
+                current_x = start_pos[0] + (end_x - start_pos[0]) * t
+                current_y = start_pos[1] + (end_y - start_pos[1]) * t
+
+                self.screen.blit(self.card_back, (current_x, current_y))
+            else:
+                # Animation complete, add card to hand
                 self.hand_player.add_card(self.deck.draw())
+                self.hitting = False
+
                 if self.hand_player.is_bust():
                     self.state = GameState.DEALER_TURN
 
                 if len(self.hand_player.cards) == 5:
                     self.state = GameState.DEALER_TURN
+
+        if self.state == GameState.PLAYER_TURN:
+
+            if hit and not self.hitting:
+                self.hitting = True
+                self.hit_start = self.elapsed()
 
             if stand:
                 self.state = GameState.DEALER_TURN
