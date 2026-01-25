@@ -10,7 +10,7 @@ JackGames Multicart is a PyGame-based collection of games built for a nephew nam
 
 ### Scene-Based Architecture
 The game uses a scene stack system where scenes are managed by the `Game` class:
-- **Scene Stack**: Scenes can be pushed, popped, or replaced using `game.scene_push`, `game.scene_pop`, `game.scene_replace`
+- **Scene Stack**: Scenes can be pushed, popped, or replaced using `game.scene_push`, `game.scene_pop`, `game.scene_replace`, `game.scene_push_under`
 - **Scene Base Class**: All scenes inherit from `Scene` class in `scene.py` which provides common functionality
 - **Scene Loading**: Scenes are dynamically loaded using `eval("scenes." + scene_name + "(self)")` pattern
 
@@ -34,17 +34,8 @@ The project uses multiple settings files that are swapped during build:
 # Run the main game
 python main.py
 
-# Run with specific scene (for debugging)
-python main.py scene run <SceneName>
-```
-
-### Scene Management
-```bash
 # Create a new scene
 python main.py scene new
-
-# List all available scenes
-python main.py scene list
 ```
 
 ### Building for Different Platforms
@@ -101,6 +92,15 @@ python qbfastapi.py
 - Press backtick (`) to open/close console
 - Add commands to scenes via `self.commands` dict
 - Console provides logging and debugging capabilities
+- Built-in console commands:
+  - `help` or `?` - Show help and available commands
+  - `clear` - Clear console output
+  - `debug` - Toggle debug mode
+  - `scene list` - List scenes in the scene stack
+  - `scene len` - Show scene stack length
+  - `scene init` - Reinitialize the scene under console
+  - `exit` or `quit` - Quit the game
+  - Any Python code can be executed directly
 
 ## Build System Notes
 
