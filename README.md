@@ -2,6 +2,30 @@
 
 A collection of games for the Jack Games Multicart.
 
+## Setup
+
+This project uses [uv](https://docs.astral.sh/uv/) for Python package management.
+
+```bash
+# Install dependencies and create virtual environment
+uv sync
+
+# Run the game
+uv run python main.py
+
+# Create a new scene
+uv run python main.py scene new
+```
+
+### Server Dependencies
+
+The QuadBlox multiplayer server has additional dependencies in `requirements.txt`:
+
+```bash
+uv pip install -r requirements.txt
+uv run python qbfastapi.py
+```
+
 # Notes
 
 Font sizes: Upheaval looks best when using a multiple of 20.
@@ -63,8 +87,8 @@ My simple PNG/CSV based color palette swapper
 
 1. Create a CSV list of all RGBA values encountered in a folder of PNGs.
 
-```
-python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv`
+```bash
+uv run python swappy.py assets/jackninjas/images/tiles/grass palette.csv
 ```
 
 2. Modify the CSV and adjust the target RGBA values.
@@ -72,8 +96,8 @@ python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv`
 3. Supply the CSV and source folder along with a destination folder to
 perform the palette swap.
 
-```
-python .\swappy.py assets\jackninjas\images\tiles\grass palette.csv assets\jackninjas\images\tiles\snow
+```bash
+uv run python swappy.py assets/jackninjas/images/tiles/grass palette.csv assets/jackninjas/images/tiles/snow
 ```
 
 # Credits

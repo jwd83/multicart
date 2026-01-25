@@ -27,15 +27,27 @@ The project uses multiple settings files that are swapped during build:
 - `settings-win.py` - Desktop/Windows settings
 - `settings-wasm.py` - Web browser settings via pygbag
 
+## Package Management
+
+This project uses [uv](https://docs.astral.sh/uv/) for Python package and virtual environment management.
+
+```bash
+# Install dependencies and create virtual environment
+uv sync
+
+# Add a new dependency
+uv add <package>
+```
+
 ## Common Development Commands
 
 ### Running the Game
 ```bash
 # Run the main game
-python main.py
+uv run python main.py
 
 # Create a new scene
-python main.py scene new
+uv run python main.py scene new
 ```
 
 ### Building for Different Platforms
@@ -50,16 +62,19 @@ build-web.bat
 ### Color Palette Swapping (Swappy Tool)
 ```bash
 # Generate color palette CSV from image folder
-python swappy.py <source_folder> <output.csv>
+uv run python swappy.py <source_folder> <output.csv>
 
 # Apply palette swap using CSV
-python swappy.py <source_folder> <palette.csv> <target_folder>
+uv run python swappy.py <source_folder> <palette.csv> <target_folder>
 ```
 
 ### FastAPI Server (QuadBlox multiplayer)
 ```bash
+# Install server dependencies (fastapi, uvicorn, psycopg, etc.)
+uv pip install -r requirements.txt
+
 # Run the multiplayer game server
-python qbfastapi.py
+uv run python qbfastapi.py
 
 # Server runs on port 8000 by default, or PORT environment variable
 ```
