@@ -9,7 +9,7 @@ class JackWizardsMap(Scene):
 
         self.map_image = load_tpng("jackwizards/dall-e-map.png")
 
-        self.log("Rendering map: ", self.game.jw.level)
+        self.log(f"Rendering map: {self.game.jw.level}")
 
     def update(self):
         # if the user presses escape or F5 key, quit the event loop.
