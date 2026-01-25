@@ -98,12 +98,12 @@ class TriBaller(Scene):
         self.shooter.aim_at(mouse_x, mouse_y)
 
         # Swap bubbles with right click or S key
-        if self.game.just_mouse_down == 3 or pygame.K_s in self.game.just_pressed:
+        if 3 in self.game.just_mouse_down or pygame.K_s in self.game.just_pressed:
             self.shooter.swap_bubbles()
             self.play_sound("jsfxr-drop2")
 
         # Shoot on left click or space
-        if self.game.just_mouse_down == 1 or pygame.K_SPACE in self.game.just_pressed:
+        if 1 in self.game.just_mouse_down or pygame.K_SPACE in self.game.just_pressed:
             x, y, angle, color = self.shooter.shoot()
             self.flying_bubble = FlyingBubble(x, y, angle, color)
             self.state = STATE_SHOOTING
