@@ -42,10 +42,11 @@ def scene():
 
 
 def scene_list():
-    """List all detected scenes by parsing scenes/__init__.py"""
+    """List all detected scenes by parsing scenes/__init__.py and scanning for unregistered ones"""
     import re
 
-    scenes = []
+    # Parse registered scenes from __init__.py
+    registered = {}  # class_name -> module_path
 
     with open("scenes/__init__.py") as f:
         for line in f:
@@ -60,20 +61,69 @@ def scene_list():
                 # Clean up module path for display
                 module_path = module_path.lstrip(".")
                 module_path = module_path.replace("scenes.", "")
-                scenes.append((class_name, module_path))
+                registered[class_name] = module_path
 
-    # Sort alphabetically by class name
-    scenes.sort(key=lambda x: x[0].lower())
+    # Scan for all scene classes in the scenes directory
+    all_scenes = {}  # class_name -> (module_path, file_path)
+    scene_class_pattern = re.compile(r"^class\s+(\w+)\s*\(\s*Scene\s*\)\s*:")
 
-    # Calculate column width for formatting
-    max_name_len = max(len(s[0]) for s in scenes) if scenes else 0
+    for root, dirs, files in os.walk("scenes"):
+        # Skip __pycache__ directories
+        dirs[:] = [d for d in dirs if d != "__pycache__"]
 
-    print(f"\nDetected Scenes ({len(scenes)} total):\n")
+        for file in files:
+            if not file.endswith(".py"):
+                continue
+            if file.startswith("__") or file == "blank.py":
+                continue
+
+            file_path = os.path.join(root, file)
+            # Convert file path to module path
+            module_path = file_path.replace("scenes/", "").replace("/", ".").replace("\\", ".")[:-3]
+
+            with open(file_path) as f:
+                try:
+                    content = f.read()
+                    for match in scene_class_pattern.finditer(content):
+                        class_name = match.group(1)
+                        all_scenes[class_name] = (module_path, file_path)
+                except Exception:
+                    pass
+
+    # Find unregistered scenes
+    unregistered = []
+    for class_name, (module_path, file_path) in all_scenes.items():
+        if class_name not in registered:
+            unregistered.append((class_name, module_path, file_path))
+
+    # Sort both lists
+    registered_list = sorted(registered.items(), key=lambda x: x[0].lower())
+    unregistered.sort(key=lambda x: x[0].lower())
+
+    # Calculate column width
+    all_names = [name for name, _ in registered_list] + [name for name, _, _ in unregistered]
+    max_name_len = max(len(n) for n in all_names) if all_names else 0
+
+    # Print registered scenes
+    print(f"\nRegistered Scenes ({len(registered_list)}):\n")
     print(f"{'Scene Name':<{max_name_len + 2}} Module Path")
-    print("-" * (max_name_len + 2 + 30))
+    print("-" * (max_name_len + 2 + 35))
 
-    for class_name, module_path in scenes:
+    for class_name, module_path in registered_list:
         print(f"{class_name:<{max_name_len + 2}} {module_path}")
+
+    # Print unregistered scenes if any
+    if unregistered:
+        print(f"\nUnregistered Scenes ({len(unregistered)}):\n")
+        print(f"{'Scene Name':<{max_name_len + 2}} File Path")
+        print("-" * (max_name_len + 2 + 35))
+
+        for class_name, module_path, file_path in unregistered:
+            print(f"{class_name:<{max_name_len + 2}} {file_path}")
+
+        print("\nTo register a scene, add an import to scenes/__init__.py")
+    else:
+        print("\nAll scenes are registered.")
 
     print()
 
