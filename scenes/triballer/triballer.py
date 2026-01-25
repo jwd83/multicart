@@ -46,6 +46,9 @@ class TriBaller(Scene):
         self.standard_stroke_color = (0, 0, 0)
         self.standard_stroke_thickness = 1
 
+        # Load background image
+        self.bg_image = pygame.image.load("assets/triballer/triballerbg.png").convert()
+
         # Initialize level
         self.start_new_game()
 
@@ -239,17 +242,8 @@ class TriBaller(Scene):
 
     def draw(self):
         """Draw the game."""
-        # Fill background
-        self.screen.fill((20, 20, 40))
-
-        # Draw playfield background
-        pygame.draw.rect(
-            self.screen,
-            (30, 30, 50),
-            (PLAYFIELD_LEFT - 5, PLAYFIELD_TOP - 5,
-             PLAYFIELD_WIDTH + 10, SHOOTER_Y - PLAYFIELD_TOP + 20),
-            border_radius=5
-        )
+        # Draw background
+        self.screen.blit(self.bg_image, (0, 0))
 
         # Draw danger line
         danger_y = PLAYFIELD_TOP + DANGER_ROW * BUBBLE_DIAMETER
