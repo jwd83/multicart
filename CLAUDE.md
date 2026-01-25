@@ -44,13 +44,13 @@ uv add <package>
 ### Running the Game
 ```bash
 # Run the main game
-uv run python main.py
+uv run main.py
 
 # Create a new scene
-uv run python main.py scene new
+uv run main.py scene new
 
 # List all available scenes
-uv run python main.py scene list
+uv run main.py scene list
 ```
 
 ### Building for Different Platforms
@@ -65,10 +65,10 @@ build-web.bat
 ### Color Palette Swapping (Swappy Tool)
 ```bash
 # Generate color palette CSV from image folder
-uv run python swappy.py <source_folder> <output.csv>
+uv run swappy.py <source_folder> <output.csv>
 
 # Apply palette swap using CSV
-uv run python swappy.py <source_folder> <palette.csv> <target_folder>
+uv run swappy.py <source_folder> <palette.csv> <target_folder>
 ```
 
 ### FastAPI Server (QuadBlox multiplayer)
@@ -77,7 +77,7 @@ uv run python swappy.py <source_folder> <palette.csv> <target_folder>
 uv pip install -r requirements.txt
 
 # Run the multiplayer game server
-uv run python qbfastapi.py
+uv run qbfastapi.py
 
 # Server runs on port 8000 by default, or PORT environment variable
 ```
