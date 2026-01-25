@@ -37,6 +37,45 @@ def scene():
 
     if sys.argv[2] == "new":
         scene_new()
+    elif sys.argv[2] == "list":
+        scene_list()
+
+
+def scene_list():
+    """List all detected scenes by parsing scenes/__init__.py"""
+    import re
+
+    scenes = []
+
+    with open("scenes/__init__.py") as f:
+        for line in f:
+            # Match import patterns like:
+            # from .folder.module import ClassName
+            # from scenes.module import ClassName
+            match = re.match(
+                r"from\s+([\w.]+)\s+import\s+(\w+)", line.strip()
+            )
+            if match:
+                module_path, class_name = match.groups()
+                # Clean up module path for display
+                module_path = module_path.lstrip(".")
+                module_path = module_path.replace("scenes.", "")
+                scenes.append((class_name, module_path))
+
+    # Sort alphabetically by class name
+    scenes.sort(key=lambda x: x[0].lower())
+
+    # Calculate column width for formatting
+    max_name_len = max(len(s[0]) for s in scenes) if scenes else 0
+
+    print(f"\nDetected Scenes ({len(scenes)} total):\n")
+    print(f"{'Scene Name':<{max_name_len + 2}} Module Path")
+    print("-" * (max_name_len + 2 + 30))
+
+    for class_name, module_path in scenes:
+        print(f"{class_name:<{max_name_len + 2}} {module_path}")
+
+    print()
 
 
 def scene_new():

@@ -48,6 +48,9 @@ uv run python main.py
 
 # Create a new scene
 uv run python main.py scene new
+
+# List all available scenes
+uv run python main.py scene list
 ```
 
 ### Building for Different Platforms
