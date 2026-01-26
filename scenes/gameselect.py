@@ -21,6 +21,7 @@ class GameSelect(Scene):
         self.standard_font_size = 15
 
         self.opts = {
+            "GeometryBlast": "Geometry Blast",
             "RayCaster": "Ray Caster",
             "JackNinjasTitle": "Jack Ninjas",
             "JackNinjasEditor": "Jack Ninjas Editor",
