@@ -24,17 +24,17 @@ BALL_SPEED = 8
 AIM_MIN_ANGLE = 10
 AIM_MAX_ANGLE = 170
 
-# Pastel colors from QuadBlox (indices 1-7 are bubble colors)
+# Vibrant colors for better contrast (indices 1-7 are bubble colors)
 # Index 0 is empty, index 8 is white for highlight
 COLORS = [
     (0, 0, 0),        # 0 - empty/black
-    "#ffadad",        # 1 - pink
-    "#ffd6a5",        # 2 - orange
-    "#fdffb6",        # 3 - yellow
-    "#caffbf",        # 4 - green
-    "#9bf6ff",        # 5 - cyan
-    "#a0c4ff",        # 6 - blue
-    "#bdb2ff",        # 7 - purple
+    "#ff4757",        # 1 - red
+    "#ff6b35",        # 2 - orange (red-orange)
+    "#fff000",        # 3 - yellow (bright yellow)
+    "#32cd32",        # 4 - green (lime green)
+    "#00bfff",        # 5 - cyan (deep sky blue)
+    "#4169e1",        # 6 - blue (royal blue)
+    "#a55eea",        # 7 - purple
 ]
 
 # Number of colors to use (can be adjusted for difficulty)
