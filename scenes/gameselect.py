@@ -53,18 +53,18 @@ class GameSelect(Scene):
         self.play_music("sounds/music.wav")
 
     def update(self):
-        if pygame.K_ESCAPE in self.game.just_pressed and not settings.WASM:
+        if self.game.input["cancel"].just_pressed and not settings.WASM:
             self.game.quit = True
 
-        if pygame.K_DOWN in self.game.just_pressed:
+        if self.game.input["down"].just_pressed:
             self.selected = (self.selected + 1) % len(self.opts)
             self.play_sound("click")
 
-        if pygame.K_UP in self.game.just_pressed:
+        if self.game.input["up"].just_pressed:
             self.selected = (self.selected - 1) % len(self.opts)
             self.play_sound("click")
 
-        if pygame.K_RETURN in self.game.just_pressed:
+        if self.game.input["confirm"].just_pressed:
             if self.selected != len(self.opts) - 1:
                 self.play_sound("jsxfr-select")
 

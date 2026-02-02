@@ -3,11 +3,13 @@ import pygame
 
 
 class GameController:
-    def __init__(self, joystick, mappings):
+    def __init__(self, joystick, mappings, verbose=False):
 
         self.reset()
+        self.verbose = verbose
 
-        print(f"Hats on Joystick: {joystick.get_numhats()}")
+        if self.verbose:
+            print(f"Hats on Joystick: {joystick.get_numhats()}")
 
         self.joystick = joystick
         self.instance_id = joystick.get_instance_id()
@@ -19,13 +21,10 @@ class GameController:
     def extract_lookup(self, lookup):
         for k in self.mappings:
             if k.startswith(lookup + ":"):
-                print(f"Found lookup, {lookup}, at {k}")
-
                 # return the value of the mapping after the colon
                 return k.split(":")[1]
 
     def build_lookups(self):
-        print(f"Lookups before build: {self.lookups}")
         # build the lookups
         self.lookups["a"] = int(self.extract_lookup("a")[1:])
         self.lookups["b"] = int(self.extract_lookup("b")[1:])
@@ -53,7 +52,6 @@ class GameController:
             # grab the hat number in the character after the h
             hat_num = int(dpup[1:2])
 
-            print(f"dpad bound to hat: {hat_num}")
             self.lookups["up"] = hat_num
             self.lookups["down"] = hat_num
             self.lookups["left"] = hat_num
@@ -67,10 +65,6 @@ class GameController:
             self.lookups["down"] = int(self.extract_lookup("dpdown")[1:])
             self.lookups["left"] = int(self.extract_lookup("dpleft")[1:])
             self.lookups["right"] = int(self.extract_lookup("dpright")[1:])
-
-        print(f"dpad_up: {dpup}")
-
-        print(f"Lookups after build: {self.lookups}")
 
     def reset(self):
         self.held = []
@@ -120,9 +114,6 @@ class GameController:
         # we only care about events that are related to this joystick
         if event.instance_id != self.instance_id:
             return
-
-        # handle the event
-        print(f"Handling event: {event}")
 
     # logic for handling a generic hat input each frame
     def __update_hat_input(self, button):
@@ -266,13 +257,6 @@ class GameController:
             self.__update_hat_input("left")
             self.__update_hat_input("right")
 
-        # if the hat is not (0,0) lets print it out for now
-        hat_count = 0
-        for hat in self.hats:
-            if hat != (0, 0):
-                print(f"hat {hat_count}: {hat}")
-            hat_count += 1
-
 
 # returns the string representation of the platform the script is running on
 # in the format expected by the gamecontrollerdb.txt file. Returns 'unknown' if
@@ -333,7 +317,6 @@ def parse_file(field, value):
 
         # if we found a match, return the mappings
         if match_found:
-            print(f"Match found: {l_name} [{l_guid}] on {l_platform}")
             return l_mappings
 
         # print(f"Processing line. Fields count: {fields_count}, guid: {l_guid}, name: {l_name}, mappings: {l_mappings}, platform: {l_platform}")

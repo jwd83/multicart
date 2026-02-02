@@ -43,10 +43,10 @@ class Menu(Scene):
 
     def update(self):
 
-        if pygame.K_ESCAPE in self.game.just_pressed:
+        if self.game.input["cancel"].just_pressed:
             self.game.scene_pop = True
 
-        if pygame.K_LEFT in self.game.just_pressed:
+        if self.game.input["left"].just_pressed:
             if self.selected == 0:
                 self.game.volume_effects = (self.game.volume_effects - 10) % 110
                 self.create_text()
@@ -54,7 +54,7 @@ class Menu(Scene):
                 self.game.volume_music = (self.game.volume_music - 10) % 110
                 self.create_text()
 
-        if pygame.K_RIGHT in self.game.just_pressed:
+        if self.game.input["right"].just_pressed:
             if self.selected == 0:
                 self.game.volume_effects = (self.game.volume_effects + 10) % 110
                 self.create_text()
@@ -62,7 +62,7 @@ class Menu(Scene):
                 self.game.volume_music = (self.game.volume_music + 10) % 110
                 self.create_text()
 
-        if pygame.K_RETURN in self.game.just_pressed:
+        if self.game.input["confirm"].just_pressed:
 
             if self.selected == 0:
                 self.game.volume_effects = (self.game.volume_effects + 10) % 110
@@ -81,11 +81,11 @@ class Menu(Scene):
             if self.selected == 4 and not settings.WASM:
                 self.game.quit = True
 
-        if pygame.K_UP in self.game.just_pressed:
+        if self.game.input["up"].just_pressed:
             self.selected = (self.selected - 1) % len(self.options)
             self.play_sound("click")
 
-        if pygame.K_DOWN in self.game.just_pressed:
+        if self.game.input["down"].just_pressed:
             self.selected = (self.selected + 1) % len(self.options)
             self.play_sound("click")
 

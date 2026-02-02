@@ -7,7 +7,17 @@ import sys
 import asyncio
 import configparser
 import time
-from gamecontrollerdb import GameController
+from gamecontrollerdb import GameController, mappings_by_guid
+
+
+class InputAction:
+    """Represents the state of a single input action (e.g., 'jump')."""
+
+    def __init__(self):
+        self.pressed = False  # Currently held down
+        self.just_pressed = False  # Pressed this frame
+        self.just_released = False  # Released this frame
+        self.axis = 0.0  # For analog values (-1.0 to 1.0)
 
 
 class Game:
@@ -17,6 +27,14 @@ class Game:
         pygame.mixer.init()
         pygame.mixer.set_num_channels(64)
         pygame.joystick.init()
+
+        # Initialize controllers
+        self.controllers = []
+        self._init_controllers()
+
+        # Initialize unified input system
+        self.input = {}
+        self._init_input_actions()
 
         self.debug_scene = None
         self.console = None
@@ -384,6 +402,12 @@ class Game:
                 self.just_mouse_down.append(event.button)
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.just_mouse_up.append(event.button)
+            elif event.type == pygame.JOYDEVICEADDED:
+                print("Controller connected!")
+                self._init_controllers()
+            elif event.type == pygame.JOYDEVICEREMOVED:
+                print("Controller disconnected!")
+                self._init_controllers()
 
         # check if ctrl and backquote was pressed to instantly quit the game
         if pygame.K_BACKQUOTE in self.just_pressed and (
@@ -400,6 +424,180 @@ class Game:
         # check for F11 to toggle the debug setting
         if pygame.K_F11 in self.just_pressed:
             settings.DEBUG = not settings.DEBUG
+
+        # Update all connected controllers
+        for controller in self.controllers:
+            controller.update()
+
+        # Merge keyboard + controller into unified input
+        self._update_unified_input()
+
+    def _init_controllers(self):
+        """Detect and initialize any connected game controllers."""
+        # Default Xbox-style mapping for controllers not in the database
+        DEFAULT_XBOX_MAPPINGS = [
+            "a:b0", "b:b1", "x:b2", "y:b3",
+            "leftshoulder:b4", "rightshoulder:b5",
+            "back:b6", "start:b7",
+            "leftstick:b8", "rightstick:b9",
+            "leftx:a0", "lefty:a1",
+            "rightx:a2", "righty:a3",
+            "lefttrigger:a4", "righttrigger:a5",
+            "dpup:h0.1", "dpdown:h0.4", "dpleft:h0.8", "dpright:h0.2",
+        ]
+
+        self.controllers = []
+        joystick_count = pygame.joystick.get_count()
+
+        for i in range(joystick_count):
+            joystick = pygame.joystick.Joystick(i)
+            guid = joystick.get_guid()
+            mappings = mappings_by_guid(guid)
+
+            if not mappings:
+                # Use default Xbox mapping as fallback
+                mappings = DEFAULT_XBOX_MAPPINGS
+                print(f"Using default Xbox mapping for: {joystick.get_name()}")
+
+            controller = GameController(joystick, mappings)
+            self.controllers.append(controller)
+            print(f"Controller ready: {joystick.get_name()}")
+
+    def _init_input_actions(self):
+        """Initialize all input action slots."""
+        actions = [
+            "left",
+            "right",
+            "up",
+            "down",
+            "jump",
+            "dash",
+            "throw",
+            "menu",
+            "confirm",
+            "cancel",
+            "inventory",
+        ]
+        for action in actions:
+            self.input[action] = InputAction()
+
+    def _update_unified_input(self):
+        """Merge keyboard and controller input into unified input dict."""
+        STICK_DEADZONE = 0.3
+
+        # Get primary controller (if any)
+        ctrl = self.controllers[0] if self.controllers else None
+
+        # Helper to update an action's state
+        def update_action(action_name, kb_pressed, kb_just_pressed, ctrl_pressed, ctrl_just_pressed):
+            action = self.input[action_name]
+            new_pressed = kb_pressed or ctrl_pressed
+            new_just_pressed = kb_just_pressed or ctrl_just_pressed
+
+            # Track just_released transition
+            if not new_pressed and action.pressed:
+                action.just_released = True
+            else:
+                action.just_released = False
+
+            # Track just_pressed
+            if new_just_pressed or (new_pressed and not action.pressed):
+                action.just_pressed = True
+            else:
+                action.just_pressed = False
+
+            action.pressed = new_pressed
+
+        # Movement - Left
+        kb_left_pressed = self.pressed[pygame.K_LEFT] or self.pressed[pygame.K_a]
+        kb_left_just = pygame.K_LEFT in self.just_pressed or pygame.K_a in self.just_pressed
+        ctrl_left_pressed = False
+        ctrl_left_just = False
+        if ctrl:
+            ctrl_left_pressed = "left" in ctrl.held or ctrl.l_thumb[0] < -STICK_DEADZONE
+            ctrl_left_just = "left" in ctrl.pressed
+        update_action("left", kb_left_pressed, kb_left_just, ctrl_left_pressed, ctrl_left_just)
+        self.input["left"].axis = ctrl.l_thumb[0] if ctrl and ctrl.l_thumb[0] < -STICK_DEADZONE else (-1.0 if kb_left_pressed else 0.0)
+
+        # Movement - Right
+        kb_right_pressed = self.pressed[pygame.K_RIGHT] or self.pressed[pygame.K_d]
+        kb_right_just = pygame.K_RIGHT in self.just_pressed or pygame.K_d in self.just_pressed
+        ctrl_right_pressed = False
+        ctrl_right_just = False
+        if ctrl:
+            ctrl_right_pressed = "right" in ctrl.held or ctrl.l_thumb[0] > STICK_DEADZONE
+            ctrl_right_just = "right" in ctrl.pressed
+        update_action("right", kb_right_pressed, kb_right_just, ctrl_right_pressed, ctrl_right_just)
+        self.input["right"].axis = ctrl.l_thumb[0] if ctrl and ctrl.l_thumb[0] > STICK_DEADZONE else (1.0 if kb_right_pressed else 0.0)
+
+        # Movement - Up
+        kb_up_pressed = self.pressed[pygame.K_UP] or self.pressed[pygame.K_w]
+        kb_up_just = pygame.K_UP in self.just_pressed or pygame.K_w in self.just_pressed
+        ctrl_up_pressed = False
+        ctrl_up_just = False
+        if ctrl:
+            ctrl_up_pressed = "up" in ctrl.held or ctrl.l_thumb[1] < -STICK_DEADZONE
+            ctrl_up_just = "up" in ctrl.pressed
+        update_action("up", kb_up_pressed, kb_up_just, ctrl_up_pressed, ctrl_up_just)
+
+        # Movement - Down
+        kb_down_pressed = self.pressed[pygame.K_DOWN] or self.pressed[pygame.K_s]
+        kb_down_just = pygame.K_DOWN in self.just_pressed or pygame.K_s in self.just_pressed
+        ctrl_down_pressed = False
+        ctrl_down_just = False
+        if ctrl:
+            ctrl_down_pressed = "down" in ctrl.held or ctrl.l_thumb[1] > STICK_DEADZONE
+            ctrl_down_just = "down" in ctrl.pressed
+        update_action("down", kb_down_pressed, kb_down_just, ctrl_down_pressed, ctrl_down_just)
+
+        # Jump - Space/W/Up + Controller A
+        kb_jump_pressed = self.pressed[pygame.K_SPACE]
+        kb_jump_just = pygame.K_SPACE in self.just_pressed
+        ctrl_jump_pressed = ctrl and "a" in ctrl.held
+        ctrl_jump_just = ctrl and "a" in ctrl.pressed
+        update_action("jump", kb_jump_pressed, kb_jump_just, ctrl_jump_pressed, ctrl_jump_just)
+
+        # Dash - X key + Controller X
+        kb_dash_pressed = self.pressed[pygame.K_x]
+        kb_dash_just = pygame.K_x in self.just_pressed
+        ctrl_dash_pressed = ctrl and "x" in ctrl.held
+        ctrl_dash_just = ctrl and "x" in ctrl.pressed
+        update_action("dash", kb_dash_pressed, kb_dash_just, ctrl_dash_pressed, ctrl_dash_just)
+
+        # Throw - Z key (held) + Controller Y (held)
+        kb_throw_pressed = self.pressed[pygame.K_z]
+        kb_throw_just = pygame.K_z in self.just_pressed
+        ctrl_throw_pressed = ctrl and "y" in ctrl.held
+        ctrl_throw_just = ctrl and "y" in ctrl.pressed
+        update_action("throw", kb_throw_pressed, kb_throw_just, ctrl_throw_pressed, ctrl_throw_just)
+
+        # Menu - Escape + Controller Start
+        kb_menu_pressed = self.pressed[pygame.K_ESCAPE]
+        kb_menu_just = pygame.K_ESCAPE in self.just_pressed
+        ctrl_menu_pressed = ctrl and "start" in ctrl.held
+        ctrl_menu_just = ctrl and "start" in ctrl.pressed
+        update_action("menu", kb_menu_pressed, kb_menu_just, ctrl_menu_pressed, ctrl_menu_just)
+
+        # Inventory - I key + Controller Select/Back
+        kb_inv_pressed = self.pressed[pygame.K_i]
+        kb_inv_just = pygame.K_i in self.just_pressed
+        ctrl_inv_pressed = ctrl and "select" in ctrl.held
+        ctrl_inv_just = ctrl and "select" in ctrl.pressed
+        update_action("inventory", kb_inv_pressed, kb_inv_just, ctrl_inv_pressed, ctrl_inv_just)
+
+        # Confirm - Enter/Space + Controller A
+        kb_confirm_pressed = self.pressed[pygame.K_RETURN] or self.pressed[pygame.K_SPACE]
+        kb_confirm_just = pygame.K_RETURN in self.just_pressed or pygame.K_SPACE in self.just_pressed
+        ctrl_confirm_pressed = ctrl and "a" in ctrl.held
+        ctrl_confirm_just = ctrl and "a" in ctrl.pressed
+        update_action("confirm", kb_confirm_pressed, kb_confirm_just, ctrl_confirm_pressed, ctrl_confirm_just)
+
+        # Cancel - Escape + Controller B
+        kb_cancel_pressed = self.pressed[pygame.K_ESCAPE]
+        kb_cancel_just = pygame.K_ESCAPE in self.just_pressed
+        ctrl_cancel_pressed = ctrl and "b" in ctrl.held
+        ctrl_cancel_just = ctrl and "b" in ctrl.pressed
+        update_action("cancel", kb_cancel_pressed, kb_cancel_just, ctrl_cancel_pressed, ctrl_cancel_just)
 
     def valid_scene_name(self, scene: str):
         found: bool = scene in dir(scenes)

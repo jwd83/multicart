@@ -122,58 +122,36 @@ class JackNinjas(Scene):
 
     def update(self):
 
-        # need to rewrite the hell out of this one...
-        if pygame.K_ESCAPE in self.game.just_pressed:
+        # Menu
+        if self.game.input["menu"].just_pressed:
             self.game.scene_push = "Menu"
 
-        # movement input
-        if (
-            pygame.K_LEFT in self.game.just_pressed
-            or pygame.K_a in self.game.just_pressed
-        ):
+        # Movement input (supports keyboard and controller)
+        if self.game.input["left"].just_pressed:
             self.movement[0] = True
-        if (
-            pygame.K_RIGHT in self.game.just_pressed
-            or pygame.K_d in self.game.just_pressed
-        ):
+        if self.game.input["right"].just_pressed:
             self.movement[1] = True
 
-        if (
-            pygame.K_LEFT in self.game.just_released
-            or pygame.K_a in self.game.just_released
-        ):
+        if self.game.input["left"].just_released:
             self.movement[0] = False
-        if (
-            pygame.K_RIGHT in self.game.just_released
-            or pygame.K_d in self.game.just_released
-        ):
+        if self.game.input["right"].just_released:
             self.movement[1] = False
 
-        if (
-            pygame.K_SPACE in self.game.just_pressed
-            or pygame.K_w in self.game.just_pressed
-            or pygame.K_UP in self.game.just_pressed
-        ):
+        # Jump
+        if self.game.input["jump"].just_pressed:
             self.player.jump()
 
-        if pygame.K_x in self.game.just_pressed:
+        # Dash
+        if self.game.input["dash"].just_pressed:
             self.player.dash()
 
-        if pygame.K_i in self.game.just_pressed:
+        # Inventory
+        if self.game.input["inventory"].just_pressed:
             self.game.scene_push = "JackNinjasInventory"
 
-        if self.game.pressed[pygame.K_z]:
+        # Throw (held)
+        if self.game.input["throw"].pressed:
             self.player.throw_glaive()
-
-        # if pygame.K_z in self.game.just_pressed:
-        #     self.player.throw_glaive()
-
-        # jack's optional q code for testing
-        # if pygame.K_q in self.game.just_pressed:
-        #     self.inventory.append("double_jump")
-        #     self.inventory.append("glaive")
-
-        # TODO - rewrite the joystick/gamepad input logic.
 
     def draw(self):
         self.display.fill((0, 0, 0, 0))  # pure transparency
