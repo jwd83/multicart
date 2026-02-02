@@ -10,11 +10,10 @@ class JackNinjasTitle(Scene):
         self.title_image = load_tpng("jackninjas/jack-ninjas-title-360p.png")
 
     def update(self):
-        # if the user presses escape or F5 key, quit the event loop.
-        if pygame.K_ESCAPE in self.game.just_pressed:
+        if self.game.input["cancel"].just_pressed:
             self.game.scene_replace = "Menu"
 
-        if pygame.K_RETURN in self.game.just_pressed:
+        if self.game.input["confirm"].just_pressed:
             self.game.scene_replace = "JackNinjas"
 
     def draw(self):
