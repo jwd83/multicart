@@ -749,10 +749,9 @@ class GeometryBlast(Scene):
         if self.wave_announcement > 0:
             self.wave_announcement -= 1
 
-        # Handle escape
-        if pygame.K_ESCAPE in self.game.just_pressed:
+        # Menu
+        if self.game.input["menu"].just_pressed:
             self.game.scene_push = "Menu"
-            return
 
         # Handle game over state
         if self.state == "gameover":
