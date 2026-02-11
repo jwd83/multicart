@@ -320,15 +320,10 @@ class Game:
     def get_events_and_input(self):
         # get input
         self.unicode = ""
-        self.pressed = pygame.key.get_pressed()
         self.just_pressed = []
         self.just_released = []
         self.just_mouse_down = []
         self.just_mouse_up = []
-
-        # capture the list of modifiers being held down
-        ctrl = pygame.key.get_mods() & pygame.KMOD_CTRL
-        alt = pygame.key.get_mods() & pygame.KMOD_ALT
 
         # get events
         for event in pygame.event.get():
@@ -387,7 +382,7 @@ class Game:
                     reject_unicode = True
 
                 # check ctrl or alt are being held down
-                if ctrl or alt:
+                if event.mod & (pygame.KMOD_CTRL | pygame.KMOD_ALT):
                     reject_unicode = True
 
                 if not reject_unicode:
@@ -408,6 +403,9 @@ class Game:
             elif event.type == pygame.JOYDEVICEREMOVED:
                 print("Controller disconnected!")
                 self._init_controllers()
+
+        # get key state AFTER processing events so pressed[] is in sync
+        self.pressed = pygame.key.get_pressed()
 
         # check if ctrl and backquote was pressed to instantly quit the game
         if pygame.K_BACKQUOTE in self.just_pressed and (

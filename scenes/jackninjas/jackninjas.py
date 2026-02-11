@@ -17,6 +17,7 @@ from typing import List
 class JackNinjas(Scene):
     def __init__(self, game):
         super().__init__(game)
+        self.throwable_weapons = ("glaive", "boomerang")
         # define this at startup so it's ready for for the first load
         self.collectible_map = {
             0: "double_jump",
@@ -26,7 +27,9 @@ class JackNinjas(Scene):
 
         # this will store the list of items the player has collected
         self.inventory = []
+        self.active_weapon = None
         self.game.inventory = self.inventory
+        self.game.jack_ninjas_active_weapon = self.active_weapon
 
         # we will render at 320x180 and then scale it up
         self.display = pygame.Surface((320, 180), pygame.SRCALPHA)
@@ -78,9 +81,24 @@ class JackNinjas(Scene):
         # setup screenshake variables
         self.screen_shake = 0
 
+    def sync_active_weapon(self):
+        # Keep active weapon valid and mirrored to the shared game state.
+        if self.active_weapon in self.throwable_weapons and self.active_weapon in self.inventory:
+            self.game.jack_ninjas_active_weapon = self.active_weapon
+            return
+
+        self.active_weapon = None
+        for weapon in self.throwable_weapons:
+            if weapon in self.inventory:
+                self.active_weapon = weapon
+                break
+
+        self.game.jack_ninjas_active_weapon = self.active_weapon
+
     def load_level(self, map_id):
         self.player.health = self.player.health_max
         self.tilemap.load("assets/jackninjas/maps/" + str(map_id) + ".json")
+        self.sync_active_weapon()
 
         # setup leaf spawners
         self.leaf_spawners = []
@@ -121,6 +139,10 @@ class JackNinjas(Scene):
         sys.exit()
 
     def update(self):
+        selected_weapon = getattr(self.game, "jack_ninjas_active_weapon", None)
+        if selected_weapon in self.throwable_weapons and selected_weapon in self.inventory:
+            self.active_weapon = selected_weapon
+        self.sync_active_weapon()
 
         # Menu
         if self.game.input["menu"].just_pressed:
@@ -213,6 +235,9 @@ class JackNinjas(Scene):
                 item_to_add = self.collectible_map.get(collectible["variant"], None)
                 if item_to_add and item_to_add not in self.inventory:
                     self.inventory.append(item_to_add)
+                    if item_to_add in self.throwable_weapons and self.active_weapon is None:
+                        self.active_weapon = item_to_add
+                    self.sync_active_weapon()
 
             self.display.blit(
                 self.assets["collectibles"][collectible["variant"]],

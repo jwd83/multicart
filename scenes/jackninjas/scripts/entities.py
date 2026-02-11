@@ -271,10 +271,19 @@ class Player(PhysicsEntity):
         if t - self.throw_last > self.throw_cooldown:
             self.throw_last = t
 
-            if self.has("glaive") or self.has("boomerang"):
-                self.scene.play_sound("throw")
+            active_weapon = getattr(self.scene, "active_weapon", None)
+            if active_weapon not in {"glaive", "boomerang"}:
+                return False
 
-            if self.has("glaive"):
+            if not self.has(active_weapon):
+                self.scene.sync_active_weapon()
+                active_weapon = getattr(self.scene, "active_weapon", None)
+                if active_weapon not in {"glaive", "boomerang"}:
+                    return False
+
+            self.scene.play_sound("throw")
+
+            if active_weapon == "glaive":
                 p_rotation_speed = -1000 if self.flip else 1000
                 p_velocity = -4 if self.flip else 4
 
@@ -288,8 +297,9 @@ class Player(PhysicsEntity):
                         flip=not self.flip,
                     )
                 )
+                return True
 
-            if self.has("boomerang"):
+            if active_weapon == "boomerang":
                 p_rotation_speed = -1000 if self.flip else 1000
                 p_velocity = -5 if self.flip else 5
 
@@ -303,6 +313,9 @@ class Player(PhysicsEntity):
                         flip=not self.flip,
                     )
                 )
+                return True
+
+        return False
 
     def max_jumps(self) -> int:
         return 2 if self.has("double_jump") else 1
