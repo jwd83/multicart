@@ -25,7 +25,8 @@ class RayCaster(Scene):
         super().__init__(game)
 
         self.assets = {
-            "bricks": load_image("textures/bricks-bg-tiles.png"),
+            "bricks": load_image("textures/tiles/02_mossy_dungeon_brick.png"),
+            # "bricks": load_image("textures/bricks-bg-tiles.png"),
             "chandelier-old": load_image("textures/chandelier.png"),
             "chandelier": Animation(
                 load_images(
@@ -33,7 +34,8 @@ class RayCaster(Scene):
                 ),
                 img_dur=20,
             ),
-            "flag": load_image("textures/flag.png"),
+            # "flag": load_image("textures/flag.png"),
+            "flag": load_image("textures/tiles/05_skull_relief.png"),
             "icon-ammo": load_image("textures/icon-ammo.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
