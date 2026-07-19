@@ -152,6 +152,18 @@ class Game:
             (640, 360), pygame.SRCALPHA, 32
         ).convert_alpha()
 
+    def __mouse_relative(self, enabled: bool):
+        """Enable/disable unbounded relative mouse motion. Falls back to
+        hiding + grabbing the cursor on drivers without relative mode
+        support (get_rel() is bounded by the window edges there)."""
+        try:
+            if pygame.mouse.get_relative_mode() != enabled:
+                pygame.mouse.set_relative_mode(enabled)
+        except pygame.error:
+            if pygame.mouse.get_visible() == enabled:
+                pygame.mouse.set_visible(not enabled)
+                pygame.event.set_grab(enabled)
+
     # pygbag requires this be async to run the game
     async def run(self):
         # create our debug and console scenes now so we can start logging
@@ -185,15 +197,13 @@ class Game:
 
             # check if the current scene is using mouse lock
             if self.scene[-1].mouse_lock:
-                if pygame.mouse.get_focused():
-                    if pygame.mouse.get_visible():
-                        pygame.mouse.set_visible(False)
-                        pygame.event.set_grab(True)
-                else:
-                    if not pygame.mouse.get_visible():
-                        pygame.mouse.set_visible(True)
-                        pygame.event.set_grab(False)
+                # relative mode hides the cursor and reports unbounded
+                # motion via get_rel() even when the cursor would have
+                # hit the window edge (grab alone pins the cursor at the
+                # edge and get_rel() stops reporting)
+                self.__mouse_relative(pygame.mouse.get_focused())
             else:
+                self.__mouse_relative(False)
                 # the current scene was NOT using mouse lock, check if it's using mouse hide
                 if self.scene[-1].mouse_hide:
 

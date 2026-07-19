@@ -25,7 +25,9 @@ class RayCaster(Scene):
         super().__init__(game)
 
         self.assets = {
-            "bricks": load_image("textures/tiles/02_mossy_dungeon_brick.png"),
+            "bricks": load_image(
+                "textures/tiles/02_mossy_dungeon_brick.png", colorkey=None
+            ),
             # "bricks": load_image("textures/bricks-bg-tiles.png"),
             "chandelier-old": load_image("textures/chandelier.png"),
             "chandelier": Animation(
@@ -35,7 +37,7 @@ class RayCaster(Scene):
                 img_dur=20,
             ),
             # "flag": load_image("textures/flag.png"),
-            "flag": load_image("textures/tiles/05_skull_relief.png"),
+            "flag": load_image("textures/tiles/05_skull_relief.png", colorkey=None),
             "icon-ammo": load_image("textures/icon-ammo.png"),
             "pistol": load_image("textures/pistol.png"),
             "rifle": load_image("textures/rifle.png"),
@@ -50,13 +52,14 @@ class RayCaster(Scene):
             "tree": load_image("textures/tree.png"),
             "telepad": load_image("textures/telepad.png"),
             "tree-big": load_image("textures/tree-big.png"),
-            "wood": load_image("textures/wood-bg-tiles.png"),
+            "wood": load_image("textures/wood-bg-tiles.png", colorkey=None),
         }
 
         self.texts = {}
         self.create_text_fields()
 
         self.mouse_lock = True
+        self.last_steer_frame = -10
 
         self.fov_degrees = 60
         self.fov_degrees_half = self.fov_degrees // 2
@@ -214,6 +217,15 @@ class RayCaster(Scene):
         if self.mouse_lock:
             # get the mouse movement
             mx, my = pygame.mouse.get_rel()
+
+            # discard motion that accumulated while this scene was not
+            # updating (e.g. the menu was open) so the camera doesn't
+            # snap when we regain control
+            frame = self.game.frame_count()
+            if frame - self.last_steer_frame > 1:
+                mx = 0
+            self.last_steer_frame = frame
+
             self.camera.angle += mx * 0.003
 
     def move_player(self):
@@ -605,7 +617,9 @@ class RayCaster(Scene):
         wp_y = self.wall_points[x, 1]
         texture_x = abs(wp_x - int(wp_x)) + abs(wp_y - int(wp_y))
         texture_x = self.constrain(texture_x, 0, 1)
-        texture_x = int(texture_x * wall_texture.get_width() - 1)
+        texture_x = min(
+            int(texture_x * wall_texture.get_width()), wall_texture.get_width() - 1
+        )
 
         wall_height = (1 / corrected_distance) * self.render_height
         wall_height = self.constrain(wall_height, 5, self.render_height * 4)
@@ -1068,7 +1082,10 @@ def load_image(path, colorkey=(0, 0, 0), alpha=False, scale=1):
         img = pygame.image.load(full_path).convert_alpha()
     else:
         img = pygame.image.load(full_path).convert()
-        img.set_colorkey(colorkey)
+        # colorkey=None keeps the image fully opaque (needed for wall
+        # textures that legitimately contain pure black pixels)
+        if colorkey is not None:
+            img.set_colorkey(colorkey)
 
     if scale != 1:
         img = pygame.transform.scale(
