@@ -52,7 +52,8 @@ class RayCaster(Scene):
             "tree": load_image("textures/tree.png"),
             "telepad": load_image("textures/telepad.png"),
             "tree-big": load_image("textures/tree-big.png"),
-            "wood": load_image("textures/wood-bg-tiles.png", colorkey=None),
+            "wood": load_image("textures/tiles/10_ossuary.png", colorkey=None),
+            #"wood": load_image("textures/wood-bg-tiles.png", colorkey=None),
         }
 
         self.texts = {}
