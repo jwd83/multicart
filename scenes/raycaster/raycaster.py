@@ -19,6 +19,10 @@ from classes import *
 BASE_IMAGE_PATH = "assets/raycaster/"
 PI_2 = math.pi * 2
 
+# a tile boundary belongs to the tile on its far side, so a body snapped to
+# exactly wall_padding away still reads as touching. back off by a hair
+WALL_SNAP_EPSILON = 1e-6
+
 
 class RayCaster(Scene):
     def __init__(self, game):
@@ -68,10 +72,21 @@ class RayCaster(Scene):
         self.fov_rad_half = math.radians(self.fov_degrees_half)
 
         self.level = LevelMap(1, self)
-        self.camera = Camera(self.level.pos_camera_start)
+
+        # stand in the middle of the start tile, the same way monsters and
+        # level objects are placed, so the player never starts inside the
+        # wall padding
+        self.camera = Camera(
+            (self.level.pos_camera_start[0] + 0.5, self.level.pos_camera_start[1] + 0.5)
+        )
+
+        # how close the player may get to a wall, in tiles
+        self.wall_padding = 0.25
+
         self.commands = {
             "ammo": self.command_ammo,
             "camera": self.command_camera,
+            "invert": self.command_invert,
             "monsters": self.command_monsters,
             "spawn": self.command_spawn,
         }
@@ -85,6 +100,18 @@ class RayCaster(Scene):
         self.wall_textures = np.zeros(self.render_width)
         self.display = self.make_surface((self.render_width, self.render_height))
         self.display_scaled = self.make_surface((self.game.WIDTH, self.game.HEIGHT))
+
+        # vertical look. the cast itself stays 2d - pitching up or down slides
+        # the horizon line and shears the whole view with it, the way the old
+        # dos shooters faked looking around
+        self.proj_dist = (self.render_width / 2) / math.tan(self.fov_rad_half)
+        self.pitch_max = math.radians(30)
+        self.pitch_offset_max = int(math.tan(self.pitch_max) * self.proj_dist) + 1
+        self.horizon = self.render_height // 2
+        self.mouse_sensitivity = 0.003
+        self.mouse_invert_y = False
+        self.backdrop = self.make_backdrop()
+
         self.inventory = ["pistol", "rifle"]
         self.ammo = 30
         self.spawn_rate = 60
@@ -93,6 +120,46 @@ class RayCaster(Scene):
         self.weapon_fire_rate = 7
         self.weapon_fire_show = 3
         self.shoot_cooldown = 0
+
+    def make_backdrop(self):
+        """pre-render the floor and ceiling as a single gradient strip.
+
+        it is taller than the screen by the most we can ever shear the view
+        so it can just slide with the horizon when the player looks up or
+        down. shading toward the horizon gives the flat colors some depth.
+        """
+        floor_color = (120, 120, 120)
+        ceiling_color = (160, 160, 165)
+        far_shade = 0.55
+
+        height = self.render_height + self.pitch_offset_max * 2
+        horizon = height // 2
+        surface = pygame.Surface((self.render_width, height)).convert()
+
+        for y in range(height):
+            if y < horizon:
+                color = ceiling_color
+                # 0 at the horizon (far away), 1 at the top of the view
+                pct = (horizon - y) / horizon
+            else:
+                color = floor_color
+                pct = (y - horizon) / (height - horizon)
+
+            shade = far_shade + (1 - far_shade) * pct
+            pygame.draw.line(
+                surface,
+                [int(c * shade) for c in color],
+                (0, y),
+                (self.render_width, y),
+            )
+
+        return surface
+
+    def update_horizon(self):
+        # where the eye level sits on screen for the camera's current pitch
+        self.horizon = int(
+            self.render_height // 2 + math.tan(self.camera.pitch) * self.proj_dist
+        )
 
     def create_text_fields(self):
         self.texts["ammo"] = self.Text(
@@ -131,6 +198,14 @@ class RayCaster(Scene):
         self.log(
             f"Camera Angle:    {self.camera.angle} ({math.degrees(self.camera.angle)})"
         )
+        self.log(
+            f"Camera Pitch:    {self.camera.pitch} ({math.degrees(self.camera.pitch)})"
+        )
+        self.log(f"Horizon:         {self.horizon}")
+
+    def command_invert(self):
+        self.mouse_invert_y = not self.mouse_invert_y
+        self.log(f"Mouse Y invert: {self.mouse_invert_y}")
 
     def update(self):
         self.update_player()
@@ -203,8 +278,23 @@ class RayCaster(Scene):
         if self.game.pressed[pygame.K_RIGHT] or self.game.pressed[pygame.K_e]:
             self.camera.angle += turn_factor
 
+    def keyboard_pitch(self):
+
+        pitch_factor = 0.03
+
+        # look up/down (page up/page down, home re-centers)
+        if self.game.pressed[pygame.K_PAGEUP]:
+            self.camera.pitch += pitch_factor
+
+        if self.game.pressed[pygame.K_PAGEDOWN]:
+            self.camera.pitch -= pitch_factor
+
+        if pygame.K_HOME in self.game.just_pressed:
+            self.camera.pitch = 0
+
     def turn_player(self):
         self.keyboard_steer()
+        self.keyboard_pitch()
         self.mouse_steer()
 
         # cap the angle to 2pi
@@ -213,6 +303,11 @@ class RayCaster(Scene):
 
         while self.camera.angle < 0:
             self.camera.angle += PI_2
+
+        # the pitch does not wrap, it stops before straight up/down
+        self.camera.pitch = self.constrain(
+            self.camera.pitch, -self.pitch_max, self.pitch_max
+        )
 
     def mouse_steer(self):
         if self.mouse_lock:
@@ -224,10 +319,16 @@ class RayCaster(Scene):
             # snap when we regain control
             frame = self.game.frame_count()
             if frame - self.last_steer_frame > 1:
-                mx = 0
+                mx = my = 0
             self.last_steer_frame = frame
 
-            self.camera.angle += mx * 0.003
+            if self.mouse_invert_y:
+                my = -my
+
+            self.camera.angle += mx * self.mouse_sensitivity
+
+            # screen y grows downward, so pushing the mouse away looks up
+            self.camera.pitch -= my * self.mouse_sensitivity
 
     def move_player(self):
 
@@ -273,12 +374,49 @@ class RayCaster(Scene):
             )
 
     def relocate_player(self, new_pos):
-        if not self.level.wall_collision(new_pos):
+        # keep a gap between the player and the wall, otherwise you can walk
+        # right up against it and the texture swallows the screen
+        if not self.level.wall_collision(new_pos, self.wall_padding):
             self.camera.pos = new_pos
-        elif not self.level.wall_collision((new_pos[0], self.camera.pos[1])):
-            self.camera.pos = (new_pos[0], self.camera.pos[1])
-        elif not self.level.wall_collision((self.camera.pos[0], new_pos[1])):
-            self.camera.pos = (self.camera.pos[0], new_pos[1])
+            return
+
+        # blocked, so resolve one axis at a time. that snaps us flush against
+        # the padding instead of stopping a whole step short, and lets us keep
+        # sliding along the wall we walked into
+        x = self.slide_axis(self.camera.pos[0], new_pos[0], self.camera.pos[1], 0)
+        y = self.slide_axis(self.camera.pos[1], new_pos[1], x, 1)
+
+        self.camera.pos = (x, y)
+
+    def slide_axis(self, current, target, other, axis):
+        """move one axis toward target, stopping wall_padding from the block.
+
+        current/target are the coordinate on the axis we are moving, other is
+        the fixed coordinate on the axis we are not. returns where we ended up.
+        """
+        pad = self.wall_padding
+
+        def at(value):
+            return (value, other) if axis == 0 else (other, value)
+
+        if not self.level.wall_collision(at(target), pad):
+            return target
+
+        if target > current:
+            # walked into the near face of the tile ahead of us
+            snapped = math.floor(target + pad) - pad - WALL_SNAP_EPSILON
+            snapped = max(current, snapped)
+        else:
+            # walked into the far face of the tile behind us
+            snapped = math.floor(target - pad) + 1 + pad + WALL_SNAP_EPSILON
+            snapped = min(current, snapped)
+
+        # the snap can still be blocked by the other axis, e.g. an inside
+        # corner, in which case we just do not move on this axis
+        if self.level.wall_collision(at(snapped), pad):
+            return current
+
+        return snapped
 
     def update_player(self):
 
@@ -378,13 +516,11 @@ class RayCaster(Scene):
                 break  # only hit 1 monster, no more piercing
 
     def draw(self):
-        floor_color = (120, 120, 120)
-        ceiling_color = (160, 160, 165)
-        self.display.fill(ceiling_color)
-        pygame.draw.rect(
-            self.display,
-            floor_color,
-            (0, self.render_height // 2, self.render_width, self.render_height // 2),
+        self.update_horizon()
+
+        # slide the floor/ceiling strip so its horizon lines up with ours
+        self.display.blit(
+            self.backdrop, (0, self.horizon - self.backdrop.get_height() // 2)
         )
 
         self.draw_walls()
@@ -471,6 +607,11 @@ class RayCaster(Scene):
         elif self.weapon == "rifle":
             self.draw_rifle()
 
+    def weapon_pitch_shift(self):
+        # let the weapon sink a little when looking up and lift when looking
+        # down, so the hands feel attached to the head
+        return (self.horizon - self.render_height // 2) * 0.25
+
     def draw_rifle(self):
 
         asset = self.assets["rifle"]
@@ -479,7 +620,7 @@ class RayCaster(Scene):
 
         x = self.render_width // 2 - asset.get_width() // 2
 
-        y = self.render_height - asset.get_height()
+        y = self.render_height - asset.get_height() + self.weapon_pitch_shift()
 
         if self.move_start:
 
@@ -502,7 +643,11 @@ class RayCaster(Scene):
 
         x = self.render_width // 3 * 2
 
-        y = self.render_height - self.assets["pistol"].get_height()
+        y = (
+            self.render_height
+            - self.assets["pistol"].get_height()
+            + self.weapon_pitch_shift()
+        )
 
         if self.move_start:
             traversal = 5
@@ -570,8 +715,8 @@ class RayCaster(Scene):
 
             wall_height = (1 / corrected_distance) * self.render_height
             wall_height = self.constrain(wall_height, 5, self.render_height * 4)
-            wh_top = (self.render_height // 2) - (wall_height // 2)
-            wh_bottom = (self.render_height // 2) + (wall_height // 2)
+            wh_top = self.horizon - (wall_height // 2)
+            wh_bottom = self.horizon + (wall_height // 2)
             left = x - scaled.get_width() // 2
             top = wh_bottom - scaled.get_height()
             # draw the object at bottom of the wall
@@ -624,7 +769,7 @@ class RayCaster(Scene):
 
         wall_height = (1 / corrected_distance) * self.render_height
         wall_height = self.constrain(wall_height, 5, self.render_height * 4)
-        top = (self.render_height // 2) - (wall_height // 2)
+        top = self.horizon - (wall_height // 2)
 
         self.display.blit(
             pygame.transform.scale(
@@ -875,6 +1020,7 @@ class Camera:
     def __init__(self, pos=(0, 0)):
         self.pos = pos
         self.angle = 0
+        self.pitch = 0  # vertical look in radians, positive looks up
 
 
 class LevelMap:
@@ -976,11 +1122,32 @@ class LevelMap:
 
                 self.monsters.append(mob)
 
-    def wall_collision(self, pos=(0, 0)) -> bool:
+    def wall_collision(self, pos=(0, 0), radius: float = 0.0) -> bool:
+        """check if pos is inside a wall, or within radius tiles of one.
 
-        x = int(pos[0])
-        y = int(pos[1])
-        return self.map[x, y] > 0
+        radius is a half extent, so the four corners of the box around pos
+        are sampled. that covers any radius under half a tile, which is all
+        we need to keep a body from touching the wall it is beside.
+        """
+
+        # de-duped so the common case (a body well inside one tile) is a
+        # single lookup, same as the old point test
+        xs = {math.floor(pos[0] - radius), math.floor(pos[0] + radius)}
+        ys = {math.floor(pos[1] - radius), math.floor(pos[1] + radius)}
+
+        for x in xs:
+            for y in ys:
+                # anything off the edge of the map counts as solid
+                if x < 0 or x >= self.map_width:
+                    return True
+
+                if y < 0 or y >= self.map_height:
+                    return True
+
+                if self.map[x, y] > 0:
+                    return True
+
+        return False
 
     def monster_collisions(
         self, pos=(0, 0), radius: float = 1.0, ignore: None | list = None
